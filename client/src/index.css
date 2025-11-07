@@ -1,7 +1,26 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
-  @apply bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark antialiased;
+  @apply bg-background-light dark:bg-background-dark font-sans text-text-light dark:text-text-dark antialiased;
+}
+
+/* Headings use Poppins (font-display) */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display;
+}
+
+/* Utility class to use the Material Icons Outlined font for icon ligatures */
+.material-icons-outlined {
+  font-family: 'Material Icons Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: inherit;
+  line-height: 1;
+  display: inline-block;
+  text-transform: none;
+  speak: none;
 }
 
 .grid-bg-light {

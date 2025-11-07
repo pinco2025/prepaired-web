@@ -21,6 +21,16 @@ module.exports = {
       },
       fontFamily: {
         display: ["Poppins", "sans-serif"],
+        sans: [
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica',
+          'Arial',
+          'sans-serif'
+        ],
       },
       borderRadius: {
         DEFAULT: "0.5rem",
