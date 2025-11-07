@@ -1,3 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+body {
+  @apply bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark antialiased;
+}
+
+.grid-bg-light {
+  background-image:
+    linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+}
+
+.grid-bg-dark {
+  background-image:
+    linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+}
