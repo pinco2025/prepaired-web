@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 body {
-  @apply bg-background-light dark:bg-background-dark font-sans text-text-light dark:text-text-dark antialiased;
+  /* Background color is handled by the app-level background layer so the grid shows through. */
+  @apply font-sans text-text-light dark:text-text-dark antialiased;
 }
 
 /* Headings use Poppins (font-display) */

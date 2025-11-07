@@ -19,8 +19,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-background-light dark:bg-background-dark">
-      <div className="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10"></div>
+    <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">

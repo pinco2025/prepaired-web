@@ -35,31 +35,43 @@ const Header: React.FC = () => {
                 className="text-sm font-semibold text-primary border-b-2 border-primary pb-1"
                 href="#"
               >
-                Dashboard
+                Home
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
                 href="#"
               >
-                Practice
+                Subjects
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
                 href="#"
               >
-                Tests
+                Revision
+              </a>
+              <a
+                className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
+                href="#"
+              >                
+                Test &  Analysis
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
                 href="#"
               >
-                Analytics
+                Mentorship
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
                 href="#"
               >
-                Resources
+                Advanced Material
+              </a>
+              <a
+                className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
+                href="#"
+              >
+                Schedule & Routine
               </a>
             </div>
           </div>
