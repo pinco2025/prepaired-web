@@ -1,0 +1,129 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../utils/supabaseClient';
+
+const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      navigate('/');
+    } catch (error: any) {
+      alert(error.error_description || error.message);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center relative px-4">
+      <div className="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10"></div>
+      <div className="w-full max-w-md">
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <img
+            alt="prepAIred logo"
+            className="h-10 w-10"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdzj_WfIjmmM52JXz4zKQrlQgJkA4UmPvuySjzEbq9Bsdj31RsY7ncfFrEi-fD-BWSo0ZTpLvMe7hOv0DP_1JXMQbL8BW_EgaawiBsr0daDGG68D4iJN_47bGlm98RGzILkKm4sgrjxbv04CENGDP2nGSO6OWmZ8vg5Q9-vdcYbpfJrfN1QRe-Abx_bYN4iP1dZnaJMNe-Jycl4XN4_crPSiEv3ULZH5fzZGU9CbUHu7gVaJ3NCZ4o0LRozC1uo6aoEl7HLrY5k_En"
+          />
+          <span className="text-3xl font-bold text-text-light dark:text-text-dark">
+            prep<span className="text-primary">AI</span>red
+          </span>
+        </div>
+        <div className="bg-surface-light dark:bg-surface-dark p-8 rounded-xl shadow-card-light dark:shadow-card-dark">
+          <h1 className="text-2xl font-bold text-center text-text-light dark:text-text-dark mb-2">Welcome Back</h1>
+          <p className="text-center text-text-secondary-light dark:text-text-secondary-dark mb-8">
+            Login to continue your preparation.
+          </p>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark" htmlFor="email">
+                Email
+              </label>
+              <div className="mt-1">
+                <input
+                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm"
+                  id="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark" htmlFor="password">
+                  Password
+                </label>
+                <a className="text-sm font-medium text-primary hover:underline" href="#">
+                  Forgot Password?
+                </a>
+              </div>
+              <div className="mt-1">
+                <input
+                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm"
+                  id="password"
+                  name="password"
+                  required
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <button
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                type="submit"
+              >
+                Login
+              </button>
+            </div>
+          </form>
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border-light dark:border-border-dark"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-surface-light dark:bg-surface-dark text-text-secondary-light dark:text-text-secondary-dark">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            <div className="mt-6">
+              <a
+                className="w-full inline-flex justify-center py-2.5 px-4 border border-border-light dark:border-border-dark rounded-md shadow-sm bg-surface-light dark:bg-surface-dark text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-background-dark"
+                href="#"
+              >
+                <span className="sr-only">Login with Google</span>
+                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"></path>
+                </svg>
+                <span className="ml-3">Login with Google</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="mt-8 text-center">
+          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+            Don't have an account?
+            <a className="font-medium text-primary hover:underline" href="#">
+              Sign Up
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
