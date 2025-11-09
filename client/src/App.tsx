@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import RequireAuth from './components/RequireAuth';
+import ComingSoon from './components/ComingSoon';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const AppContent: React.FC = () => {
             </RequireAuth>
           }
         />
+        <Route path="/coming-soon" element={<ComingSoon />} />
       </Routes>
     </div>
   );
