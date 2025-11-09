@@ -73,43 +73,43 @@ const Header: React.FC = () => {
             <div className="hidden md:flex items-center space-x-6">
               <a
                 className="text-sm font-semibold text-primary border-b-2 border-primary pb-1"
-                href="#"
+                href="/"
               >
-                Home
+                Dashboard
               </a>
               <a
-                className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
+                className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors opacity-50 cursor-not-allowed"
                 href="#"
               >
                 Subjects
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
-                href="#"
+                href="/coming-soon"
               >
                 Revision
               </a>
               <a
-                className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
+                className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors opacity-50 cursor-not-allowed"
                 href="#"
               >                
                 Test &  Analysis
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
-                href="#"
+                href="/coming-soon"
               >
                 Mentorship
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
-                href="#"
+                href="/coming-soon"
               >
                 Advanced Material
               </a>
               <a
                 className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
-                href="#"
+                href="/coming-soon"
               >
                 Schedule & Routine
               </a>
