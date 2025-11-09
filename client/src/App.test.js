@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import App from './App';
+import AuthContext, { AuthProvider } from './contexts/AuthContext';
 
 test('renders welcome message', () => {
   render(
-    <MemoryRouter>
+    <AuthProvider>
       <App />
-    </MemoryRouter>
+    </AuthProvider>
   );
-  const linkElement = screen.getByText(/Welcome back, Alex!/i);
+  const linkElement = screen.getByText(/Welcome to prepAIred/i);
   expect(linkElement).toBeInTheDocument();
 });

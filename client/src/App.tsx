@@ -9,6 +9,7 @@ import ComingSoon from './components/ComingSoon';
 import { AuthProvider } from './contexts/AuthContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
 import HomePlaceholder from './components/HomePlaceholder';
+import Subjects from './components/Subjects';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -38,6 +39,14 @@ const AppContent: React.FC = () => {
           element={
             <RequireAuth>
               <AdminPlaceholder />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/subjects"
+          element={
+            <RequireAuth>
+              <Subjects />
             </RequireAuth>
           }
         />
