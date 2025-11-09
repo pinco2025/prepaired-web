@@ -82,7 +82,11 @@ const Header: React.FC = () => {
               ) : (
                 <>
                   <a
-                    className="text-sm font-semibold text-primary border-b-2 border-primary pb-1"
+                    className={
+                      location.pathname === '/dashboard'
+                        ? 'text-sm font-semibold text-primary border-b-2 border-primary pb-1'
+                        : 'text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors'
+                    }
                     href="/dashboard"
                     onClick={(e) => {
                       e.preventDefault();
@@ -92,12 +96,21 @@ const Header: React.FC = () => {
                   >
                     Dashboard
                   </a>
-                  <span
-                    className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark transition-colors opacity-50 cursor-not-allowed"
-                    aria-disabled
+                  <a
+                    className={
+                      location.pathname === '/subjects'
+                        ? 'text-sm font-semibold text-primary border-b-2 border-primary pb-1'
+                        : 'text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors'
+                    }
+                    href="/subjects"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!user) navigate('/login');
+                      else navigate('/subjects');
+                    }}
                   >
                     Subjects
-                  </span>
+                  </a>
                   <a
                     className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
                     href="/coming-soon"
