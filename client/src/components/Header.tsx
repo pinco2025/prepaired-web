@@ -1,7 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import { User } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data) {
+        setUser(data.user);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     if (darkMode) {
@@ -13,6 +31,28 @@ const Header: React.FC = () => {
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
   };
 
   return (
@@ -79,13 +119,49 @@ const Header: React.FC = () => {
             <button onClick={toggleDarkMode} className="w-10 h-10 rounded-full flex items-center justify-center text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
               <span className="material-icons-outlined">{darkMode ? 'light_mode' : 'dark_mode'}</span>
             </button>
-            <button className="ml-4 w-10 h-10 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
-              <img
-                alt="User profile picture"
-                className="w-10 h-10 rounded-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHE3oUlM1yUb7TA8XdWQV26WNdHzcgBDSKirGjXJIdxcOt5I09wPGatmTzwvZ-v8L8w-jPYAcySvVhjDZxdFNtQcHuxuydZ_luTJLKBeLxGz4fZl1bDm5NxbGWchY27b1ZydID7ghZJmMq6GSuBo0taVI_RRmVifP0b70PpM3btYMLVoRMdBXGhwwrDElzljgyoI9FbZIn8pSLFH0axsXyHGbcCPoCl2HG6R_vzcK3HrsyGv1OMaOwkcAXSX-uxUsV21-SnO9-vbyo"
-              />
-            </button>
+            <div className="relative" ref={menuRef}>
+              <button onClick={toggleMenu} className="ml-4 w-10 h-10 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
+                <img
+                  alt="User profile picture"
+                  className="w-10 h-10 rounded-full object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHE3oUlM1yUb7TA8XdWQV26WNdHzcgBDSKirGjXJIdxcOt5I09wPGatmTzwvZ-v8L8w-jPYAcySvVhjDZxdFNtQcHuxuydZ_luTJLKBeLxGz4fZl1bDm5NxbGWchY27b1ZydID7ghZJmMq6GSuBo0taVI_RRmVifP0b70PpM3btYMLVoRMdBXGhwwrDElzljgyoI9FbZIn8pSLFH0axsXyHGbcCPoCl2HG6R_vzcK3HrsyGv1OMaOwkcAXSX-uxUsV21-SnO9-vbyo"
+                />
+              </button>
+              <div
+                className={`absolute top-14 right-0 w-64 bg-surface-light dark:bg-surface-dark rounded-xl shadow-dropdown-light dark:shadow-dropdown-dark border border-border-light dark:border-border-dark overflow-hidden z-20 transition-all duration-300 ease-in-out transform ${
+                  isMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                }`}
+              >
+                <div className="p-4 border-b border-border-light dark:border-border-dark">
+                  <p className="font-semibold text-text-light dark:text-text-dark truncate">
+                    {user?.user_metadata.full_name || 'Alex Johnson'}
+                    </p>
+                    <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">
+                      {user?.email || 'alex.johnson@example.com'}
+                    </p>
+                  </div>
+                  <nav className="py-2">
+                    <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
+                      <span className="material-symbols-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> person </span>
+                      <span>Edit Profile</span>
+                    </a>
+                    <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
+                      <span className="material-symbols-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> settings </span>
+                      <span>Settings</span>
+                    </a>
+                    <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
+                      <span className="material-symbols-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> help_center </span>
+                      <span>Help Center</span>
+                    </a>
+                  </nav>
+                  <div className="p-2">
+                    <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-xl"> logout </span>
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+            </div>
           </div>
         </div>
       </nav>
