@@ -43,11 +43,11 @@ const SignUp: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center relative px-4">
       <div className="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10"></div>
       <div className="w-full max-w-md">
-        <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="flex items-center justify-center gap-3 h-24">
           <img
             alt="prepAIred logo"
             className="h-10 w-10"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdzj_WfIjmmM52JXz4zKQrlQgJkA4UmPvuySjzEbq9Bsdj31RsY7ncfFrEi-fD-BWSo0ZTpLvMe7hOv0DP_1JXMQbL8BW_EgaawiBsr0daDGG68D4iJN_47bGlm98RGzILkKm4sgrjxbv04CENGDP2nGSO6OWmZ8vg5Q9-vdcYbpfJrfN1QRe-Abx_bYN4iP1dZnaJMNe-Jycl4XN4_crPSiEv3ULZH5fzZGU9CbUHu7gVaJ3NCZ4o0LRozC1uo6aoEl7HLrY5k_En"
+            src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000"
           />
           <span className="text-3xl font-bold text-text-light dark:text-text-dark">
             prep<span className="text-primary">AI</span>red
@@ -65,7 +65,7 @@ const SignUp: React.FC = () => {
               </label>
               <div className="mt-1">
                 <input
-                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm"
+                  className="block w-full h-10 leading-[48px] rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm text-left px-4"
                   id="fullname"
                   name="fullname"
                   placeholder="John Doe"
@@ -82,7 +82,7 @@ const SignUp: React.FC = () => {
               </label>
               <div className="mt-1">
                 <input
-                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm"
+                  className="block w-full h-10 leading-[48px] rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm text-left px-4"
                   id="email"
                   name="email"
                   placeholder="you@example.com"
@@ -99,7 +99,7 @@ const SignUp: React.FC = () => {
               </label>
               <div className="mt-1 relative">
                 <input
-                  className="block w-full rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm"
+                  className="block w-full h-10 leading-[48px] rounded-md border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary shadow-sm text-left px-4"
                   id="password"
                   name="password"
                   required
@@ -110,7 +110,7 @@ const SignUp: React.FC = () => {
                 <button
                   type="button"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-2.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary focus:outline-none"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   <span className="material-icons-outlined select-none" aria-hidden="true">
