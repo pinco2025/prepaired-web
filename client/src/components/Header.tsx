@@ -8,7 +8,7 @@ const Header: React.FC = () => {
   const location = useLocation();
   const [darkMode, setDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, subscriptionType } = useAuth();
+  const { user, subscriptionType, fullName, email } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
   const isHome = location.pathname === '/';
 
@@ -169,10 +169,10 @@ const Header: React.FC = () => {
                     >
                       <div className="p-4 border-b border-border-light dark:border-border-dark">
                         <p className="font-semibold text-text-light dark:text-text-dark truncate">
-                          {user?.user_metadata?.full_name || 'Alex Johnson'}
+                          {(fullName ?? user?.user_metadata?.full_name) || 'Alex Johnson'}
                         </p>
                         <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">
-                          {user?.email || 'alex.johnson@example.com'}
+                          {(email ?? user?.email) || 'alex.johnson@example.com'}
                         </p>
                       </div>
                       <nav className="py-2">
