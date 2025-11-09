@@ -1,11 +1,33 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // If user is already authenticated, prevent access to login page
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const session = data?.session ?? null;
+        if (session && mounted) {
+          // already logged in -> redirect to home/dashboard
+          navigate('/', { replace: true });
+        }
+      } catch (err) {
+        // ignore errors here; allow login UI to show
+      }
+    };
+    check();
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -17,9 +39,25 @@ const Login: React.FC = () => {
         password,
       });
       if (error) throw error;
-      navigate('/');
+      const from = (location.state as any)?.from || '/';
+      navigate(from);
     } catch (error: any) {
       alert(error.error_description || error.message);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const from = (location.state as any)?.from || '/';
+      const redirectTo = from.startsWith('/') ? window.location.origin + from : from;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo },
+      });
+      if (error) throw error;
+      // signInWithOAuth will redirect the browser to Google; no further action here
+    } catch (err: any) {
+      alert(err.error_description || err.message || String(err));
     }
   };
 
@@ -112,16 +150,17 @@ const Login: React.FC = () => {
               </div>
             </div>
             <div className="mt-6">
-              <a
-                className="w-full inline-flex justify-center py-2.5 px-4 border border-border-light dark:border-border-dark rounded-md shadow-sm bg-surface-light dark:bg-surface-dark text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-background-dark"
-                href="#"
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-border-light dark:border-border-dark rounded-md shadow-sm bg-surface-light dark:bg-surface-dark text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-background-dark"
               >
                 <span className="sr-only">Login with Google</span>
                 <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"></path>
                 </svg>
                 <span className="ml-3">Login with Google</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>

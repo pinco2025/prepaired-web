@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 
@@ -8,6 +8,26 @@ const SignUp: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // If user is already authenticated, prevent access to register page
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const session = data?.session ?? null;
+        if (session && mounted) {
+          navigate('/', { replace: true });
+        }
+      } catch (err) {
+        // ignore and allow registration UI
+      }
+    };
+    check();
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
