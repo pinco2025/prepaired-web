@@ -6,6 +6,9 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import RequireAuth from './components/RequireAuth';
 import ComingSoon from './components/ComingSoon';
+import { AuthProvider } from './contexts/AuthContext';
+import AdminPlaceholder from './components/AdminPlaceholder';
+import HomePlaceholder from './components/HomePlaceholder';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -21,11 +24,20 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<SignUp />} />
+        <Route path="/" element={<HomePlaceholder />} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <RequireAuth>
               <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth>
+              <AdminPlaceholder />
             </RequireAuth>
           }
         />
@@ -38,7 +50,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 };
