@@ -142,28 +142,26 @@ const Header: React.FC = () => {
                   </div>
                   <nav className="py-2">
                     <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
-                      <span className="material-symbols-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> person </span>
+                      <span className="material-icons-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> person </span>
                       <span>Edit Profile</span>
                     </a>
                     <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
-                      <span className="material-symbols-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> settings </span>
+                      <span className="material-icons-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> settings </span>
                       <span>Settings</span>
                     </a>
                     <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
-                      <span className="material-symbols-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> help_center </span>
+                      <span className="material-icons-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> help_center </span>
                       <span>Help Center</span>
                     </a>
                   </nav>
-                  <div className="p-2">
-                    <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                      <span className="material-symbols-outlined text-xl"> logout </span>
+                    <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors">
+                      <span className="material-icons-outlined text-xl"> logout </span>
                       <span>Sign Out</span>
                     </button>
                   </div>
                 </div>
             </div>
           </div>
-        </div>
       </nav>
     </header>
   );
