@@ -4,7 +4,7 @@ const Subjects: React.FC = () => {
   return (
     <main className="flex-grow flex items-center justify-center">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Subjects</h1>
           <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1">
             Choose a subject to start your preparation.
@@ -18,8 +18,8 @@ const Subjects: React.FC = () => {
             <div className="flex flex-col items-center text-center">
               <div className="w-20 h-20 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
                 <span
-                  className="material-symbols-outlined text-4xl text-blue-500 dark:text-blue-400"
-                  style={{ fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
+                  className="material-icons-outlined text-4xl text-blue-500 dark:text-blue-400"
+                  style={{ fontSize: "32px", fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
                 >
                   rocket_launch
                 </span>
@@ -40,8 +40,8 @@ const Subjects: React.FC = () => {
             <div className="flex flex-col items-center text-center">
               <div className="w-20 h-20 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
                 <span
-                  className="material-symbols-outlined text-4xl text-green-500 dark:text-green-400"
-                  style={{ fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
+                  className="material-icons-outlined text-4xl text-green-500 dark:text-green-400"
+                  style={{ fontSize: "32px", fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
                 >
                   science
                 </span>
@@ -62,8 +62,8 @@ const Subjects: React.FC = () => {
             <div className="flex flex-col items-center text-center">
               <div className="w-20 h-20 flex items-center justify-center bg-orange-100 dark:bg-orange-900/30 rounded-full mb-4">
                 <span
-                  className="material-symbols-outlined text-4xl text-orange-500 dark:text-orange-400"
-                  style={{ fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
+                  className="material-icons-outlined text-4xl text-orange-500 dark:text-orange-400"
+                  style={{ fontSize: "32px", fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
                 >
                   calculate
                 </span>
@@ -84,8 +84,8 @@ const Subjects: React.FC = () => {
               <div className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 flex items-center justify-center bg-purple-100 dark:bg-purple-900/30 rounded-full mb-4">
                   <span
-                    className="material-symbols-outlined text-4xl text-purple-500 dark:text-purple-400"
-                    style={{ fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
+                    className="material-icons-outlined text-4xl text-purple-500 dark:text-purple-400"
+                    style={{ fontSize: "32px", fontVariationSettings: "'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48" }}
                   >
                     translate
                   </span>
