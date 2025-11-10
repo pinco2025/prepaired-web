@@ -10,6 +10,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
 import HomePlaceholder from './components/HomePlaceholder';
 import Subjects from './components/Subjects';
+import SubjectDetails from './components/SubjectDetails';
 import Tests from './components/Tests';
 
 const AppContent: React.FC = () => {
@@ -48,6 +49,14 @@ const AppContent: React.FC = () => {
           element={
             <RequireAuth>
               <Subjects />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/subjects/:subject/:grade"
+          element={
+            <RequireAuth>
+              <SubjectDetails />
             </RequireAuth>
           }
         />

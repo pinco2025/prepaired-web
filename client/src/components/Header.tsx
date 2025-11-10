@@ -98,7 +98,7 @@ const Header: React.FC = () => {
                   </a>
                   <a
                     className={
-                      location.pathname === '/subjects'
+                      location.pathname.startsWith('/subjects')
                         ? 'text-sm font-semibold text-primary border-b-2 border-primary pb-1'
                         : 'text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors'
                     }
