@@ -122,9 +122,21 @@ const Header: React.FC = () => {
                   >
                     Revision
                   </a>
-                  <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark transition-colors opacity-50 cursor-not-allowed">                
-                    Test &  Analysis
-                  </span>
+                  <a
+                    className={
+                      location.pathname === '/tests'
+                        ? 'text-sm font-semibold text-primary border-b-2 border-primary pb-1'
+                        : 'text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors'
+                    }
+                    href="/tests"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!user) navigate('/login');
+                      else navigate('/tests');
+                    }}
+                  >
+                    Test & Analysis
+                  </a>
                   <a
                     className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
                     href="/coming-soon"
