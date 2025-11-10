@@ -30,7 +30,7 @@ const SubjectDetails: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <h2 className="text-xl font-semibold text-text-light dark:text-text-dark">{section.title}</h2>
                 </div>
-                <span className="material-symbols-outlined chevron text-text-secondary-light dark:text-text-secondary-dark">chevron_right</span>
+                <span className="material-icons-outlined chevron text-text-secondary-light dark:text-text-secondary-dark">chevron_right</span>
               </summary>
               <div className="px-6 pb-6">
                 <div className="border-t border-border-light dark:border-border-dark pt-6 space-y-4">
