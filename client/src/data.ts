@@ -89,3 +89,52 @@ export const recommendations: RecommendationItem[] = [
     actionText: 'Take Quiz',
   },
 ];
+
+export interface Section {
+  title: string;
+  chapters: string[];
+}
+
+export interface SubjectDetailsData {
+  title: string;
+  sections: Section[];
+}
+
+export const subjectDetails: { [subject: string]: { [grade: string]: SubjectDetailsData } } = {
+  'chemistry': {
+    '11': {
+      title: 'Class 11 Chemistry',
+      sections: [
+        {
+          title: 'Physical Chemistry',
+          chapters: [
+            '1. Some Basic Concepts of Chemistry',
+            '2. Structure of Atom',
+            '3. States of Matter',
+            '4. Thermodynamics',
+            '5. Equilibrium',
+          ],
+        },
+        {
+          title: 'Inorganic Chemistry',
+          chapters: [
+            '6. Classification of Elements and Periodicity in Properties',
+            '7. Chemical Bonding and Molecular Structure',
+            '8. Redox Reactions',
+            '9. Hydrogen',
+            '10. The s-Block Elements',
+            '11. The p-Block Elements',
+          ],
+        },
+        {
+          title: 'Organic Chemistry',
+          chapters: [
+            '12. Organic Chemistry – Some Basic Principles and Techniques',
+            '13. Hydrocarbons',
+            '14. Environmental Chemistry',
+          ],
+        },
+      ],
+    }
+  }
+};

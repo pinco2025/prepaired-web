@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface GradeSelectionProps {
   subject: string;
@@ -7,6 +8,7 @@ interface GradeSelectionProps {
 
 const GradeSelection: React.FC<GradeSelectionProps> = ({ subject, onBack }) => {
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const navigate = useNavigate();
 
   const handleBack = () => {
     setIsFadingOut(true);
@@ -14,6 +16,10 @@ const GradeSelection: React.FC<GradeSelectionProps> = ({ subject, onBack }) => {
       onBack();
       setIsFadingOut(false);
     }, 300);
+  };
+
+  const handleGradeSelect = (grade: string) => {
+    navigate(`/subjects/${subject}/${grade}`);
   };
 
   return (
@@ -25,16 +31,16 @@ const GradeSelection: React.FC<GradeSelectionProps> = ({ subject, onBack }) => {
             <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1">Select your grade to begin.</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-16 lg:gap-24">
-            <a className="group" href="#">
+            <button className="group" onClick={() => handleGradeSelect('11')}>
               <div className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 flex items-center justify-center bg-surface-light dark:bg-surface-dark rounded-full shadow-card-light dark:shadow-card-dark grade-circle border-2 border-transparent group-hover:border-primary dark:group-hover:border-primary">
                 <span className="text-8xl font-bold text-primary">11</span>
               </div>
-            </a>
-            <a className="group" href="#">
+            </button>
+            <button className="group" onClick={() => handleGradeSelect('12')}>
               <div className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 flex items-center justify-center bg-surface-light dark:bg-surface-dark rounded-full shadow-card-light dark:shadow-card-dark grade-circle border-2 border-transparent group-hover:border-primary dark:group-hover:border-primary">
                 <span className="text-8xl font-bold text-primary">12</span>
               </div>
-            </a>
+            </button>
           </div>
           <div className="text-center mt-12">
             <button
