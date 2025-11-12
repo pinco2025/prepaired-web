@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { subjectDetails } from '../data';
 
 const SubjectDetails: React.FC = () => {
@@ -34,11 +34,18 @@ const SubjectDetails: React.FC = () => {
               </summary>
               <div className="px-6 pb-6">
                 <div className="border-t border-border-light dark:border-border-dark pt-6 space-y-4">
-                  {section.chapters.map((chapter, chapterIndex) => (
-                    <a key={chapterIndex} href="#" className="block text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors">
-                      {chapter}
-                    </a>
-                  ))}
+                  {section.chapters.map((chapter, chapterIndex) => {
+                    const chapterUrl = chapter.toLowerCase().replace(/\s+/g, '-');
+                    return (
+                      <Link
+                        key={chapterIndex}
+                        to={`/subjects/${subject}/${grade}/${chapterUrl}`}
+                        className="block text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary transition-colors"
+                      >
+                        {chapter}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </details>
