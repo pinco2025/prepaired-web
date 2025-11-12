@@ -135,6 +135,123 @@ export const subjectDetails: { [subject: string]: { [grade: string]: SubjectDeta
           ],
         },
       ],
-    }
-  }
+    },
+  },
+
+  'physics': {
+    '11': {
+      title: 'Class 11 Physics',
+      sections: [
+        {
+          title: 'Mechanics',
+          chapters: [
+            '1. Physical World',
+            '2. Units and Measurements',
+            '3. Motion in a Straight Line',
+            '4. Motion in a Plane',
+            '5. Laws of Motion',
+            '6. Work, Energy and Power',
+            '7. System of Particles and Rotational Motion',
+            '8. Gravitation',
+          ],
+        },
+        {
+          title: 'Thermodynamics & Waves',
+          chapters: [
+            '9. Mechanical Properties of Solids',
+            '10. Mechanical Properties of Fluids',
+            '11. Thermal Properties of Matter',
+            '12. Thermodynamics',
+            '13. Kinetic Theory',
+            '14. Oscillations',
+            '15. Waves',
+          ],
+        },
+      ],
+    },
+  },
+
+  'mathematics': {
+    '11': {
+      title: 'Class 11 Mathematics',
+      sections: [
+        {
+          title: 'Algebra',
+          chapters: [
+            '1. Sets',
+            '2. Relations and Functions',
+            '3. Trigonometric Functions',
+            '4. Principle of Mathematical Induction',
+            '5. Complex Numbers and Quadratic Equations',
+            '6. Linear Inequalities',
+            '7. Permutations and Combinations',
+          ],
+        },
+        {
+          title: 'Calculus & Geometry',
+          chapters: [
+            '8. Binomial Theorem',
+            '9. Sequences and Series',
+            '10. Straight Lines',
+            '11. Conic Sections',
+            '12. Introduction to Three-dimensional Geometry',
+            '13. Limits and Derivatives',
+          ],
+        },
+        {
+          title: 'Statistics & Probability',
+          chapters: [
+            '14. Mathematical Reasoning',
+            '15. Statistics',
+            '16. Probability',
+          ],
+        },
+      ],
+    },
+  },
+
+  'biology': {
+    '11': {
+      title: 'Class 11 Biology',
+      sections: [
+        {
+          title: 'Diversity of Living Organisms',
+          chapters: [
+            '1. The Living World',
+            '2. Biological Classification',
+            '3. Plant Kingdom',
+            '4. Animal Kingdom',
+          ],
+        },
+        {
+          title: 'Structural Organisation',
+          chapters: [
+            '5. Morphology of Flowering Plants',
+            '6. Anatomy of Flowering Plants',
+            '7. Structural Organisation in Animals',
+          ],
+        },
+        {
+          title: 'Cell & Physiology',
+          chapters: [
+            '8. Cell: The Unit of Life',
+            '9. Biomolecules',
+            '10. Cell Cycle and Cell Division',
+            '11. Transport in Plants',
+            '12. Mineral Nutrition',
+            '13. Photosynthesis in Higher Plants',
+            '14. Respiration in Plants',
+            '15. Plant Growth and Development',
+            '16. Digestion and Absorption',
+            '17. Breathing and Exchange of Gases',
+            '18. Body Fluids and Circulation',
+            '19. Excretory Products and Their Elimination',
+            '20. Locomotion and Movement',
+            '21. Neural Control and Coordination',
+            '22. Chemical Coordination and Integration',
+          ],
+        },
+      ],
+    },
+  },
 };
