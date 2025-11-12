@@ -11,6 +11,7 @@ import AdminPlaceholder from './components/AdminPlaceholder';
 import HomePlaceholder from './components/HomePlaceholder';
 import Subjects from './components/Subjects';
 import SubjectDetails from './components/SubjectDetails';
+import ChapterDetails from './components/ChapterDetails';
 import Tests from './components/Tests';
 
 const AppContent: React.FC = () => {
@@ -33,6 +34,14 @@ const AppContent: React.FC = () => {
           element={
             <RequireAuth>
               <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/subjects/:subject/:grade/:chapter"
+          element={
+            <RequireAuth>
+              <ChapterDetails />
             </RequireAuth>
           }
         />
