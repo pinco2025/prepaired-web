@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { fetchTestData, Test } from '../utils/testData';
+import { fetchTestData } from '../utils/testData';
+import { Test } from '../data';
 import { InlineMath } from 'react-katex';
 import { supabase } from '../utils/supabaseClient';
+
+type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
 
 const TestInterface: React.FC = () => {
   const [testData, setTestData] = useState<Test | null>(null);
@@ -9,6 +12,8 @@ const TestInterface: React.FC = () => {
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
   function renderMixedMath(text: string) {
     const parts = text.split(/(\$[^$]*\$)/g);
@@ -53,7 +58,30 @@ const TestInterface: React.FC = () => {
   useEffect(() => {
     const initializeTest = async () => {
       const data = fetchTestData();
-      setTestData(data);
+      const adaptedTestData: Test = {
+        id: data.testId,
+        testId: data.testId,
+        title: data.title,
+        description: `${data.duration / 60} minutes | ${data.totalMarks} Marks`,
+        duration: data.duration,
+        totalMarks: data.totalMarks,
+        totalQuestions: data.questions.length,
+        markingScheme: `Varies`,
+        instructions: [
+          'The test contains multiple-choice questions with a single correct answer.',
+          'Each correct answer will be awarded marks as per the question.',
+          'There is no negative marking for incorrect answers.',
+          'Unanswered questions will receive 0 marks.',
+          'You can navigate between questions and sections at any time during the test.',
+          'Ensure you have a stable internet connection throughout the duration of the test.',
+          'Do not close the browser window or refresh the page, as it may result in loss of progress.',
+          'The test will automatically submit once the timer runs out.',
+        ],
+        sections: data.sections,
+        questions: data.questions,
+      };
+      setTestData(adaptedTestData);
+      setQuestionStatuses(Array(data.questions.length).fill('notVisited'));
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -123,7 +151,12 @@ const TestInterface: React.FC = () => {
   }, [answers, testData]);
 
   const handleNext = () => {
-    if (testData && currentQuestionIndex < testData.questions.length - 1) {
+    if (testData && testData.questions && currentQuestionIndex < testData.questions.length - 1) {
+      const newQuestionStatuses = [...questionStatuses];
+      if (questionStatuses[currentQuestionIndex] === 'notVisited') {
+        newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+        setQuestionStatuses(newQuestionStatuses);
+      }
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -138,10 +171,35 @@ const TestInterface: React.FC = () => {
     if (currentQuestion) {
       setAnswers({ ...answers, [currentQuestion.id]: optionId });
       setSelectedOption(optionId);
+      const newQuestionStatuses = [...questionStatuses];
+      newQuestionStatuses[currentQuestionIndex] = 'answered';
+      setQuestionStatuses(newQuestionStatuses);
     }
   };
 
-  const currentQuestion = testData?.questions[currentQuestionIndex];
+  const handleMarkForReview = () => {
+    const newQuestionStatuses = [...questionStatuses];
+    if (currentQuestion && questionStatuses[currentQuestionIndex] !== 'markedForReview') {
+      newQuestionStatuses[currentQuestionIndex] = 'markedForReview';
+    } else if (currentQuestion) {
+      newQuestionStatuses[currentQuestionIndex] = answers[currentQuestion.id] ? 'answered' : 'notAnswered';
+    }
+    setQuestionStatuses(newQuestionStatuses);
+  };
+
+  const handlePaletteClick = (index: number) => {
+    const newQuestionStatuses = [...questionStatuses];
+    if (questionStatuses[currentQuestionIndex] === 'notVisited') {
+      newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+      setQuestionStatuses(newQuestionStatuses);
+    }
+    setCurrentQuestionIndex(index);
+  };
+
+  const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
+
+  const filteredQuestions = testData?.questions?.map((q, i) => ({ ...q, originalIndex: i }))
+    .filter(q => testData.sections && q.section === testData.sections[currentSectionIndex].name) || [];
 
   useEffect(() => {
     if (currentQuestion) {
@@ -157,7 +215,7 @@ const TestInterface: React.FC = () => {
             <>
               <div className="flex items-start justify-between mb-6">
                 <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">
-                  Question {currentQuestionIndex + 1} of {testData?.questions.length}
+                  Question {currentQuestionIndex + 1} of {testData?.questions?.length}
                 </h2>
                 <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-3 py-1 rounded-full">
                   {currentQuestion.section}
@@ -204,13 +262,18 @@ const TestInterface: React.FC = () => {
             <span className="material-icons-outlined">arrow_back</span>
             Previous
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors">
-            <span className="material-icons-outlined">bookmark_border</span>
+<button
+            onClick={handleMarkForReview}
+            className="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors"
+          >
+            <span className="material-icons-outlined">
+              {questionStatuses[currentQuestionIndex] === 'markedForReview' ? 'bookmark' : 'bookmark_border'}
+            </span>
             Mark for Review
           </button>
           <button
             onClick={handleNext}
-            disabled={!testData || currentQuestionIndex === testData.questions.length - 1}
+            disabled={!testData || !testData.questions || currentQuestionIndex === testData.questions.length - 1}
             className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-primary hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             Next
@@ -226,16 +289,37 @@ const TestInterface: React.FC = () => {
           </span>
         </div>
         <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
+        <div className="flex items-center justify-center space-x-2 mb-4">
+          {testData?.sections?.map((section, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSectionIndex(index)}
+              className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+                currentSectionIndex === index
+                  ? 'bg-primary text-white'
+                  : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
+              }`}
+            >
+              {section.name}
+            </button>
+          ))}
+        </div>
         <div className="grid grid-cols-5 gap-2">
-          {Array.from({ length: 10 }, (_, i) => (
-            <button key={i} className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${
-              i + 1 === 1 ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500' :
-              i + 1 === 3 ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500' :
-              i + 1 === 4 || i + 1 === 7 ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500' :
-              i + 1 === 5 ? 'bg-primary text-white ring-2 ring-primary-focus' :
-              'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
-            }`}>
-              {i + 1}
+          {filteredQuestions.map((question, index) => (
+            <button
+              key={question.id}
+              onClick={() => handlePaletteClick(question.originalIndex)}
+              className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${
+                questionStatuses[question.originalIndex] === 'answered'
+                  ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
+                  : questionStatuses[question.originalIndex] === 'notAnswered'
+                  ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500'
+                  : questionStatuses[question.originalIndex] === 'markedForReview'
+                  ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
+                  : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
+              } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
+            >
+              {index + 1}
             </button>
           ))}
         </div>
