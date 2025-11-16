@@ -1,98 +1,155 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { fetchTestData, Test } from '../utils/testData';
+import { InlineMath } from 'react-katex';
+import { io, Socket } from 'socket.io-client';
+import { supabase } from '../utils/supabaseClient';
 
 const TestInterface: React.FC = () => {
+  const [testData, setTestData] = useState<Test | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<{[key: string]: string}>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  const handleSubmit = useCallback(async () => {
+    if (testData) {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const submission = {
+          test_id: testData.testId,
+          answers: answers,
+          user_id: user.id,
+        };
+
+        const { error } = await supabase
+          .from('submissions')
+          .insert([submission]);
+
+        if (error) {
+          console.error('Error submitting test:', error);
+        } else {
+          console.log('Test submitted successfully!');
+          // You might want to redirect the user or show a success message here
+        }
+      } else {
+        console.error('User not logged in');
+        // Handle case where user is not logged in
+      }
+    }
+  }, [answers, testData]);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:4000');
+
+    const data = fetchTestData();
+    setTestData(data);
+    setTimeLeft(data.duration);
+    newSocket.emit('start-timer', data.duration);
+
+    const savedAnswers = localStorage.getItem(`test-answers-${data.testId}`);
+    if (savedAnswers) {
+      setAnswers(JSON.parse(savedAnswers));
+    }
+
+    newSocket.on('time-update', (time) => {
+      setTimeLeft(time);
+    });
+
+    newSocket.on('time-up', () => {
+      handleSubmit();
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [handleSubmit]);
+
+  useEffect(() => {
+    if (testData) {
+      localStorage.setItem(`test-answers-${testData.testId}`, JSON.stringify(answers));
+    }
+  }, [answers, testData]);
+
+  const handleNext = () => {
+    if (testData && currentQuestionIndex < testData.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleSelectOption = (optionId: string) => {
+    if (currentQuestion) {
+      setAnswers({ ...answers, [currentQuestion.id]: optionId });
+      setSelectedOption(optionId);
+    }
+  };
+
+  const currentQuestion = testData?.questions[currentQuestionIndex];
+
+  useEffect(() => {
+    if (currentQuestion) {
+      setSelectedOption(answers[currentQuestion.id] || null);
+    }
+  }, [currentQuestion, answers]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col">
         <div className="flex-grow">
-          <div className="flex items-start justify-between mb-6">
-            <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">Question 5 of 90</h2>
-            <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-3 py-1 rounded-full">Physics</span>
-          </div>
-          <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8">A block of mass 'm' is placed on a smooth inclined plane of inclination θ with the horizontal. What is the acceleration of the block down the incline?</p>
-          <div className="space-y-4">
-            <button
-              onClick={() => setSelectedOption('A')}
-              className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                selectedOption === 'A'
-                  ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
-                  : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
-              }`}
-            >
-              <span
-                className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
-                  selectedOption === 'A'
-                    ? 'text-white bg-primary border-primary'
-                    : 'text-primary border-primary'
-                }`}
-              >
-                A
-              </span>
-              <span className="text-text-light dark:text-text-dark">g tan(θ)</span>
-            </button>
-            <button
-              onClick={() => setSelectedOption('B')}
-              className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                selectedOption === 'B'
-                  ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
-                  : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
-              }`}
-            >
-              <span
-                className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
-                  selectedOption === 'B'
-                    ? 'text-white bg-primary border-primary'
-                    : 'text-primary border-primary'
-                }`}
-              >
-                B
-              </span>
-              <span className="text-text-light dark:text-text-dark font-medium">g sin(θ)</span>
-            </button>
-            <button
-              onClick={() => setSelectedOption('C')}
-              className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                selectedOption === 'C'
-                  ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
-                  : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
-              }`}
-            >
-              <span
-                className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
-                  selectedOption === 'C'
-                    ? 'text-white bg-primary border-primary'
-                    : 'text-primary border-primary'
-                }`}
-              >
-                C
-              </span>
-              <span className="text-text-light dark:text-text-dark">g cos(θ)</span>
-            </button>
-            <button
-              onClick={() => setSelectedOption('D')}
-              className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                selectedOption === 'D'
-                  ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
-                  : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
-              }`}
-            >
-              <span
-                className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
-                  selectedOption === 'D'
-                    ? 'text-white bg-primary border-primary'
-                    : 'text-primary border-primary'
-                }`}
-              >
-                D
-              </span>
-              <span className="text-text-light dark:text-text-dark">g</span>
-            </button>
-          </div>
+          {currentQuestion && (
+            <>
+              <div className="flex items-start justify-between mb-6">
+                <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">
+                  Question {currentQuestionIndex + 1} of {testData?.questions.length}
+                </h2>
+                <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-3 py-1 rounded-full">
+                  {currentQuestion.section}
+                </span>
+              </div>
+              <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8">
+                <InlineMath math={currentQuestion.text} />
+              </p>
+              <div className="space-y-4">
+                {currentQuestion.options.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => handleSelectOption(option.id)}
+                    className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${
+                      selectedOption === option.id
+                        ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
+                        : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
+                    }`}
+                  >
+                    <span
+                      className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
+                        selectedOption === option.id
+                          ? 'text-white bg-primary border-primary'
+                          : 'text-primary border-primary'
+                      }`}
+                    >
+                      {option.id.toUpperCase()}
+                    </span>
+                    <span className="text-text-light dark:text-text-dark">
+                      <InlineMath math={option.text} />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
         <div className="mt-8 pt-6 border-t border-border-light dark:border-border-dark flex items-center justify-between">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark hover:bg-border-light dark:hover:bg-border-dark transition-colors">
+          <button
+            onClick={handlePrevious}
+            disabled={currentQuestionIndex === 0}
+            className="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark hover:bg-border-light dark:hover:bg-border-dark transition-colors disabled:opacity-50"
+          >
             <span className="material-icons-outlined">arrow_back</span>
             Previous
           </button>
@@ -100,17 +157,27 @@ const TestInterface: React.FC = () => {
             <span className="material-icons-outlined">bookmark_border</span>
             Mark for Review
           </button>
-          <button className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-primary hover:opacity-90 transition-opacity">
+          <button
+            onClick={handleNext}
+            disabled={!testData || currentQuestionIndex === testData.questions.length - 1}
+            className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-primary hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
             Next
             <span className="material-icons-outlined">arrow_forward</span>
           </button>
         </div>
       </div>
       <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Time Left:</h3>
+          <span className="text-lg font-semibold text-text-light dark:text-text-dark">
+            {timeLeft !== null && `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}`}
+          </span>
+        </div>
         <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
         <div className="grid grid-cols-5 gap-2">
           {Array.from({ length: 10 }, (_, i) => (
-            <a key={i} href="#" className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${
+            <button key={i} className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${
               i + 1 === 1 ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500' :
               i + 1 === 3 ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500' :
               i + 1 === 4 || i + 1 === 7 ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500' :
@@ -118,7 +185,7 @@ const TestInterface: React.FC = () => {
               'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
             }`}>
               {i + 1}
-            </a>
+            </button>
           ))}
         </div>
         <div className="mt-6 pt-6 border-t border-border-light dark:border-border-dark space-y-3 text-sm">
@@ -139,7 +206,7 @@ const TestInterface: React.FC = () => {
             <span>Not Visited</span>
           </div>
         </div>
-        <button className="w-full mt-6 bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">Submit Test</button>
+        <button onClick={handleSubmit} className="w-full mt-6 bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">Submit Test</button>
       </aside>
     </div>
   );
