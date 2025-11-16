@@ -13,6 +13,7 @@ import Subjects from './components/Subjects';
 import SubjectDetails from './components/SubjectDetails';
 import ChapterDetails from './components/ChapterDetails';
 import Tests from './components/Tests';
+import TestPage from './components/TestPage';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -74,6 +75,14 @@ const AppContent: React.FC = () => {
           element={
             <RequireAuth>
               <Tests />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/tests/:testId"
+          element={
+            <RequireAuth>
+              <TestPage />
             </RequireAuth>
           }
         />

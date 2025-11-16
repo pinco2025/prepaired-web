@@ -15,21 +15,21 @@ const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }
       <div className="mb-8 border-b border-border-light dark:border-border-dark pb-8">
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12 text-center">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-3xl">timer</span>
+            <span className="material-icons-outlined text-primary text-3xl">timer</span>
             <div>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Duration</p>
               <p className="font-semibold text-text-light dark:text-text-dark">{test.duration}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-3xl">quiz</span>
+            <span className="material-icons-outlined text-primary text-3xl">quiz</span>
             <div>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Questions</p>
               <p className="font-semibold text-text-light dark:text-text-dark">{test.totalQuestions}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-3xl">rule</span>
+            <span className="material-icons-outlined text-primary text-3xl">rule</span>
             <div>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Marking Scheme</p>
               <p className="font-semibold text-text-light dark:text-text-dark">{test.markingScheme}</p>
@@ -51,7 +51,7 @@ const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }
           className="w-full sm:w-auto inline-flex items-center justify-center px-12 py-4 border border-transparent text-base font-semibold rounded-lg shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark transition-colors duration-300"
         >
           Start Test
-          <span className="material-symbols-outlined ml-2">arrow_forward</span>
+          <span className="material-icons-outlined ml-2">arrow_forward</span>
         </button>
       </div>
     </div>
