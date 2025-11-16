@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { fetchTestData, Test } from '../utils/testData';
 import { InlineMath } from 'react-katex';
 import { io, Socket } from 'socket.io-client';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../utils/supabaseClient'; 
 
 const TestInterface: React.FC = () => {
   const [testData, setTestData] = useState<Test | null>(null);
@@ -10,6 +10,19 @@ const TestInterface: React.FC = () => {
   const [answers, setAnswers] = useState<{[key: string]: string}>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  function renderMixedMath(text: string) {
+  // split into chunks where $...$ is kept as separate tokens
+  const parts = text.split(/(\$[^$]*\$)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('$') && part.endsWith('$')) {
+      const math = part.slice(1, -1);
+      return <InlineMath key={i}>{math}</InlineMath>;
+    }
+    // plain text chunk
+    return <span key={i}>{part}</span>;
+  });
+  }
 
   const handleSubmit = useCallback(async () => {
     if (testData) {
@@ -113,7 +126,7 @@ const TestInterface: React.FC = () => {
                 </span>
               </div>
               <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8">
-                <InlineMath math={currentQuestion.text} />
+                {renderMixedMath(currentQuestion.text)}
               </p>
               <div className="space-y-4">
                 {currentQuestion.options.map((option) => (
@@ -136,7 +149,7 @@ const TestInterface: React.FC = () => {
                       {option.id.toUpperCase()}
                     </span>
                     <span className="text-text-light dark:text-text-dark">
-                      <InlineMath math={option.text} />
+                      {renderMixedMath(option.text)}
                     </span>
                   </button>
                 ))}
