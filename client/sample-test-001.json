@@ -1,0 +1,714 @@
+{
+  "testId": "sample-test-001",
+  "title": "Sample Test",
+  "duration": 3600,
+  "totalMarks": 80,
+  "sections": [
+    {
+      "name": "Section A",
+      "marksPerQuestion": 4
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "uuid": "bb0f339191c9",
+      "text": "All organisms therefore are 'aware' of:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Only food sources"
+        },
+        {
+          "id": "b",
+          "text": "Only predators"
+        },
+        {
+          "id": "c",
+          "text": "Their surroundings"
+        },
+        {
+          "id": "d",
+          "text": "Only temperature"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q2",
+      "uuid": "f665c19e3f8b",
+      "text": "According to the chapter, early man deified some inanimate matter such as wind, sea, fire and also some:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Rocks and minerals"
+        },
+        {
+          "id": "b",
+          "text": "Among animals and plants"
+        },
+        {
+          "id": "c",
+          "text": "Stars and planets"
+        },
+        {
+          "id": "d",
+          "text": "Mountains and rivers"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q3",
+      "uuid": "f4a75d9cbb51",
+      "text": "Order being a higher category is the assemblage of families which exhibit:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Many similar characters"
+        },
+        {
+          "id": "b",
+          "text": "A few similar characters"
+        },
+        {
+          "id": "c",
+          "text": "No similar characters"
+        },
+        {
+          "id": "d",
+          "text": "Identical characters"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q4",
+      "uuid": "37588aa976ca",
+      "text": "Since it is nearly impossible to study all living organisms, what process makes this possible?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Photography"
+        },
+        {
+          "id": "b",
+          "text": "Classification"
+        },
+        {
+          "id": "c",
+          "text": "Preservation"
+        },
+        {
+          "id": "d",
+          "text": "Documentation"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q5",
+      "uuid": "ce1561dbb9e7",
+      "text": "As we explore new areas and even old ones, what continuously happens?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Species become extinct"
+        },
+        {
+          "id": "b",
+          "text": "New organisms are continuously being identified"
+        },
+        {
+          "id": "c",
+          "text": "Nothing changes"
+        },
+        {
+          "id": "d",
+          "text": "Old species disappear"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q6",
+      "uuid": "51c92cfc7bb6",
+      "text": "In taxonomic studies, a group of individual organisms with fundamental similarities is called:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Population"
+        },
+        {
+          "id": "b",
+          "text": "Species"
+        },
+        {
+          "id": "c",
+          "text": "Genus"
+        },
+        {
+          "id": "d",
+          "text": "Family"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q7",
+      "uuid": "943f173cec59",
+      "text": "What does ICZN stand for in taxonomic studies?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "International Code of Zoological Names"
+        },
+        {
+          "id": "b",
+          "text": "International Code of Zoological Nomenclature"
+        },
+        {
+          "id": "c",
+          "text": "International Committee of Zoological Nomenclature"
+        },
+        {
+          "id": "d",
+          "text": "Indian Code of Zoological Nomenclature"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q8",
+      "uuid": "f3df82c2c764",
+      "text": "When we think of 'Alsatians', we know we are talking about:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Cats"
+        },
+        {
+          "id": "b",
+          "text": "A specific type of dog"
+        },
+        {
+          "id": "c",
+          "text": "Horses"
+        },
+        {
+          "id": "d",
+          "text": "Birds"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q9",
+      "uuid": "2561cbb2cea3",
+      "text": "According to the chapter, what is the defining property that makes humans unique among all organisms?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Metabolism"
+        },
+        {
+          "id": "b",
+          "text": "Growth"
+        },
+        {
+          "id": "c",
+          "text": "Self-consciousness"
+        },
+        {
+          "id": "d",
+          "text": "Reproduction"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q10",
+      "uuid": "f5afd802f2ee",
+      "text": "From which Latin word is 'systematics' derived?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Systema"
+        },
+        {
+          "id": "b",
+          "text": "Systematicus"
+        },
+        {
+          "id": "c",
+          "text": "Systemae"
+        },
+        {
+          "id": "d",
+          "text": "Systemus"
+        }
+      ],
+      "correctAnswer": "a",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q11",
+      "uuid": "d8eda33f1f07",
+      "text": "What happens to the number of common characteristics as we go from species to kingdom?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Increases"
+        },
+        {
+          "id": "b",
+          "text": "Remains same"
+        },
+        {
+          "id": "c",
+          "text": "Decreases"
+        },
+        {
+          "id": "d",
+          "text": "First increases then decreases"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q12",
+      "uuid": "e2ddcca860e4",
+      "text": "Which letter should the first word denoting the genus start with in a scientific name?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Small letter"
+        },
+        {
+          "id": "b",
+          "text": "Capital letter"
+        },
+        {
+          "id": "c",
+          "text": "Either capital or small"
+        },
+        {
+          "id": "d",
+          "text": "Roman numeral"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q13",
+      "uuid": "886ddf92b3e5",
+      "text": "According to Table 1.1 in the chapter, mango belongs to which family?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Solanaceae"
+        },
+        {
+          "id": "b",
+          "text": "Poaceae"
+        },
+        {
+          "id": "c",
+          "text": "Anacardiaceae"
+        },
+        {
+          "id": "d",
+          "text": "Liliaceae"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q14",
+      "uuid": "2a71b757d84e",
+      "text": "What is a taxonomic category commonly termed as?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Taxa"
+        },
+        {
+          "id": "b",
+          "text": "Taxon (singular) or Taxa (plural)"
+        },
+        {
+          "id": "c",
+          "text": "Taxonomic unit"
+        },
+        {
+          "id": "d",
+          "text": "Classification group"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q15",
+      "uuid": "bf9ddcf6c3be",
+      "text": "All living organisms are made of:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Only proteins"
+        },
+        {
+          "id": "b",
+          "text": "Only water"
+        },
+        {
+          "id": "c",
+          "text": "Chemicals of various classes, sizes, and functions"
+        },
+        {
+          "id": "d",
+          "text": "Only carbohydrates"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q16",
+      "uuid": "c18f70e43386",
+      "text": "The revelation that all present day living organisms are related to each other and also to all organisms that ever lived on earth led to:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Commercial exploitation"
+        },
+        {
+          "id": "b",
+          "text": "Industrial development"
+        },
+        {
+          "id": "c",
+          "text": "Cultural movements for conservation of biodiversity"
+        },
+        {
+          "id": "d",
+          "text": "Military applications"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q17",
+      "uuid": "099d9f3cf662",
+      "text": "Order Primata includes which of the following animals?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Tiger, cat, dog"
+        },
+        {
+          "id": "b",
+          "text": "Monkey, gorilla, gibbon"
+        },
+        {
+          "id": "c",
+          "text": "Lion, leopard, cheetah"
+        },
+        {
+          "id": "d",
+          "text": "Fish, amphibians, reptiles"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q18",
+      "uuid": "47d930b368e6",
+      "text": "Properties of tissues are present in:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "The constituent cells"
+        },
+        {
+          "id": "b",
+          "text": "Not present in constituent cells but arise from interactions among them"
+        },
+        {
+          "id": "c",
+          "text": "Only the extracellular matrix"
+        },
+        {
+          "id": "d",
+          "text": "The nucleus of cells"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "H",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q19",
+      "uuid": "af26b9d912eb",
+      "text": "Understanding characters helps in identifying similarities and dissimilarities among individuals of:",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "The same kind of organisms only"
+        },
+        {
+          "id": "b",
+          "text": "Other kinds of organisms only"
+        },
+        {
+          "id": "c",
+          "text": "Both the same kind and other kinds of organisms"
+        },
+        {
+          "id": "d",
+          "text": "Neither same nor different organisms"
+        }
+      ],
+      "correctAnswer": "c",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "M",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q20",
+      "uuid": "c92bee5f2891",
+      "text": "Is taxonomy something new in human history?",
+      "image": 0,
+      "options": [
+        {
+          "id": "a",
+          "text": "Yes, developed in 20th century"
+        },
+        {
+          "id": "b",
+          "text": "No, human beings have always been interested in knowing about various organisms"
+        },
+        {
+          "id": "c",
+          "text": "Yes, started with Linnaeus"
+        },
+        {
+          "id": "d",
+          "text": "Yes, started with Darwin"
+        }
+      ],
+      "correctAnswer": "b",
+      "marks": 4,
+      "section": "Section A",
+      "tags": {
+        "tag1": "BL",
+        "tag2": "TLW",
+        "tag3": "E",
+        "tag4": "",
+        "type": "NC",
+        "year": "2024"
+      }
+    }
+  ]
+}
