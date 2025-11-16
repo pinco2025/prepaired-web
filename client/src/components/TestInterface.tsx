@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTestData, Test } from '../utils/testData';
 import { InlineMath } from 'react-katex';
 import { supabase } from '../utils/supabaseClient';
@@ -44,6 +44,11 @@ const TestInterface: React.FC = () => {
       }
     }
   }, [answers, testData]);
+
+  const handleSubmitRef = useRef(handleSubmit);
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+  }, [handleSubmit]);
 
   useEffect(() => {
     const initializeTest = async () => {
@@ -92,7 +97,7 @@ const TestInterface: React.FC = () => {
         if (newTimeLeft <= 0) {
           setTimeLeft(0);
           clearInterval(timer);
-          handleSubmit();
+          handleSubmitRef.current();
         } else {
           setTimeLeft(newTimeLeft);
         }
@@ -109,7 +114,7 @@ const TestInterface: React.FC = () => {
     };
 
     initializeTest();
-  }, [handleSubmit]);
+  }, []);
 
   useEffect(() => {
     if (testData) {
