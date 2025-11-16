@@ -1,19 +1,55 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTestData } from '../utils/testData';
-import { Test } from '../data';
+// keep the original import if other code relies on it, but we won't assume its shape here
+import { Test as ImportedTest } from '../data';
 import { InlineMath } from 'react-katex';
 import { supabase } from '../utils/supabaseClient';
 
+/** Local types that match what this component expects from fetchTestData() */
 type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
 
+interface LocalOption {
+  id: string;
+  text: string;
+}
+
+interface LocalQuestion {
+  id: string;
+  text: string;
+  options: LocalOption[];
+  section?: string;
+}
+
+interface LocalSection {
+  name: string;
+}
+
+interface LocalTest {
+  // fields your component expects
+  id: string;
+  testId: string;
+  title: string;
+  description?: string;
+  duration: number; // seconds
+  totalMarks?: number;
+  totalQuestions?: number;
+  markingScheme?: string;
+  instructions?: string[];
+  sections: LocalSection[];
+  questions: LocalQuestion[];
+}
+
 const TestInterface: React.FC = () => {
-  const [testData, setTestData] = useState<Test | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
+  const [testData, setTestData] = useState<LocalTest | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
+
+  // derived current question (typed)
+  const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
 
   function renderMixedMath(text: string) {
     const parts = text.split(/(\$[^$]*\$)/g);
@@ -27,26 +63,28 @@ const TestInterface: React.FC = () => {
   }
 
   const handleSubmit = useCallback(async () => {
-    if (testData) {
-      const { data: { user } } = await supabase.auth.getUser();
+    if (!testData) return;
 
-      if (user) {
-        const submission = {
-          test_id: testData.testId,
-          answers: answers,
-          user_id: user.id,
-        };
+    const { data } = await supabase.auth.getUser();
+    const user = (data as any)?.user;
 
-        const { error } = await supabase.from('submissions').insert([submission]);
+    if (!user) {
+      console.error('User not logged in');
+      return;
+    }
 
-        if (error) {
-          console.error('Error submitting test:', error);
-        } else {
-          console.log('Test submitted successfully!');
-        }
-      } else {
-        console.error('User not logged in');
-      }
+    const submission = {
+      test_id: testData.testId,
+      answers: answers,
+      user_id: user.id,
+      started_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase.from('student_tests').insert([submission]);
+    if (error) {
+      //console.error('Error submitting test:', error);
+    } else {
+      //console.log('Test submitted successfully!');
     }
   }, [answers, testData]);
 
@@ -56,16 +94,21 @@ const TestInterface: React.FC = () => {
   }, [handleSubmit]);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+
     const initializeTest = async () => {
-      const data = fetchTestData();
-      const adaptedTestData: Test = {
+      // fetchTestData might be async or sync — await to be safe
+      const data = await fetchTestData();
+
+      // Build object matching LocalTest
+      const adaptedTestData: LocalTest = {
         id: data.testId,
         testId: data.testId,
         title: data.title,
-        description: `${data.duration / 60} minutes | ${data.totalMarks} Marks`,
-        duration: data.duration,
-        totalMarks: data.totalMarks,
-        totalQuestions: data.questions.length,
+        description: `${Math.floor((data.duration ?? 0) / 60)} minutes | ${data.totalMarks ?? 0} Marks`,
+        duration: Number(data.duration ?? 0), // ensure numeric
+        totalMarks: data.totalMarks ?? 0,
+        totalQuestions: (data.questions ?? []).length,
         markingScheme: `Varies`,
         instructions: [
           'The test contains multiple-choice questions with a single correct answer.',
@@ -77,111 +120,137 @@ const TestInterface: React.FC = () => {
           'Do not close the browser window or refresh the page, as it may result in loss of progress.',
           'The test will automatically submit once the timer runs out.',
         ],
-        sections: data.sections,
-        questions: data.questions,
+        sections: (data.sections ?? []) as LocalSection[],
+        questions: (data.questions ?? []) as LocalQuestion[],
       };
+
       setTestData(adaptedTestData);
-      setQuestionStatuses(Array(data.questions.length).fill('notVisited'));
 
-      const { data: { user } } = await supabase.auth.getUser();
+      // initialize question statuses length-correctly
+      const qCount = adaptedTestData.questions?.length ?? 0;
+      setQuestionStatuses(Array(qCount).fill('notVisited' as QuestionStatus));
+
+      // auth
+      const { data: authData } = await supabase.auth.getUser();
+      const user = (authData as any)?.user;
       if (!user) {
-        console.error("User not logged in. Cannot fetch test start time.");
-        return;
+        console.error('User not logged in. Cannot fetch test start time.');
       }
 
-      const { data: studentTestData, error } = await supabase
-        .from('student_tests')
-        .select('started_at')
-        .eq('user_id', user.id)
-        .eq('test_id', data.testId)
-        .single();
+      // fetch or create student_tests row to get started_at
+      let testStartTimeISO: string | null = null;
+      try {
+        if (user) {
+          const { data: studentTestData, error } = await supabase
+            .from('student_tests')
+            .select('started_at')
+            .eq('user_id', user.id)
+            .eq('test_id', data.testId)
+            .single();
 
-      let testStartTime: string;
-      if (error || !studentTestData) {
-        console.error('Error fetching test start time, creating a new entry:', error);
-        const { data: newStudentTest, error: insertError } = await supabase
-          .from('student_tests')
-          .insert({ test_id: data.testId, user_id: user.id })
-          .select('started_at')
-          .single();
+          if (error || !studentTestData) {
+            // insert a new record
+            const { data: newStudentTest, error: insertError } = await supabase
+              .from('student_tests')
+              .insert({ test_id: data.testId, user_id: user.id })
+              .select('started_at')
+              .single();
 
-        if (insertError || !newStudentTest) {
-          console.error('Failed to create a new student test entry.', insertError);
-          testStartTime = new Date().toISOString();
+            if (insertError || !newStudentTest) {
+              console.error('Failed to create a new student test entry.', insertError);
+              testStartTimeISO = new Date().toISOString();
+            } else {
+              testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
+            }
+          } else {
+            testStartTimeISO = (studentTestData as any).started_at ?? new Date().toISOString();
+          }
         } else {
-          testStartTime = newStudentTest.started_at;
+          testStartTimeISO = new Date().toISOString();
         }
-      } else {
-        testStartTime = studentTestData.started_at;
+      } catch (e) {
+        console.error('Error while fetching/creating student_tests entry', e);
+        testStartTimeISO = new Date().toISOString();
       }
 
-      const testDuration = data.duration;
-      const timer = setInterval(() => {
+      const testDuration = Number(data.duration ?? 0); // seconds
+
+      // start timer
+      timer = setInterval(() => {
         const now = new Date();
-        const startTime = new Date(testStartTime);
+        const startTime = new Date(testStartTimeISO!);
         const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
         const newTimeLeft = testDuration - elapsedTime;
 
         if (newTimeLeft <= 0) {
           setTimeLeft(0);
-          clearInterval(timer);
+          if (timer) {
+            clearInterval(timer);
+            timer = null;
+          }
+          // submit
           handleSubmitRef.current();
         } else {
           setTimeLeft(newTimeLeft);
         }
       }, 1000);
 
-      const savedAnswers = localStorage.getItem(`test-answers-${data.testId}`);
-      if (savedAnswers) {
-        setAnswers(JSON.parse(savedAnswers));
+      // load saved answers
+      try {
+        const saved = localStorage.getItem(`test-answers-${data.testId}`);
+        if (saved) setAnswers(JSON.parse(saved));
+      } catch (e) {
+        console.warn('Could not read saved answers from localStorage', e);
       }
-
-      return () => {
-        clearInterval(timer);
-      };
     };
 
+    // call initializer
     initializeTest();
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, []);
 
   useEffect(() => {
-    if (testData) {
+    if (!testData) return;
+    try {
       localStorage.setItem(`test-answers-${testData.testId}`, JSON.stringify(answers));
+    } catch (e) {
+      console.warn('Could not save answers to localStorage', e);
     }
   }, [answers, testData]);
 
   const handleNext = () => {
     if (testData && testData.questions && currentQuestionIndex < testData.questions.length - 1) {
       const newQuestionStatuses = [...questionStatuses];
-      if (questionStatuses[currentQuestionIndex] === 'notVisited') {
+      if (newQuestionStatuses[currentQuestionIndex] === 'notVisited') {
         newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
         setQuestionStatuses(newQuestionStatuses);
       }
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setCurrentQuestionIndex((i) => i + 1);
     }
   };
 
   const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
+    setCurrentQuestionIndex((i) => Math.max(0, i - 1));
   };
 
   const handleSelectOption = (optionId: string) => {
-    if (currentQuestion) {
-      setAnswers({ ...answers, [currentQuestion.id]: optionId });
-      setSelectedOption(optionId);
-      const newQuestionStatuses = [...questionStatuses];
-      newQuestionStatuses[currentQuestionIndex] = 'answered';
-      setQuestionStatuses(newQuestionStatuses);
-    }
+    if (!currentQuestion) return;
+    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+    setSelectedOption(optionId);
+    const newQuestionStatuses = [...questionStatuses];
+    newQuestionStatuses[currentQuestionIndex] = 'answered';
+    setQuestionStatuses(newQuestionStatuses);
   };
 
   const handleMarkForReview = () => {
+    if (!currentQuestion) return;
     const newQuestionStatuses = [...questionStatuses];
-    if (currentQuestion && questionStatuses[currentQuestionIndex] !== 'markedForReview') {
+    if (newQuestionStatuses[currentQuestionIndex] !== 'markedForReview') {
       newQuestionStatuses[currentQuestionIndex] = 'markedForReview';
-    } else if (currentQuestion) {
+    } else {
       newQuestionStatuses[currentQuestionIndex] = answers[currentQuestion.id] ? 'answered' : 'notAnswered';
     }
     setQuestionStatuses(newQuestionStatuses);
@@ -189,17 +258,17 @@ const TestInterface: React.FC = () => {
 
   const handlePaletteClick = (index: number) => {
     const newQuestionStatuses = [...questionStatuses];
-    if (questionStatuses[currentQuestionIndex] === 'notVisited') {
+    if (newQuestionStatuses[currentQuestionIndex] === 'notVisited') {
       newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
       setQuestionStatuses(newQuestionStatuses);
     }
     setCurrentQuestionIndex(index);
   };
 
-  const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
-
-  const filteredQuestions = testData?.questions?.map((q, i) => ({ ...q, originalIndex: i }))
-    .filter(q => testData.sections && q.section === testData.sections[currentSectionIndex].name) || [];
+  const filteredQuestions: (LocalQuestion & { originalIndex: number })[] =
+    testData?.questions
+      ?.map((q, i) => ({ ...q, originalIndex: i }))
+      .filter((q) => testData?.sections && q.section === testData.sections[currentSectionIndex]?.name) ?? [];
 
   useEffect(() => {
     if (currentQuestion) {
@@ -237,22 +306,19 @@ const TestInterface: React.FC = () => {
                   >
                     <span
                       className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
-                        selectedOption === option.id
-                          ? 'text-white bg-primary border-primary'
-                          : 'text-primary border-primary'
+                        selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
                       }`}
                     >
                       {option.id.toUpperCase()}
                     </span>
-                    <span className="text-text-light dark:text-text-dark">
-                      {renderMixedMath(option.text)}
-                    </span>
+                    <span className="text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
                   </button>
                 ))}
               </div>
             </>
           )}
         </div>
+
         <div className="mt-8 pt-6 border-t border-border-light dark:border-border-dark flex items-center justify-between">
           <button
             onClick={handlePrevious}
@@ -262,7 +328,8 @@ const TestInterface: React.FC = () => {
             <span className="material-icons-outlined">arrow_back</span>
             Previous
           </button>
-<button
+
+          <button
             onClick={handleMarkForReview}
             className="flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors"
           >
@@ -271,6 +338,7 @@ const TestInterface: React.FC = () => {
             </span>
             Mark for Review
           </button>
+
           <button
             onClick={handleNext}
             disabled={!testData || !testData.questions || currentQuestionIndex === testData.questions.length - 1}
@@ -281,13 +349,15 @@ const TestInterface: React.FC = () => {
           </button>
         </div>
       </div>
+
       <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Time Left:</h3>
           <span className="text-lg font-semibold text-text-light dark:text-text-dark">
-            {timeLeft !== null && `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}`}
+            {timeLeft !== null ? `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}` : '--:--'}
           </span>
         </div>
+
         <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
         <div className="flex items-center justify-center space-x-2 mb-4">
           {testData?.sections?.map((section, index) => (
@@ -295,15 +365,14 @@ const TestInterface: React.FC = () => {
               key={index}
               onClick={() => setCurrentSectionIndex(index)}
               className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
-                currentSectionIndex === index
-                  ? 'bg-primary text-white'
-                  : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
+                currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
               }`}
             >
               {section.name}
             </button>
           ))}
         </div>
+
         <div className="grid grid-cols-5 gap-2">
           {filteredQuestions.map((question, index) => (
             <button
@@ -323,25 +392,29 @@ const TestInterface: React.FC = () => {
             </button>
           ))}
         </div>
+
         <div className="mt-6 pt-6 border-t border-border-light dark:border-border-dark space-y-3 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-green-500/20 border border-green-500"></div>
+            <div className="w-5 h-5 rounded-md bg-green-500/20 border border-green-500" />
             <span>Answered</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-red-500/20 border border-red-500"></div>
+            <div className="w-5 h-5 rounded-md bg-red-500/20 border border-red-500" />
             <span>Not Answered</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-purple-500/20 border border-purple-500"></div>
+            <div className="w-5 h-5 rounded-md bg-purple-500/20 border border-purple-500" />
             <span>Marked for Review</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark"></div>
+            <div className="w-5 h-5 rounded-md bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark" />
             <span>Not Visited</span>
           </div>
         </div>
-        <button onClick={handleSubmit} className="w-full mt-6 bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">Submit Test</button>
+
+        <button onClick={handleSubmit} className="w-full mt-6 bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">
+          Submit Test
+        </button>
       </aside>
     </div>
   );
