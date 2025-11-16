@@ -82,6 +82,7 @@ const Header: React.FC = () => {
               ) : (
                 <>
                   <a
+                    data-testid="dashboard-link"
                     className={
                       location.pathname === '/dashboard'
                         ? 'text-sm font-semibold text-primary border-b-2 border-primary pb-1'
@@ -123,6 +124,7 @@ const Header: React.FC = () => {
                     Revision
                   </a>
                   <a
+                    data-testid="tests-link"
                     className={
                       location.pathname === '/tests'
                         ? 'text-sm font-semibold text-primary border-b-2 border-primary pb-1'

@@ -1,27 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchTestData, Test } from '../utils/testData';
 import { InlineMath } from 'react-katex';
-import { io, Socket } from 'socket.io-client';
-import { supabase } from '../utils/supabaseClient'; 
+import { supabase } from '../utils/supabaseClient';
 
 const TestInterface: React.FC = () => {
   const [testData, setTestData] = useState<Test | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<{[key: string]: string}>({});
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   function renderMixedMath(text: string) {
-  // split into chunks where $...$ is kept as separate tokens
-  const parts = text.split(/(\$[^$]*\$)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('$') && part.endsWith('$')) {
-      const math = part.slice(1, -1);
-      return <InlineMath key={i}>{math}</InlineMath>;
-    }
-    // plain text chunk
-    return <span key={i}>{part}</span>;
-  });
+    const parts = text.split(/(\$[^$]*\$)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('$') && part.endsWith('$')) {
+        const math = part.slice(1, -1);
+        return <InlineMath key={i}>{math}</InlineMath>;
+      }
+      return <span key={i}>{part}</span>;
+    });
   }
 
   const handleSubmit = useCallback(async () => {
@@ -35,47 +32,83 @@ const TestInterface: React.FC = () => {
           user_id: user.id,
         };
 
-        const { error } = await supabase
-          .from('submissions')
-          .insert([submission]);
+        const { error } = await supabase.from('submissions').insert([submission]);
 
         if (error) {
           console.error('Error submitting test:', error);
         } else {
           console.log('Test submitted successfully!');
-          // You might want to redirect the user or show a success message here
         }
       } else {
         console.error('User not logged in');
-        // Handle case where user is not logged in
       }
     }
   }, [answers, testData]);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:4000');
+    const initializeTest = async () => {
+      const data = fetchTestData();
+      setTestData(data);
 
-    const data = fetchTestData();
-    setTestData(data);
-    setTimeLeft(data.duration);
-    newSocket.emit('start-timer', data.duration);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error("User not logged in. Cannot fetch test start time.");
+        return;
+      }
 
-    const savedAnswers = localStorage.getItem(`test-answers-${data.testId}`);
-    if (savedAnswers) {
-      setAnswers(JSON.parse(savedAnswers));
-    }
+      const { data: studentTestData, error } = await supabase
+        .from('student_tests')
+        .select('started_at')
+        .eq('user_id', user.id)
+        .eq('test_id', data.testId)
+        .single();
 
-    newSocket.on('time-update', (time) => {
-      setTimeLeft(time);
-    });
+      let testStartTime: string;
+      if (error || !studentTestData) {
+        console.error('Error fetching test start time, creating a new entry:', error);
+        const { data: newStudentTest, error: insertError } = await supabase
+          .from('student_tests')
+          .insert({ test_id: data.testId, user_id: user.id })
+          .select('started_at')
+          .single();
 
-    newSocket.on('time-up', () => {
-      handleSubmit();
-    });
+        if (insertError || !newStudentTest) {
+          console.error('Failed to create a new student test entry.', insertError);
+          testStartTime = new Date().toISOString();
+        } else {
+          testStartTime = newStudentTest.started_at;
+        }
+      } else {
+        testStartTime = studentTestData.started_at;
+      }
 
-    return () => {
-      newSocket.disconnect();
+      const testDuration = data.duration;
+      const timer = setInterval(() => {
+        const now = new Date();
+        const startTime = new Date(testStartTime);
+        const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+        const newTimeLeft = testDuration - elapsedTime;
+
+        if (newTimeLeft <= 0) {
+          setTimeLeft(0);
+          clearInterval(timer);
+          handleSubmit();
+        } else {
+          setTimeLeft(newTimeLeft);
+        }
+      }, 1000);
+
+      const savedAnswers = localStorage.getItem(`test-answers-${data.testId}`);
+      if (savedAnswers) {
+        setAnswers(JSON.parse(savedAnswers));
+      }
+
+      return () => {
+        clearInterval(timer);
+      };
     };
+
+    initializeTest();
   }, [handleSubmit]);
 
   useEffect(() => {

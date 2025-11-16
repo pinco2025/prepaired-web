@@ -22,6 +22,7 @@ const Tests: React.FC = () => {
                   {category.tests.map((test) => (
                     <Link
                       key={test.id}
+                      data-testid={`test-link-${test.id}`}
                       to={`/tests/${test.id}`}
                       className="group block p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-transparent hover:border-primary dark:hover:border-primary transition-all duration-300"
                     >
