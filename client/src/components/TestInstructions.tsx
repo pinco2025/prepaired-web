@@ -1,8 +1,15 @@
 import React from 'react';
-import { Test } from '../data';
 
 interface TestInstructionsProps {
-  test: Test;
+  test: {
+    id: string;
+    title: string;
+    description: string;
+    duration: string;
+    totalQuestions: number;
+    markingScheme: string;
+    instructions: string[];
+  };
   onStartTest: () => void;
 }
 
