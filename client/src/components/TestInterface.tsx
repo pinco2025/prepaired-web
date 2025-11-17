@@ -39,7 +39,11 @@ interface LocalTest {
   questions: LocalQuestion[];
 }
 
-const TestInterface: React.FC = () => {
+interface TestInterfaceProps {
+  onSubmitSuccess: () => void;
+}
+
+const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -85,8 +89,14 @@ const TestInterface: React.FC = () => {
       //console.error('Error submitting test:', error);
     } else {
       //console.log('Test submitted successfully!');
+      try {
+        localStorage.removeItem(`test-answers-${testData.testId}`);
+      } catch (e) {
+        console.warn('Could not remove answers from localStorage', e);
+      }
+      onSubmitSuccess();
     }
-  }, [answers, testData]);
+  }, [answers, testData, onSubmitSuccess]);
 
   const handleSubmitRef = useRef(handleSubmit);
   useEffect(() => {
