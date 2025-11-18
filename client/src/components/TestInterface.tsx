@@ -325,9 +325,10 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
   }, [currentQuestion, answers]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col">
-        <div className="flex-grow">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
+      {/* Left/main column: allow internal scrolling / shrinking by using flex + min-h-0 */}
+      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 lg:h-[84vh]">
+        <div className="flex-grow overflow-y-auto min-h-0">
           {currentQuestion && (
             <>
               <div className="flex items-start justify-between mb-6">
@@ -338,7 +339,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
                   {currentQuestion.section}
                 </span>
               </div>
-              <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8">
+              <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}
               </p>
               <div className="space-y-4">
@@ -396,70 +397,82 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
         </div>
       </div>
 
-      <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Time Left:</h3>
-          <span className="text-lg font-semibold text-text-light dark:text-text-dark">
-            {timeLeft !== null ? `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}` : '--:--'}
-          </span>
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
-        <div className="flex items-center justify-center space-x-2 mb-4">
-          {testData?.sections?.map((section, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSectionIndex(index)}
-              className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
-                }`}
-            >
-              {section.name}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-5 gap-2">
-          {filteredQuestions.map((question, index) => (
-            <button
-              key={question.id}
-              onClick={() => handlePaletteClick(question.originalIndex)}
-              className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${questionStatuses[question.originalIndex] === 'answered'
-                ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
-                : questionStatuses[question.originalIndex] === 'notAnswered'
-                  ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500'
-                  : questionStatuses[question.originalIndex] === 'markedForReview'
-                    ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
-                    : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
-                } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-border-light dark:border-border-dark space-y-3 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-green-500/20 border border-green-500" />
-            <span>Answered</span>
+      {/* Right/palette aside */}
+      <div className="flex flex-col gap-4">
+        <aside
+          // make the aside sticky at the top on large screens, keep it from growing the row,
+          // and allow internal vertical scroll when contents exceed max height.
+          className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark lg:sticky lg:top-6 lg:self-start max-h-[72vh] overflow-y-auto"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Time Left:</h3>
+            <span className="text-lg font-semibold text-text-light dark:text-text-dark">
+              {timeLeft !== null ? `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}` : '--:--'}
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-red-500/20 border border-red-500" />
-            <span>Not Answered</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-purple-500/20 border border-purple-500" />
-            <span>Marked for Review</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark" />
-            <span>Not Visited</span>
-          </div>
-        </div>
 
-        <button onClick={handleSubmit} className="w-full mt-6 bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">
-          Submit Test
-        </button>
-      </aside>
+          <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            {testData?.sections?.map((section, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSectionIndex(index)}
+                className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
+                  }`}
+              >
+                {section.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-5 gap-2">
+            {filteredQuestions.map((question, index) => (
+              <button
+                key={question.id}
+                onClick={() => handlePaletteClick(question.originalIndex)}
+                className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${questionStatuses[question.originalIndex] === 'answered'
+                  ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
+                  : questionStatuses[question.originalIndex] === 'notAnswered'
+                    ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500'
+                    : questionStatuses[question.originalIndex] === 'markedForReview'
+                      ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
+                      : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
+                  } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-border-light dark:border-border-dark space-y-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-md bg-green-500/20 border border-green-500" />
+              <span>Answered</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-md bg-red-500/20 border border-red-500" />
+              <span>Not Answered</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-md bg-purple-500/20 border border-purple-500" />
+              <span>Marked for Review</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-md bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark" />
+              <span>Not Visited</span>
+            </div>
+          </div>
+        </aside>
+        <div className="lg:self-stretch">
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Submit Test
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 };
