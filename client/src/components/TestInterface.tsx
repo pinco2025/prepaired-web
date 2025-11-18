@@ -4,6 +4,7 @@ import { fetchTestData } from '../utils/testData';
 import { Test as ImportedTest } from '../data';
 import { InlineMath } from 'react-katex';
 import { supabase } from '../utils/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 /** Local types that match what this component expects from fetchTestData() */
 type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
@@ -51,6 +52,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
+  const navigate = useNavigate();
+  const isSubmittingRef = useRef(false);
 
   // derived current question (typed)
   const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
@@ -69,34 +72,50 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
   const handleSubmit = useCallback(async () => {
     if (!testData) return;
 
-    const { data } = await supabase.auth.getUser();
-    const user = (data as any)?.user;
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    try {
+      const { data } = await supabase.auth.getUser();
+      const user = (data as any)?.user;
 
-    if (!user) {
-      console.error('User not logged in');
-      return;
-    }
-
-    const submission = {
-      test_id: testData.testId,
-      answers: answers,
-      user_id: user.id,
-      started_at: new Date().toISOString()
-    };
-
-    const { error } = await supabase.from('student_tests').insert([submission]);
-    if (error) {
-      //console.error('Error submitting test:', error);
-    } else {
-      //console.log('Test submitted successfully!');
-      try {
-        localStorage.removeItem(`test-answers-${testData.testId}`);
-      } catch (e) {
-        console.warn('Could not remove answers from localStorage', e);
+      if (!user) {
+        console.error('User not logged in');
+        isSubmittingRef.current = false; // allow retry if needed
+        return;
       }
-      onSubmitSuccess();
+
+      const submission = {
+        test_id: testData.testId,
+        answers: answers,
+        user_id: user.id,
+        started_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('student_tests').insert([submission]);
+      if (error) {
+        console.error('Error submitting test:', error);
+        // keep isSubmittingRef.current = false so user can retry if desired
+        isSubmittingRef.current = false;
+      } else {
+        try {
+          localStorage.removeItem(`test-answers-${testData.testId}`);
+        } catch (e) {
+          console.warn('Could not remove answers from localStorage', e);
+        }
+        try {
+          onSubmitSuccess();
+        } catch (e) {
+          console.warn('onSubmitSuccess threw:', e);
+        }
+
+        // navigate away — don't reset isSubmittingRef, not necessary after navigation
+        navigate('/test-submitted');
+      }
+    } catch (e) {
+      console.error('Submission failed', e);
+      isSubmittingRef.current = false;
     }
-  }, [answers, testData, onSubmitSuccess]);
+  }, [answers, testData, onSubmitSuccess, navigate]);
 
   const handleSubmitRef = useRef(handleSubmit);
   useEffect(() => {
@@ -198,8 +217,9 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
             clearInterval(timer);
             timer = null;
           }
-          // submit
-          handleSubmitRef.current();
+          if (!isSubmittingRef.current) {// submit
+            handleSubmitRef.current();
+          }
         } else {
           setTimeLeft(newTimeLeft);
         }
@@ -308,16 +328,14 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
                   <button
                     key={option.id}
                     onClick={() => handleSelectOption(option.id)}
-                    className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                      selectedOption === option.id
-                        ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
-                        : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
-                    }`}
+                    className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
+                      ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
+                      : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
+                      }`}
                   >
                     <span
-                      className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${
-                        selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
-                      }`}
+                      className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
+                        }`}
                     >
                       {option.id.toUpperCase()}
                     </span>
@@ -374,9 +392,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
             <button
               key={index}
               onClick={() => setCurrentSectionIndex(index)}
-              className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
-                currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
-              }`}
+              className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
+                }`}
             >
               {section.name}
             </button>
@@ -388,15 +405,14 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
             <button
               key={question.id}
               onClick={() => handlePaletteClick(question.originalIndex)}
-              className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${
-                questionStatuses[question.originalIndex] === 'answered'
-                  ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
-                  : questionStatuses[question.originalIndex] === 'notAnswered'
+              className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${questionStatuses[question.originalIndex] === 'answered'
+                ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
+                : questionStatuses[question.originalIndex] === 'notAnswered'
                   ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500'
                   : questionStatuses[question.originalIndex] === 'markedForReview'
-                  ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
-                  : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
-              } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
+                    ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
+                    : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
+                } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
             >
               {index + 1}
             </button>

@@ -14,6 +14,7 @@ import SubjectDetails from './components/SubjectDetails';
 import ChapterDetails from './components/ChapterDetails';
 import Tests from './components/Tests';
 import TestPage from './components/TestPage';
+import TestSubmitted from './components/TestSubmitted'
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -87,6 +88,11 @@ const AppContent: React.FC = () => {
           }
         />
         <Route path="/coming-soon" element={<ComingSoon />} />
+        <Route path="/test-submitted" element={
+          <RequireAuth>
+            <TestSubmitted />
+          </RequireAuth>
+        } />
       </Routes>
     </div>
   );
