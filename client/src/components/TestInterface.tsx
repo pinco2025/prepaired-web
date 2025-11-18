@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTestData } from '../utils/testData';
 // keep the original import if other code relies on it, but we won't assume its shape here
 import { Test as ImportedTest } from '../data';
-import { InlineMath } from 'react-katex';
 import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import katex from 'katex'
+import 'katex/dist/katex.min.css';
+
 
 /** Local types that match what this component expects from fetchTestData() */
 type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
@@ -43,6 +45,7 @@ interface LocalTest {
 interface TestInterfaceProps {
   onSubmitSuccess: () => void;
 }
+const escapeLatex = (s: string) => s.replace(/\\/g, "\\");
 
 const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
@@ -58,15 +61,30 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
   // derived current question (typed)
   const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
 
+
   function renderMixedMath(text: string) {
-    const parts = text.split(/(\$[^$]*\$)/g);
-    return parts.map((part, i) => {
-      if (part.startsWith('$') && part.endsWith('$')) {
-        const math = part.slice(1, -1);
-        return <InlineMath key={i}>{math}</InlineMath>;
-      }
-      return <span key={i}>{part}</span>;
-    });
+    const parts = text.split(/\$([^$]+)\$/g);
+
+    return (
+      <>
+        {parts.map((part, i) => {
+          if (i % 2 === 1) {
+            try {
+              const html = katex.renderToString(part, {
+                throwOnError: false,
+                output: 'html', // Only HTML, no MathML
+                displayMode: false
+              });
+              return <span key={i} dangerouslySetInnerHTML={{ __html: html }} />;
+            } catch (e) {
+              console.error('KaTeX error:', e);
+              return <span key={i}>{part}</span>;
+            }
+          }
+          return part ? <span key={i}>{part}</span> : null;
+        })}
+      </>
+    );
   }
 
   const handleSubmit = useCallback(async () => {
