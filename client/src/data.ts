@@ -264,6 +264,7 @@ export interface Test {
   totalQuestions: number;
   markingScheme: string;
   instructions: string[];
+  url: string;
 }
 
 export interface TestCategory {
@@ -272,85 +273,3 @@ export interface TestCategory {
   tests: Test[];
 }
 
-export const testsData: TestCategory[] = [
-  {
-    title: 'Full Syllabus Mock Tests',
-    icon: 'checklist',
-    tests: [
-      {
-        id: 'jee-main-full-1',
-        title: 'JEE Main Full Test #1',
-        description: '3 hours | 300 Marks',
-        duration: '3 hours',
-        totalQuestions: 90,
-        markingScheme: '+4 for correct, -1 for incorrect',
-        instructions: [
-          'The test contains multiple-choice questions with a single correct answer.',
-          'Each correct answer will be awarded +4 marks, and each incorrect answer will result in a penalty of -1 mark.',
-          'Unanswered questions will receive 0 marks.',
-          'You can navigate between questions and sections at any time during the test.',
-          'Ensure you have a stable internet connection throughout the duration of the test.',
-          'Do not close the browser window or refresh the page, as it may result in loss of progress.',
-          'The test will automatically submit once the timer runs out.',
-        ],
-      },
-      {
-        id: 'jee-advanced-full-1',
-        title: 'JEE Advanced Full Test #1',
-        description: '3 hours | 180 Marks',
-        duration: '3 hours',
-        totalQuestions: 54,
-        markingScheme: 'Varies per section',
-        instructions: [
-          'The test contains multiple sections with different question types.',
-          'Marking scheme varies across different sections.',
-          'Read the instructions for each section carefully.',
-          'You can navigate between questions and sections at any time during the test.',
-          'Ensure you have a stable internet connection throughout the duration of the test.',
-          'Do not close the browser window or refresh the page, as it may result in loss of progress.',
-          'The test will automatically submit once the timer runs out.',
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Previous Year Papers',
-    icon: 'history',
-    tests: [
-      {
-        id: 'jee-main-2023-1',
-        title: 'JEE Main 2023 - Shift 1',
-        description: '3 hours | 300 Marks',
-        duration: '3 hours',
-        totalQuestions: 90,
-        markingScheme: '+4 for correct, -1 for incorrect',
-        instructions: [
-          'The test contains multiple-choice questions with a single correct answer.',
-          'Each correct answer will be awarded +4 marks, and each incorrect answer will result in a penalty of -1 mark.',
-          'Unanswered questions will receive 0 marks.',
-          'You can navigate between questions and sections at any time during the test.',
-          'Ensure you have a stable internet connection throughout the duration of the test.',
-          'Do not close the browser window or refresh the page, as it may result in loss of progress.',
-          'The test will automatically submit once the timer runs out.',
-        ],
-      },
-      {
-        id: 'jee-advanced-2022-1',
-        title: 'JEE Advanced 2022 - Paper 1',
-        description: '3 hours | 180 Marks',
-        duration: '3 hours',
-        totalQuestions: 54,
-        markingScheme: 'Varies per section',
-        instructions: [
-          'The test contains multiple sections with different question types.',
-          'Marking scheme varies across different sections.',
-          'Read the instructions for each section carefully.',
-          'You can navigate between questions and sections at any time during the test.',
-          'Ensure you have a stable internet connection throughout the duration of the test.',
-          'Do not close the browser window or refresh the page, as it may result in loss of progress.',
-          'The test will automatically submit once the timer runs out.',
-        ],
-      },
-    ],
-  },
-];
