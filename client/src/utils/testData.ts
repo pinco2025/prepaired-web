@@ -1,13 +1,14 @@
 export interface Option {
   id: string;
   text: string;
+  image?: string | number | null;
 }
 
 export interface Question {
   id: string;
   uuid: string;
   text: string;
-  image: number;
+  image?: string | number | null;
   options: Option[];
   correctAnswer: string;
   marks: number;
