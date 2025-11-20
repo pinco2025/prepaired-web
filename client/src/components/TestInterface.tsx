@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTestData } from '../utils/testData';
-// keep the original import if other code relies on it, but we won't assume its shape here
 import { Test } from '../data';
 import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import katex from 'katex'
 import 'katex/dist/katex.min.css';
 
-
-/** Local types that match what this component expects from fetchTestData() */
 type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
 
 interface LocalOption {
@@ -30,12 +27,11 @@ interface LocalSection {
 }
 
 interface LocalTest {
-  // fields your component expects
   id: string;
   testId: string;
   title: string;
   description?: string;
-  duration: number; // seconds
+  duration: number;
   totalMarks?: number;
   totalQuestions?: number;
   markingScheme?: string;
@@ -48,6 +44,7 @@ interface TestInterfaceProps {
   test: Test;
   onSubmitSuccess: () => void;
 }
+
 const escapeLatex = (s: string) => s.replace(/\\/g, "\\");
 
 const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) => {
@@ -60,10 +57,17 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // derived current question (typed)
   const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
 
+  // Format time as HH:MM:SS
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
 
   function renderMixedMath(text: string) {
     const parts = text.split(/\$([^$]+)\$/g);
@@ -75,7 +79,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
             try {
               const html = katex.renderToString(part, {
                 throwOnError: false,
-                output: 'html', // Only HTML, no MathML
+                output: 'html',
                 displayMode: false
               });
               return <span key={i} dangerouslySetInnerHTML={{ __html: html }} />;
@@ -93,15 +97,27 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
   const handleSubmit = useCallback(async () => {
     if (!testData) return;
 
-    if (isSubmittingRef.current) return;
+    if (isSubmittingRef.current) {
+      console.log('Submission already in progress, skipping...');
+      return;
+    }
+    
     isSubmittingRef.current = true;
+    console.log('Starting submission...');
+
+    // Clear timer immediately to prevent any further submissions
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     try {
       const { data } = await supabase.auth.getUser();
       const user = (data as any)?.user;
 
       if (!user) {
         console.error('User not logged in');
-        isSubmittingRef.current = false; // allow retry if needed
+        isSubmittingRef.current = false;
         return;
       }
 
@@ -115,7 +131,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
       const { error } = await supabase.from('student_tests').insert([submission]);
       if (error) {
         console.error('Error submitting test:', error);
-        // keep isSubmittingRef.current = false so user can retry if desired
         isSubmittingRef.current = false;
       } else {
         try {
@@ -129,7 +144,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
           console.warn('onSubmitSuccess threw:', e);
         }
 
-        // navigate away — don't reset isSubmittingRef, not necessary after navigation
         navigate('/test-submitted');
       }
     } catch (e) {
@@ -138,29 +152,20 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
     }
   }, [answers, testData, onSubmitSuccess, navigate]);
 
-  const handleSubmitRef = useRef(handleSubmit);
   useEffect(() => {
-    handleSubmitRef.current = handleSubmit;
-  }, [handleSubmit]);
-
-  useEffect(() => {
-    let timer: ReturnType<typeof setInterval> | null = null;
-
     const initializeTest = async () => {
-      // fetchTestData might be async or sync — await to be safe
       if (!test || !test.url) return;
       const data = await fetchTestData(test.url);
 
-      // Build object matching LocalTest
       const adaptedTestData: LocalTest = {
         id: data.testId,
         testId: data.testId,
         title: data.title,
         description: `${Math.floor((data.duration ?? 0) / 60)} minutes | ${data.totalMarks ?? 0} Marks`,
-        duration: Number(data.duration ?? 0), // ensure numeric
+        duration: Number(data.duration ?? 0),
         totalMarks: data.totalMarks ?? 0,
         totalQuestions: (data.questions ?? []).length,
-        markingScheme: `Varies`,
+        markingScheme: test.markingScheme,
         instructions: [
           'The test contains multiple-choice questions with a single correct answer.',
           'Each correct answer will be awarded marks as per the question.',
@@ -187,18 +192,15 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
 
       setTestData(adaptedTestData);
 
-      // initialize question statuses length-correctly
       const qCount = adaptedTestData.questions?.length ?? 0;
       setQuestionStatuses(Array(qCount).fill('notVisited' as QuestionStatus));
 
-      // auth
       const { data: authData } = await supabase.auth.getUser();
       const user = (authData as any)?.user;
       if (!user) {
         console.error('User not logged in. Cannot fetch test start time.');
       }
 
-      // fetch or create student_tests row to get started_at
       let testStartTimeISO: string | null = null;
       try {
         if (user) {
@@ -210,7 +212,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
             .single();
 
           if (error || !studentTestData) {
-            // insert a new record
             const { data: newStudentTest, error: insertError } = await supabase
               .from('student_tests')
               .insert({ test_id: data.testId, user_id: user.id })
@@ -234,38 +235,35 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
         testStartTimeISO = new Date().toISOString();
       }
 
-      const testDuration = Number(data.duration ?? 0); // seconds
-
-      // start timer
+      const testDuration = Number(data.duration ?? 0);
       const now = new Date();
       const startTime = new Date(testStartTimeISO!);
       const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
-      let newTimeLeft = testDuration - elapsedTime;
+      let remainingTime = testDuration - elapsedTime;
 
-      // set immediate state
-      if (newTimeLeft <= 0) {
+      if (remainingTime <= 0) {
         setTimeLeft(0);
-        // handle immediate expiry explicitly
-        if (!isSubmittingRef.current) {
-          // optionally show a confirmation before auto-submitting, or call submit immediately:
-          handleSubmitRef.current();
-        }
-      } else {
-        setTimeLeft(newTimeLeft);
-
-        timer = setInterval(() => {
-          newTimeLeft -= 1;
-          if (newTimeLeft <= 0) {
-            setTimeLeft(0);
-            clearInterval(timer!);
-            if (!isSubmittingRef.current) handleSubmitRef.current();
-          } else {
-            setTimeLeft(newTimeLeft);
-          }
-        }, 1000);
+        // Don't call handleSubmit here - let the effect below handle it
+        return;
       }
 
-      // load saved answers
+      setTimeLeft(remainingTime);
+
+      // Start the timer
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev === null || prev <= 1) {
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+              timerRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Load saved answers
       try {
         const saved = localStorage.getItem(`test-answers-${data.testId}`);
         if (saved) setAnswers(JSON.parse(saved));
@@ -274,13 +272,23 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
       }
     };
 
-    // call initializer
     initializeTest();
 
     return () => {
-      if (timer) clearInterval(timer);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, []);
+  }, [test]);
+
+  // Separate effect to handle submission when time runs out
+  useEffect(() => {
+    if (timeLeft === 0 && testData && !isSubmittingRef.current) {
+      console.log('Time expired, auto-submitting...');
+      handleSubmit();
+    }
+  }, [timeLeft, testData, handleSubmit]);
 
   useEffect(() => {
     if (!testData) return;
@@ -348,7 +356,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
-      {/* Left/main column: allow internal scrolling / shrinking by using flex + min-h-0 */}
       <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 lg:h-[84vh]">
         <div className="flex-grow overflow-y-auto min-h-0">
           {currentQuestion && (
@@ -437,17 +444,12 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
         </div>
       </div>
 
-      {/* Right/palette aside */}
       <div className="flex flex-col gap-4">
-        <aside
-          // make the aside sticky at the top on large screens, keep it from growing the row,
-          // and allow internal vertical scroll when contents exceed max height.
-          className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark lg:sticky lg:top-6 lg:self-start max-h-[72vh] overflow-y-auto"
-        >
+        <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark lg:sticky lg:top-6 lg:self-start max-h-[72vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Time Left:</h3>
             <span className="text-lg font-semibold text-text-light dark:text-text-dark">
-              {timeLeft !== null ? `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}` : '--:--'}
+              {timeLeft !== null ? formatTime(timeLeft) : '--:--:--'}
             </span>
           </div>
 
@@ -506,13 +508,13 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
         <div className="lg:self-stretch">
           <button
             onClick={handleSubmit}
-            className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity"
+            disabled={isSubmittingRef.current}
+            className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             Submit Test
           </button>
         </div>
       </div>
-
     </div>
   );
 };
