@@ -14,11 +14,13 @@ type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisit
 interface LocalOption {
   id: string;
   text: string;
+  image?: string | null;
 }
 
 interface LocalQuestion {
   id: string;
   text: string;
+  image?: string | null;
   options: LocalOption[];
   section?: string;
 }
@@ -170,7 +172,17 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
           'The test will automatically submit once the timer runs out.',
         ],
         sections: (data.sections ?? []) as LocalSection[],
-        questions: (data.questions ?? []) as LocalQuestion[],
+        questions: (data.questions ?? []).map((q: any) => ({
+          id: q.id,
+          text: q.text,
+          image: (q.image && q.image !== 0 && q.image !== "0") ? String(q.image) : null,
+          options: (q.options ?? []).map((o: any) => ({
+            id: o.id,
+            text: o.text,
+            image: (o.image && o.image !== 0 && o.image !== "0") ? String(o.image) : null,
+          })),
+          section: q.section
+        })),
       };
 
       setTestData(adaptedTestData);
@@ -352,12 +364,21 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
               <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}
               </p>
+              {currentQuestion.image && (
+                <div className="mb-8">
+                  <img
+                    src={currentQuestion.image}
+                    alt="Question Illustration"
+                    className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                  />
+                </div>
+              )}
               <div className="space-y-4">
                 {currentQuestion.options.map((option) => (
                   <button
                     key={option.id}
                     onClick={() => handleSelectOption(option.id)}
-                    className={`w-full flex items-center text-left p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
+                    className={`w-full flex items-start text-left p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
                       ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
                       : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
                       }`}
@@ -368,7 +389,16 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
                     >
                       {option.id.toUpperCase()}
                     </span>
-                    <span className="text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
+                    <div className="flex flex-col w-full gap-3">
+                      <span className="text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
+                      {option.image && (
+                        <img
+                          src={option.image}
+                          alt={`Option ${option.id} Illustration`}
+                          className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                        />
+                      )}
+                    </div>
                   </button>
                 ))}
               </div>
