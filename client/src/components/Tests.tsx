@@ -23,7 +23,7 @@ const Tests: React.FC = () => {
             };
           }
           categories[test.category].tests.push({
-            id: test.id,
+            id: test.testID,
             title: test.title,
             description: test.description,
             duration: test.duration,

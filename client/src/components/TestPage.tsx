@@ -19,7 +19,7 @@ const TestPage: React.FC = () => {
       const { data, error } = await supabase
         .from('tests')
         .select('*')
-        .eq('id', testId)
+        .eq('testID', testId)
         .single();
 
       if (error) {

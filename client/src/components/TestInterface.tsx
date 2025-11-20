@@ -225,25 +225,33 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
       const testDuration = Number(data.duration ?? 0); // seconds
 
       // start timer
-      timer = setInterval(() => {
-        const now = new Date();
-        const startTime = new Date(testStartTimeISO!);
-        const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
-        const newTimeLeft = testDuration - elapsedTime;
+      const now = new Date();
+      const startTime = new Date(testStartTimeISO!);
+      const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+      let newTimeLeft = testDuration - elapsedTime;
 
-        if (newTimeLeft <= 0) {
-          setTimeLeft(0);
-          if (timer) {
-            clearInterval(timer);
-            timer = null;
-          }
-          if (!isSubmittingRef.current) {// submit
-            handleSubmitRef.current();
-          }
-        } else {
-          setTimeLeft(newTimeLeft);
+      // set immediate state
+      if (newTimeLeft <= 0) {
+        setTimeLeft(0);
+        // handle immediate expiry explicitly
+        if (!isSubmittingRef.current) {
+          // optionally show a confirmation before auto-submitting, or call submit immediately:
+          handleSubmitRef.current();
         }
-      }, 1000);
+      } else {
+        setTimeLeft(newTimeLeft);
+
+        timer = setInterval(() => {
+          newTimeLeft -= 1;
+          if (newTimeLeft <= 0) {
+            setTimeLeft(0);
+            clearInterval(timer!);
+            if (!isSubmittingRef.current) handleSubmitRef.current();
+          } else {
+            setTimeLeft(newTimeLeft);
+          }
+        }, 1000);
+      }
 
       // load saved answers
       try {
