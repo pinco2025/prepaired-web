@@ -1,5 +1,3 @@
-import testData from '../sample-test-001.json';
-
 export interface Option {
   id: string;
   text: string;
@@ -36,6 +34,11 @@ export interface Test {
   questions: Question[];
 }
 
-export const fetchTestData = (): Test => {
+export const fetchTestData = async (url: string): Promise<Test> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch test data from ${url}`);
+  }
+  const testData = await response.json();
   return testData;
 };

@@ -1,8 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { testsData } from '../data';
+import { supabase } from '../utils/supabaseClient';
+import { TestCategory } from '../data';
 
 const Tests: React.FC = () => {
+  const [testsData, setTestsData] = useState<TestCategory[]>([]);
+
+  useEffect(() => {
+    const fetchTests = async () => {
+      const { data, error } = await supabase.from('tests').select('*');
+      if (error) {
+        console.error('Error fetching tests:', error);
+      } else {
+        // Group tests by category
+        const categories: { [key: string]: TestCategory } = {};
+        data.forEach((test: any) => {
+          if (!categories[test.category]) {
+            categories[test.category] = {
+              title: test.category,
+              icon: 'checklist', // Default icon
+              tests: [],
+            };
+          }
+          categories[test.category].tests.push({
+            id: test.id,
+            title: test.title,
+            description: test.description,
+            duration: test.duration,
+            totalQuestions: test.totalQuestions,
+            markingScheme: test.markingScheme,
+            instructions: test.instructions,
+            url: test.url,
+          });
+        });
+        setTestsData(Object.values(categories));
+      }
+    };
+
+    fetchTests();
+  }, []);
+
   return (
     <main className="flex-grow">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
