@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { testsData, Test } from '../data';
+import { Test } from '../data';
+import { supabase } from '../utils/supabaseClient';
 import TestInstructions from './TestInstructions';
 import TestInterface from './TestInterface';
 import TestSubmitted from './TestSubmitted';
@@ -13,10 +14,23 @@ const TestPage: React.FC = () => {
   const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
 
   useEffect(() => {
-    const foundTest = testsData
-      .flatMap((category) => category.tests)
-      .find((t) => t.id === testId);
-    setTest(foundTest || null);
+    const fetchTest = async () => {
+      if (!testId) return;
+      const { data, error } = await supabase
+        .from('tests')
+        .select('*')
+        .eq('id', testId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching test:', error);
+        setTest(null);
+      } else {
+        setTest(data as Test);
+      }
+    };
+
+    fetchTest();
   }, [testId]);
 
   useEffect(() => {
@@ -49,9 +63,12 @@ const TestPage: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (!test) {
+      return <div>Loading test...</div>;
+    }
     switch (testStatus) {
       case 'inProgress':
-        return <TestInterface onSubmitSuccess={handleSubmitSuccess} />;
+        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} />;
       case 'submitted':
         return <TestSubmitted />;
       case 'instructions':

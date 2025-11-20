@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTestData } from '../utils/testData';
 // keep the original import if other code relies on it, but we won't assume its shape here
-import { Test as ImportedTest } from '../data';
+import { Test } from '../data';
 import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import katex from 'katex'
@@ -43,11 +43,12 @@ interface LocalTest {
 }
 
 interface TestInterfaceProps {
+  test: Test;
   onSubmitSuccess: () => void;
 }
 const escapeLatex = (s: string) => s.replace(/\\/g, "\\");
 
-const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
+const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -145,7 +146,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onSubmitSuccess }) => {
 
     const initializeTest = async () => {
       // fetchTestData might be async or sync — await to be safe
-      const data = await fetchTestData();
+      if (!test || !test.url) return;
+      const data = await fetchTestData(test.url);
 
       // Build object matching LocalTest
       const adaptedTestData: LocalTest = {
