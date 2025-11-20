@@ -1,7 +1,7 @@
 {
   "testId": "test_nested_with_subdist",
   "title": "Physics & Chemistry Test with Nested Type Control",
-  "duration": 10800,
+  "duration": 3600,
   "totalMarks": 792,
   "sections": [
     {
@@ -375,7 +375,7 @@
     {
       "id": "q11",
       "uuid": "104e194f1f6f",
-      "text": "Pineapple ($\\textit{ananas}$) fruit develops from",
+      "text": "Pineapple (\\textit{ananas}) fruit develops from",
       "image": 0,
       "options": [
         {
@@ -695,19 +695,19 @@
       "options": [
         {
           "id": "a",
-          "text": "$\\textit{Soyabean}$"
+          "text": "\\textit{Soyabean}"
         },
         {
           "id": "b",
-          "text": "$\\textit{Brinjal}$"
+          "text": "\\textit{Brinjal}"
         },
         {
           "id": "c",
-          "text": "$\\textit{Tulip}$"
+          "text": "\\textit{Tulip}"
         },
         {
           "id": "d",
-          "text": "$\\textit{Aloe}$"
+          "text": "\\textit{Aloe}"
         }
       ],
       "correctAnswer": "a",
@@ -730,19 +730,19 @@
       "options": [
         {
           "id": "a",
-          "text": "$\\textit{Dianthus}$"
+          "text": "\\textit{Dianthus}"
         },
         {
           "id": "b",
-          "text": "$\\textit{Lemon}$"
+          "text": "\\textit{Lemon}"
         },
         {
           "id": "c",
-          "text": "$\\textit{Marigold}$"
+          "text": "\\textit{Marigold}"
         },
         {
           "id": "d",
-          "text": "$\\textit{Argemone}$"
+          "text": "\\textit{Argemone}"
         }
       ],
       "correctAnswer": "b",
@@ -3525,24 +3525,24 @@
     {
       "id": "q101",
       "uuid": "f617abfa3f44",
-      "text": "In a first order reaction, if the initial concentration of reactant is 0.1 mol L?¹ and becomes 0.06 mol L¹ after 100 seconds, what is the rate constant k using the equation $k = (2.303/t)log([R]/[R])$?",
+      "text": "In a first order reaction, if the initial concentration of reactant is $0.1$ mol $\\text{L}^{-1}$ and becomes $0.06$ mol $\\text{L}^{-1}$ after $100$ seconds, what is the rate constant $k$ using the equation $k = \\frac{2.303}{t}\\log\\frac{[R]_0}{[R]}$?",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "2.55 × 10?³ s?¹"
+          "text": "$2.55 \\times 10^{-3}$ $\\text{s}^{-1}$"
         },
         {
           "id": "b",
-          "text": "5.10 × 10?³ s?¹"
+          "text": "$5.10 \\times 10^{-3}$ $\\text{s}^{-1}$"
         },
         {
           "id": "c",
-          "text": "7.65 × 10?³ s?¹"
+          "text": "$7.65 \\times 10^{-3}$ $\\text{s}^{-1}$"
         },
         {
           "id": "d",
-          "text": "1.02 × 10?² s?¹"
+          "text": "$1.02 \\times 10^{-2}$ $\\text{s}^{-1}$"
         }
       ],
       "correctAnswer": "b",
@@ -3595,20 +3595,20 @@
     {
       "id": "q103",
       "uuid": "db0d12463597",
-      "text": "In the formation of methanol from bromomethane (${CH-Br} + OH^{-} \\rightarrow {CH-OH} + Br^{-}$), proper orientation of reactant molecules is crucial. Which orientation would lead to effective collision?",
+      "text": "In the formation of methanol from bromomethane ($\\text{CH}_3\\text{Br} + \\text{OH}^- \\rightarrow \\text{CH}_3\\text{OH} + \\text{Br}^-$), proper orientation of reactant molecules is crucial. Which orientation would lead to effective collision?",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "OH? approaching the Br atom"
+          "text": "$\\text{OH}^-$ approaching the $\\text{Br}$ atom"
         },
         {
           "id": "b",
-          "text": "OH$^{-}$ approaching the C atom from the side opposite to Br"
+          "text": "$\\text{OH}^-$ approaching the $\\text{C}$ atom from the side opposite to $\\text{Br}$"
         },
         {
           "id": "c",
-          "text": "OH$^{-}$ approaching parallel to the C-Br bond"
+          "text": "$\\text{OH}^-$ approaching parallel to the $\\text{C-Br}$ bond"
         },
         {
           "id": "d",
@@ -3630,7 +3630,7 @@
     {
       "id": "q104",
       "uuid": "9cca4c55757f",
-      "text": "The rate law for a reaction aA + bB ? cC + dD is given by Rate = $k[A]^{x}[B]^{y}$. What does the sum (x + y) represent in this expression?",
+      "text": "The rate law for a reaction $a\\text{A} + b\\text{B} \\rightarrow c\\text{C} + d\\text{D}$ is given by Rate $= k[\\text{A}]^x[\\text{B}]^y$. What does the sum $(x + y)$ represent in this expression?",
       "image": 0,
       "options": [
         {
@@ -3735,7 +3735,7 @@
     {
       "id": "q107",
       "uuid": "f59eb73bfa1a",
-      "text": "$NO_{2}$ required for a reaction is produced by decomposition of $N_{2}O_{5}$ in $CCl_{4}$ as by equation $2N_{2}O_{5}(g)$ $\\rightarrow 4NO_{2}(g) + O_{2}(g)$. The initial concentration of $N_{2}O_{5}$ is 3 mol $L^{-1}$ and it is 2.75 mol $L^{-1}$ after 30 minutes. The rate of formation of $NO_{2}$ is $x \\times 10^{-3} mol L^{-1} min^{-1}$, value of x is _______",
+      "text": "$\\text{NO}_2$ required for a reaction is produced by decomposition of $\\text{N}_2\\text{O}_5$ in $\\text{CCl}_4$ as by equation $2\\text{N}_2\\text{O}_{5(g)} \\rightarrow 4\\text{NO}_{2(g)} + \\text{O}_{2(g)}$. The initial concentration of $\\text{N}_2\\text{O}_5$ is $3$ mol $\\text{L}^{-1}$ and it is $2.75$ mol $\\text{L}^{-1}$ after $30$ minutes. The rate of formation of $\\text{NO}_2$ is $x \\times 10^{-3}$ mol $\\text{L}^{-1}$ $\\text{min}^{-1}$, value of $x$ is _______",
       "image": 0,
       "options": [
         {
@@ -3805,7 +3805,7 @@
     {
       "id": "q109",
       "uuid": "ce8861e69cf0",
-      "text": "Consider an elementary reaction A(g) + B(g) $\\rightarrow$ C(g) + D(g). If the volume of reaction mixture is suddenly reduced to $\\frac{1}{3}$ of its initial volume, the reaction rate will become x times of the original reaction rate. The value of x is:",
+      "text": "Consider an elementary reaction $\\text{A}_{(g)} + \\text{B}_{(g)} \\rightarrow \\text{C}_{(g)} + \\text{D}_{(g)}$. If the volume of reaction mixture is suddenly reduced to $\\frac{1}{3}$ of its initial volume, the reaction rate will become $x$ times of the original reaction rate. The value of $x$ is:",
       "image": 0,
       "options": [
         {
@@ -3840,24 +3840,24 @@
     {
       "id": "q110",
       "uuid": "b3356d771e79",
-      "text": "Integrated rate law equation for a first order gas phase reaction is given by (where P_i is initial pressure and P_t is total pressure at time t)",
+      "text": "Integrated rate law equation for a first order gas phase reaction is given by (where $P_i$ is initial pressure and $P_t$ is total pressure at time $t$)",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "k = $\\frac{2.303}{t} \\times \\log \\frac{P_i}{(2P_i-P_t)}$"
+          "text": "$k = \\frac{2.303}{t} \\times \\log \\frac{P_i}{(2P_i-P_t)}$"
         },
         {
           "id": "b",
-          "text": "k = $\\frac{2.303}{t} \\times \\log \\frac{2P_i}{(2P_i-P_t)}$"
+          "text": "$k = \\frac{2.303}{t} \\times \\log \\frac{2P_i}{(2P_i-P_t)}$"
         },
         {
           "id": "c",
-          "text": "k = $\\frac{2.303}{t} \\times \\log \\frac{(2P_i-P_t)}{P_i}$"
+          "text": "$k = \\frac{2.303}{t} \\times \\log \\frac{(2P_i-P_t)}{P_i}$"
         },
         {
           "id": "d",
-          "text": "k = $\\frac{2.303}{t} \\times \\frac{P_i}{(2P_i-P_t)}$"
+          "text": "$k = \\frac{2.303}{t} \\times \\frac{P_i}{(2P_i-P_t)}$"
         }
       ],
       "correctAnswer": "a",
@@ -3875,7 +3875,7 @@
     {
       "id": "q111",
       "uuid": "0b34277813b3",
-      "text": "In a first order decomposition reaction, the time taken for the decomposition of reactant to one fourth and one eighth of its initial concentration are t_1 and t_2, respectively. The ratio (s) t_1/t_2 will:",
+      "text": "In a first order decomposition reaction, the time taken for the decomposition of reactant to one fourth and one eighth of its initial concentration are $t_1$ and $t_2$, respectively. The ratio(s) $t_1/t_2$ will:",
       "image": 0,
       "options": [
         {
@@ -3910,7 +3910,7 @@
     {
       "id": "q112",
       "uuid": "a22887a66b90",
-      "text": "The rate of first order reaction is 0.04 mol L^{-1} s^{-1} at 10 minutes and 0.03 mol L^{-1} s^{-1} at 20 minutes after initiation. Half life of the reaction is _______ minutes. (Given log 2 = 0.3010, log 3 = 0.4771)",
+      "text": "The rate of first order reaction is $0.04$ mol ${L}^{-1}$ ${s}^{-1}$ at $10$ minutes and $0.03$ mol ${L}^{-1}$ ${s}^{-1}$ at $20$ minutes after initiation. Half life of the reaction is _______ minutes. (Given $log 2 = 0.3010$, $log 3 = 0.4771$)",
       "image": 0,
       "options": [
         {
@@ -3945,7 +3945,7 @@
     {
       "id": "q113",
       "uuid": "99b49dee87b6",
-      "text": "For a reaction, r = k[A], 50% of A is decomposed in 120 minutes. The time taken for decomposition of 90% A is _______ minutes.",
+      "text": "For a reaction, $r = k[\\text{A}]$, $50\\%$ of $\\text{A}$ is decomposed in $120$ minutes. The time taken for decomposition of $90\\%$ $\\text{A}$ is _______ minutes.",
       "image": 0,
       "options": [
         {
@@ -3980,7 +3980,7 @@
     {
       "id": "q114",
       "uuid": "4c1cb1433f67",
-      "text": "Reactant A converts to product D through the given mechanism (with the net evolution of heat): A \\rightarrow B (slow); \\Delta H = +ve, B \\rightarrow C (fast); \\Delta H = -ve, C \\rightarrow D (fast); \\Delta H = -ve. Which of the following represents the above reaction mechanism?",
+      "text": "Reactant $\\text{A}$ converts to product $\\text{D}$ through the given mechanism (with the net evolution of heat): $\\text{A} \\rightarrow \\text{B}$ (slow); $\\Delta H = +\\text{ve}$, $\\text{B} \\rightarrow \\text{C}$ (fast); $\\Delta H = -\\text{ve}$, $\\text{C} \\rightarrow \\text{D}$ (fast); $\\Delta H = -\\text{ve}$. Which of the following represents the above reaction mechanism?",
       "image": 0,
       "options": [
         {
@@ -4050,7 +4050,7 @@
     {
       "id": "q116",
       "uuid": "53308a6afc4d",
-      "text": "The following data were obtained during the first order thermal decomposition of a gas A at constant volume: A_{(g)} \\rightarrow 2B_{(g)} + C_{(g)}. At t=0, pressure=0.1 atm and at t=115s, pressure=0.28 atm. The rate constant of the reaction is _______ \\times 10^{-2} s^{-1} (nearest integer)",
+      "text": "The following data were obtained during the first order thermal decomposition of a gas $\\text{A}$ at constant volume: $\\text{A}_{(g)} \\rightarrow 2\\text{B}_{(g)} + \\text{C}_{(g)}$. At $t=0$, pressure$=0.1$ atm and at $t=115$s, pressure$=0.28$ atm. The rate constant of the reaction is _______ $\\times 10^{-2}$ $\\text{s}^{-1}$ (nearest integer)",
       "image": 0,
       "options": [
         {
@@ -4085,7 +4085,7 @@
     {
       "id": "q117",
       "uuid": "ac03652dc82e",
-      "text": "In a reaction A + B \\rightarrow C, initial concentrations of A and B are related as [A]_0 = 8[B]_0. The half lives of A and B are 10 min and 40 min. respectively. If they start to disappear at the same time, both following first order kinetics, after how much time will the concentration of both the reactants be same?",
+      "text": "In a reaction $\\text{A} + \\text{B} \\rightarrow \\text{C}$, initial concentrations of $\\text{A}$ and $\\text{B}$ are related as $[\\text{A}]_0 = 8[\\text{B}]_0$. The half lives of $\\text{A}$ and $\\text{B}$ are $10$ min and $40$ min. respectively. If they start to disappear at the same time, both following first order kinetics, after how much time will the concentration of both the reactants be same?",
       "image": 0,
       "options": [
         {
@@ -4120,7 +4120,7 @@
     {
       "id": "q118",
       "uuid": "304c01fd1a88",
-      "text": "The reaction A_2 + B_2 \\rightarrow 2AB follows the mechanism A_2 (fast equilibrium), A + B_2 \\rightarrow AB + B (slow), A + B \\rightarrow AB (fast). The overall order of the reaction is:",
+      "text": "The reaction $\\text{A}_2 + \\text{B}_2 \\rightarrow 2\\text{AB}$ follows the mechanism $\\text{A}_2 \\rightleftharpoons 2\\text{A}$ (fast equilibrium), $\\text{A} + \\text{B}_2 \\rightarrow \\text{AB} + \\text{B}$ (slow), $\\text{A} + \\text{B} \\rightarrow \\text{AB}$ (fast). The overall order of the reaction is:",
       "image": 0,
       "options": [
         {
@@ -4160,11 +4160,11 @@
       "options": [
         {
           "id": "a",
-          "text": "$109,677$ cm$^{-1}$"
+          "text": "$109,677$ $\\text{cm}^{-1}$"
         },
         {
           "id": "b",
-          "text": "$109,677$ m$^{-1}$"
+          "text": "$109,677$ $\\text{m}^{-1}$"
         },
         {
           "id": "c",
@@ -4225,20 +4225,20 @@
     {
       "id": "q121",
       "uuid": "1a9bef54eec2",
-      "text": "Bromine atom possesses 35 electrons with 6 electrons in 2p, 6 electrons in 3p and 5 electrons in 4p orbital. Which electrons experience lowest effective nuclear charge?",
+      "text": "Bromine atom possesses $35$ electrons with $6$ electrons in $2p$, $6$ electrons in $3p$ and $5$ electrons in $4p$ orbital. Which electrons experience lowest effective nuclear charge?",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "2p"
+          "text": "$2p$"
         },
         {
           "id": "b",
-          "text": "3p"
+          "text": "$3p$"
         },
         {
           "id": "c",
-          "text": "4p"
+          "text": "$4p$"
         },
         {
           "id": "d",
@@ -4260,7 +4260,7 @@
     {
       "id": "q122",
       "uuid": "a5f9f184f765",
-      "text": "The number of angular nodes in 4f orbital is:",
+      "text": "The number of angular nodes in $4f$ orbital is:",
       "image": 0,
       "options": [
         {
@@ -4405,19 +4405,19 @@
       "options": [
         {
           "id": "a",
-          "text": "$\\text{n}=5, l=0, m=0, s = +\\frac{1}{2}$"
+          "text": "$n=5, l=0, m=0, s = +\\frac{1}{2}$"
         },
         {
           "id": "b",
-          "text": "$\\text{n}=5, l=0, m=1, s = +\\frac{1}{2}$"
+          "text": "$n=5, l=0, m=1, s = +\\frac{1}{2}$"
         },
         {
           "id": "c",
-          "text": "$\\text{n}=5, l=1, m=0, s = +\\frac{1}{2}$"
+          "text": "$n=5, l=1, m=0, s = +\\frac{1}{2}$"
         },
         {
           "id": "d",
-          "text": "$\\text{n}=5, l=1, m=1, s = +\\frac{1}{2}$"
+          "text": "$n=5, l=1, m=1, s = +\\frac{1}{2}$"
         }
       ],
       "correctAnswer": "a",
@@ -4435,7 +4435,7 @@
     {
       "id": "q127",
       "uuid": "d911b7c8773e",
-      "text": "Correct statements for an element with atomic number 9 are A. There can be 5 electrons for which m_s = +\\frac{1}{2} and 4 electrons for which m_s = -\\frac{1}{2} B. There is only one electron in p_z orbital C. The last electron goes to orbital with n = 2 and l = 1 4. The sum of angular nodes of all the atomic orbitals is 1. Choose the correct answer from the options given below:",
+      "text": "Correct statements for an element with atomic number $9$ are (A) There can be $5$ electrons for which $m_s = +\\frac{1}{2}$ and $4$ electrons for which $m_s = -\\frac{1}{2}$ (B) There is only one electron in $p_z$ orbital (C) The last electron goes to orbital with $n = 2$ and $l = 1$ (D) The sum of angular nodes of all the atomic orbitals is $1$. Choose the correct answer from the options given below:",
       "image": 0,
       "options": [
         {
@@ -4470,7 +4470,7 @@
     {
       "id": "q128",
       "uuid": "52d3c6c303db",
-      "text": "The value of Rydberg constant (R_H) is 2.18 \\times 10^{-18} J. The velocity of electron having mass 9.1 \\times 10^{-31} kg in Bohr's first orbit of hydrogen atom is ______ \\times 10^5 ms^{-1} (nearest integer).",
+      "text": "The value of Rydberg constant $(R_H)$ is $2.18 \\times 10^{-18}$ J. The velocity of electron having mass $9.1 \\times 10^{-31}$ kg in Bohr's first orbit of hydrogen atom is ______ $\\times 10^5$ $\\text{ms}^{-1}$ (nearest integer).",
       "image": 0,
       "options": [
         {
@@ -4514,7 +4514,7 @@
         },
         {
           "id": "b",
-          "text": "An atom can take only certain distinct energies E_1, E_2, E_3, etc. These allowed states of constant energy are called the stationary states of atom"
+          "text": "An atom can take only certain distinct energies $E_1, E_2, E_3$, etc. These allowed states of constant energy are called the stationary states of atom"
         },
         {
           "id": "c",
@@ -4540,7 +4540,7 @@
     {
       "id": "q130",
       "uuid": "67fcebdbb93e",
-      "text": "The maximum number of orbitals which can be identified with n = 4 and m_l = 0 is ______",
+      "text": "The maximum number of orbitals which can be identified with $n = 4$ and $m_l = 0$ is ______",
       "image": 0,
       "options": [
         {
@@ -4575,7 +4575,7 @@
     {
       "id": "q131",
       "uuid": "a67a17b49396",
-      "text": "For hydrogen atom, energy of an electron in first excited state is -3.4 eV. K.E of the same electron of hydrogen atom is x eV. Value of x \\times 10^{-1} eV is ______. (Nearest integer)",
+      "text": "For hydrogen atom, energy of an electron in first excited state is $-3.4$ eV. K.E of the same electron of hydrogen atom is $x$ eV. Value of $x \\times 10^{-1}$ eV is ______. (Nearest integer)",
       "image": 0,
       "options": [
         {
@@ -4610,24 +4610,24 @@
     {
       "id": "q132",
       "uuid": "d07871e8d699",
-      "text": "Radius of the first excited state of Helium ion is given as: a_0 \\rightarrow radius of first stationary state of hydrogen atom.",
+      "text": "Radius of the first excited state of Helium ion is given as: $a_0 \\rightarrow$ radius of first stationary state of hydrogen atom.",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "r = 4a_0"
+          "text": "$r = 4a_0$"
         },
         {
           "id": "b",
-          "text": "r = 2a_0"
+          "text": "$r = 2a_0$"
         },
         {
           "id": "c",
-          "text": "r = \\frac{a_0}{2}"
+          "text": "$r = \\frac{a_0}{2}$"
         },
         {
           "id": "d",
-          "text": "r = \\frac{a_0}{4}"
+          "text": "$r = \\frac{a_0}{4}$"
         }
       ],
       "correctAnswer": "b",
@@ -4750,7 +4750,7 @@
     {
       "id": "q136",
       "uuid": "12ebde4be8d8",
-      "text": "What would be the IUPAC symbol for the element with atomic number 113 using systematic nomenclature?",
+      "text": "What would be the IUPAC symbol for the element with atomic number $113$ using systematic nomenclature?",
       "image": 0,
       "options": [
         {
@@ -4785,24 +4785,24 @@
     {
       "id": "q137",
       "uuid": "8766f1ad56b4",
-      "text": "Among the species Mg, $Mg^{2+}$, Al, $Al^{3+}$, which has the largest size?",
+      "text": "Among the species $\\text{Mg}$, $\\text{Mg}^{2+}$, $\\text{Al}$, $\\text{Al}^{3+}$, which has the largest size?",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "Mg"
+          "text": "$\\text{Mg}$"
         },
         {
           "id": "b",
-          "text": "$Mg^{2+}$"
+          "text": "$\\text{Mg}^{2+}$"
         },
         {
           "id": "c",
-          "text": "Al"
+          "text": "$\\text{Al}$"
         },
         {
           "id": "d",
-          "text": "$Al^{3+}$"
+          "text": "$\\text{Al}^{3+}$"
         }
       ],
       "correctAnswer": "a",
@@ -4820,7 +4820,7 @@
     {
       "id": "q138",
       "uuid": "867e32a1a1ff",
-      "text": "The official name for element 104 is:",
+      "text": "The official name for element $104$ is:",
       "image": 0,
       "options": [
         {
@@ -4868,361 +4868,363 @@
         },
         {
           "id": "c",
-          "text": "The added electron in fluorine experiences significant repulsion in the small 2p orbital"
+          "text": "The added electron in fluorine experiences significant repulsion in the small $2p$ orbital"
         },
         {
           "id": "d",
           "text": "Fluorine has completely filled orbitals"
         }
       ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "PCH",
-        "tag2": "CEP",
-        "tag3": "H",
-        "tag4": "",
-        "type": "NC",
-        "year": "11"
-      }
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "PCH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "NC",
+      "year": "11"
+    }
     },
-    {
-      "id": "q140",
-      "uuid": "38bb6e2b9402",
-      "text": "Gallium and caesium have very low melting points of approximately:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "373K and 373K"
-        },
-        {
-          "id": "b",
-          "text": "273K and 273K"
-        },
-        {
-          "id": "c",
-          "text": "303K and 302K"
-        },
-        {
-          "id": "d",
-          "text": "400K and 400K"
-        }
-      ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "PCH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "NC",
-        "year": "11"
+      
+      
+  {
+    "id": "q140",
+    "uuid": "38bb6e2b9402",
+    "text": "Gallium and caesium have very low melting points of approximately:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "$373$K and $373$K"
+      },
+      {
+        "id": "b",
+        "text": "$273$K and $273$K"
+      },
+      {
+        "id": "c",
+        "text": "$303$K and $302$K"
+      },
+      {
+        "id": "d",
+        "text": "$400$K and $400$K"
       }
-    },
-    {
-      "id": "q141",
-      "uuid": "bfbcaf674939",
-      "text": "The type of oxide formed by the element among Li, Na, Be, Mg, B and Al that has the least atomic radius is:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "A_2O"
-        },
-        {
-          "id": "b",
-          "text": "A_2O_3"
-        },
-        {
-          "id": "c",
-          "text": "AO_2"
-        },
-        {
-          "id": "d",
-          "text": "AO"
-        }
-      ],
-      "correctAnswer": "b",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "JM",
-        "year": "25"
+    ],
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "PCH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "NC",
+      "year": "11"
+    }
+  },
+  {
+    "id": "q141",
+    "uuid": "bfbcaf674939",
+    "text": "The type of oxide formed by the element among $\\text{Li}$, $\\text{Na}$, $\\text{Be}$, $\\text{Mg}$, $\\text{B}$ and $\\text{Al}$ that has the least atomic radius is:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "$\\text{A}_2\\text{O}$"
+      },
+      {
+        "id": "b",
+        "text": "$\\text{A}_2\\text{O}_3$"
+      },
+      {
+        "id": "c",
+        "text": "$\\text{AO}_2$"
+      },
+      {
+        "id": "d",
+        "text": "$\\text{AO}$"
       }
-    },
-    {
-      "id": "q142",
-      "uuid": "3a249c3b46ec",
-      "text": "The statement(s) that are $\\text{correct}$ about the species $\\text{O}^{2-}, \\text{F}^{-}, \\text{Na}^{+}, \\text{Mg}^{2+}$. $\\newline \\text{(A) All are isoelectronic} \\newline \\text{(B) All have the same nuclear charge} \\newline \\text{(C) } \\text{O}^{2-} \\text{ has the largest ionic radii} \\newline \\text{(D) } \\text{Mg}^{2+} \\text{ has the smallest ionic radii}$ \\newline Choose the most appropriate answer from the options given below:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "(B), (C) and (D) only"
-        },
-        {
-          "id": "b",
-          "text": "(C) and (D) only"
-        },
-        {
-          "id": "c",
-          "text": "(A), (C) and (D) only"
-        },
-        {
-          "id": "d",
-          "text": "(A), (B), (C) and (D)"
-        }
-      ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "JM",
-        "year": "24"
+    ],
+    "correctAnswer": "b",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "JM",
+      "year": "25"
+    }
+  },
+  {
+    "id": "q142",
+    "uuid": "3a249c3b46ec",
+    "text": "The statement(s) that are $\\text{correct}$ about the species $\\text{O}^{2-}$, $\\text{F}^{-}$, $\\text{Na}^{+}$, $\\text{Mg}^{2+}$. $\\newline$ (A) All are isoelectronic $\\newline$ (B) All have the same nuclear charge $\\newline$ (C) $\\text{O}^{2-}$ has the largest ionic radii $\\newline$ (D) $\\text{Mg}^{2+}$ has the smallest ionic radii $\\newline$ Choose the most appropriate answer from the options given below:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "(B), (C) and (D) only"
+      },
+      {
+        "id": "b",
+        "text": "(C) and (D) only"
+      },
+      {
+        "id": "c",
+        "text": "(A), (C) and (D) only"
+      },
+      {
+        "id": "d",
+        "text": "(A), (B), (C) and (D)"
       }
-    },
-    {
-      "id": "q143",
-      "uuid": "099eff3e30f2",
-      "text": "Match $\\text{List I}$ with $\\text{List II}$: $\\newline \\text{List I (Elements): (A) } \\text{Cl, S (B) } \\text{Ge, As (C) } \\text{Fr, Ra (D) } \\text{F, O} \\newline \\text{List II (Properties in their respective groups): (I) Elements with highest electronegativity (II) Elements with largest atomic size (III) Elements which show properties of both metals and non-metal (IV) Elements with highest negative electron gain enthalpy}$",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "A-II, B-I, C-IV, D-III"
-        },
-        {
-          "id": "b",
-          "text": "A-III, B-II, C-I, D-IV"
-        },
-        {
-          "id": "c",
-          "text": "A-IV, B-III, C-II, D-I"
-        },
-        {
-          "id": "d",
-          "text": "A-II, B-III, C-IV, D-I"
-        }
-      ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "JM",
-        "year": "24"
+    ],
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "JM",
+      "year": "24"
+    }
+  },
+  {
+    "id": "q143",
+    "uuid": "099eff3e30f2",
+    "text": "Match $\\text{List I}$ with $\\text{List II}$: $\\newline$ List I (Elements): (A) $\\text{Cl}$, $\\text{S}$ (B) $\\text{Ge}$, $\\text{As}$ (C) $\\text{Fr}$, $\\text{Ra}$ (D) $\\text{F}$, $\\text{O}$ $\\newline$ List II (Properties in their respective groups): (I) Elements with highest electronegativity (II) Elements with largest atomic size (III) Elements which show properties of both metals and non-metal (IV) Elements with highest negative electron gain enthalpy",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "A-II, B-I, C-IV, D-III"
+      },
+      {
+        "id": "b",
+        "text": "A-III, B-II, C-I, D-IV"
+      },
+      {
+        "id": "c",
+        "text": "A-IV, B-III, C-II, D-I"
+      },
+      {
+        "id": "d",
+        "text": "A-II, B-III, C-IV, D-I"
       }
-    },
-    {
-      "id": "q144",
-      "uuid": "dca5ec9b037e",
-      "text": "Given below are two statements: Statement-I: Along the period, the chemical reactivity of the element gradually increases from group 1 to group 18. Statement-II: The nature of oxides formed by group 1 element is basic while that of group 17 elements is acidic. In the light above statements, choose the most appropriate answer:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "Both statement I and Statement II are true"
-        },
-        {
-          "id": "b",
-          "text": "Statement I is true but Statement II is False"
-        },
-        {
-          "id": "c",
-          "text": "Statement I is false but Statement II is true"
-        },
-        {
-          "id": "d",
-          "text": "Both Statement I and Statement II is false"
-        }
-      ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "JM",
-        "year": "24"
+    ],
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "JM",
+      "year": "24"
+    }
+  },
+  {
+    "id": "q144",
+    "uuid": "dca5ec9b037e",
+    "text": "Given below are two statements: Statement-I: Along the period, the chemical reactivity of the element gradually increases from group $1$ to group $18$. Statement-II: The nature of oxides formed by group $1$ element is basic while that of group $17$ elements is acidic. In the light above statements, choose the most appropriate answer:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "Both statement I and Statement II are true"
+      },
+      {
+        "id": "b",
+        "text": "Statement I is true but Statement II is False"
+      },
+      {
+        "id": "c",
+        "text": "Statement I is false but Statement II is true"
+      },
+      {
+        "id": "d",
+        "text": "Both Statement I and Statement II is false"
       }
-    },
-    {
-      "id": "q145",
-      "uuid": "4c39daf8c62c",
-      "text": "Identify the $\\text{correct statements}$ about p-block elements and their compounds. $\\newline \\text{(A) Non metals have higher electronegativity than metals}$. $\\newline \\text{(B) Non metals have lower ionisation enthalpy than metals}$. $\\newline \\text{(C) Compounds formed between highly reactive nonmetals and highly reactive metals are generally ionic}$. $\\newline \\text{(D) The non-metal oxides are generally basic in nature}$. $\\newline \\text{(E) The metal oxides are generally acidic or neutral in nature}$. \\newline Choose the correct answer from the options given below:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "(B) and (D) only"
-        },
-        {
-          "id": "b",
-          "text": "(A) and (C) only"
-        },
-        {
-          "id": "c",
-          "text": "(D) and (E) only"
-        },
-        {
-          "id": "d",
-          "text": "(B) and (E) only"
-        }
-      ],
-      "correctAnswer": "b",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "JM",
-        "year": "24"
+    ],
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "JM",
+      "year": "24"
+    }
+  },
+  {
+    "id": "q145",
+    "uuid": "4c39daf8c62c",
+    "text": "Identify the $\\text{correct statements}$ about p-block elements and their compounds. $\\newline$ (A) Non metals have higher electronegativity than metals. $\\newline$ (B) Non metals have lower ionisation enthalpy than metals. $\\newline$ (C) Compounds formed between highly reactive nonmetals and highly reactive metals are generally ionic. $\\newline$ (D) The non-metal oxides are generally basic in nature. $\\newline$ (E) The metal oxides are generally acidic or neutral in nature. $\\newline$ Choose the correct answer from the options given below:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "(B) and (D) only"
+      },
+      {
+        "id": "b",
+        "text": "(A) and (C) only"
+      },
+      {
+        "id": "c",
+        "text": "(D) and (E) only"
+      },
+      {
+        "id": "d",
+        "text": "(B) and (E) only"
       }
-    },
-    {
-      "id": "q146",
-      "uuid": "63faea521d0d",
-      "text": "Match $\\text{List I}$ with $\\text{List II}$ (Group 13 Elements): $\\newline \\text{List I: (A) Melting Point (B) Ionic Radius } \\text{M}^{+3} \\text{ (C) } \\Delta_{\\text{i}}\\text{H}_{1} \\text{ (D) Atomic Radius} \\newline \\text{List II (Order): (I) } \\text{Tl}>\\text{In}>\\text{Ga}>\\text{Al}>\\text{B} \\text{ (II) } \\text{B}>\\text{Tl}>\\text{Al}\\approx \\text{Ga}>\\text{In} \\text{ (III) } \\text{Tl}>\\text{In}>\\text{Al}>\\text{Ga}>\\text{B} \\text{ (IV) } \\text{B}>\\text{Al}>\\text{Tl}>\\text{In}>\\text{Ga}$",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "A-I, B-III, C-IV, D-I"
-        },
-        {
-          "id": "b",
-          "text": "A-IV, B-I, C-II, D-III"
-        },
-        {
-          "id": "c",
-          "text": "A-I, B-II, C-III, D-IV"
-        },
-        {
-          "id": "d",
-          "text": "A-III, B-IV, C-I, D-II"
-        }
-      ],
-      "correctAnswer": "b",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "H",
-        "tag4": "",
-        "type": "JM",
-        "year": "24"
+    ],
+    "correctAnswer": "b",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "JM",
+      "year": "24"
+    }
+  },
+  {
+    "id": "q146",
+    "uuid": "63faea521d0d",
+    "text": "Match $\\text{List I}$ with $\\text{List II}$ (Group $13$ Elements): $\\newline$ List I: (A) Melting Point (B) Ionic Radius $\\text{M}^{3+}$ (C) $\\Delta_{\\text{i}}\\text{H}_{1}$ (D) Atomic Radius $\\newline$ List II (Order): (I) $\\text{Tl}>\\text{In}>\\text{Ga}>\\text{Al}>\\text{B}$ (II) $\\text{B}>\\text{Tl}>\\text{Al}\\approx \\text{Ga}>\\text{In}$ (III) $\\text{Tl}>\\text{In}>\\text{Al}>\\text{Ga}>\\text{B}$ (IV) $\\text{B}>\\text{Al}>\\text{Tl}>\\text{In}>\\text{Ga}$",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "A-I, B-III, C-IV, D-I"
+      },
+      {
+        "id": "b",
+        "text": "A-IV, B-I, C-II, D-III"
+      },
+      {
+        "id": "c",
+        "text": "A-I, B-II, C-III, D-IV"
+      },
+      {
+        "id": "d",
+        "text": "A-III, B-IV, C-I, D-II"
       }
-    },
-    {
-      "id": "q147",
-      "uuid": "9481afb1d3c7",
-      "text": "The atomic number of the element from the following with lowest 1st ionisation enthalpy is:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "32"
-        },
-        {
-          "id": "b",
-          "text": "35"
-        },
-        {
-          "id": "c",
-          "text": "87"
-        },
-        {
-          "id": "d",
-          "text": "19"
-        }
-      ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "E",
-        "tag4": "",
-        "type": "JM",
-        "year": "25"
+    ],
+    "correctAnswer": "b",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "H",
+      "tag4": "",
+      "type": "JM",
+      "year": "24"
+    }
+  },
+  {
+    "id": "q147",
+    "uuid": "9481afb1d3c7",
+    "text": "The atomic number of the element from the following with lowest $1$st ionisation enthalpy is:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "$32$"
+      },
+      {
+        "id": "b",
+        "text": "$35$"
+      },
+      {
+        "id": "c",
+        "text": "$87$"
+      },
+      {
+        "id": "d",
+        "text": "$19$"
       }
-    },
-    {
-      "id": "q148",
-      "uuid": "0a9df260a9e8",
-      "text": "The property/properties that show irregularity in first four elements of group-17 is/are: (A) Covalent radius (B) Electron affinity (C) Ionic radius (D) First ionization energy. Choose the correct answer from the options given below:",
-      "image": 0,
-      "options": [
-        {
-          "id": "a",
-          "text": "B and D only"
-        },
-        {
-          "id": "b",
-          "text": "A and C only"
-        },
-        {
-          "id": "c",
-          "text": "B only"
-        },
-        {
-          "id": "d",
-          "text": "A, B, C and D"
-        }
-      ],
-      "correctAnswer": "c",
-      "marks": 4,
-      "section": "Section B",
-      "tags": {
-        "tag1": "ICH",
-        "tag2": "CEP",
-        "tag3": "M",
-        "tag4": "",
-        "type": "JM",
-        "year": "25"
+    ],
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "E",
+      "tag4": "",
+      "type": "JM",
+      "year": "25"
+    }
+  },
+  {
+    "id": "q148",
+    "uuid": "0a9df260a9e8",
+    "text": "The property/properties that show irregularity in first four elements of group-$17$ is/are: (A) Covalent radius (B) Electron affinity (C) Ionic radius (D) First ionization energy. Choose the correct answer from the options given below:",
+    "image": 0,
+    "options": [
+      {
+        "id": "a",
+        "text": "B and D only"
+      },
+      {
+        "id": "b",
+        "text": "A and C only"
+      },
+      {
+        "id": "c",
+        "text": "B only"
+      },
+      {
+        "id": "d",
+        "text": "A, B, C and D"
       }
-    },
-    {
+    ],
+    "correctAnswer": "c",
+    "marks": 4,
+    "section": "Section B",
+    "tags": {
+      "tag1": "ICH",
+      "tag2": "CEP",
+      "tag3": "M",
+      "tag4": "",
+      "type": "JM",
+      "year": "25"
+    }
+  },
+  {
       "id": "q149",
       "uuid": "17245e200fcd",
-      "text": "An object of mass 1000 g experiences a time dependent force F = (2t*i + 3t^2*j) N. The power generated by the force at time t is:",
+      "text": "An object of mass 1000 g experiences a time dependent force $F = (2t\\hat{i} + 3t^2\\hat{j})$ N. The power generated by the force at time t is:",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "(2t^2 + 3t^3) W"
+          "text": "$(2t^2 + 3t^3)$ W"
         },
         {
           "id": "b",
-          "text": "(2t^2 + 18t^3) W"
+          "text": "$(2t^2 + 18t^3)$ W"
         },
         {
           "id": "c",
-          "text": "(3t^3 + 5t^5) W"
+          "text": "$(3t^3 + 5t^5)$ W"
         },
         {
           "id": "d",
-          "text": "(2t^3 + 3t^5) W"
+          "text": "$(2t^3 + 3t^5)$ W"
         }
       ],
       "correctAnswer": "d",
@@ -5275,24 +5277,24 @@
     {
       "id": "q151",
       "uuid": "aba26a3bd5b2",
-      "text": "A stationary particle breaks into two parts of masses m_A and m_B which move with velocities v_A and v_B respectively. The ratio of their kinetic energies is (K_B:K_A):",
+      "text": "A stationary particle breaks into two parts of masses $m_A$ and $m_B$ which move with velocities $v_A$ and $v_B$ respectively. The ratio of their kinetic energies is $(K_B:K_A)$:",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "v_B:v_A"
+          "text": "$v_B:v_A$"
         },
         {
           "id": "b",
-          "text": "m_B:m_A"
+          "text": "$m_B:m_A$"
         },
         {
           "id": "c",
-          "text": "m_B*v_B:m_A*v_A"
+          "text": "$m_B \\cdot v_B:m_A \\cdot v_A$"
         },
         {
           "id": "d",
-          "text": "1:1"
+          "text": "$1:1$"
         }
       ],
       "correctAnswer": "a",
@@ -5350,19 +5352,19 @@
       "options": [
         {
           "id": "a",
-          "text": "S/2, sqrt(3gS/2)"
+          "text": "$S/2$, $\\sqrt{3gS/2}$"
         },
         {
           "id": "b",
-          "text": "S/2, sqrt(3gS)"
+          "text": "$S/2$, $\\sqrt{3gS}$"
         },
         {
           "id": "c",
-          "text": "S/4, sqrt(3gS/2)"
+          "text": "$S/4$, $\\sqrt{3gS/2}$"
         },
         {
           "id": "d",
-          "text": "S/4, sqrt(3gS/2)"
+          "text": "$S/4$, $\\sqrt{3gS/2}$"
         }
       ],
       "correctAnswer": "d",
@@ -5385,19 +5387,19 @@
       "options": [
         {
           "id": "a",
-          "text": "1:2"
+          "text": "$1:2$"
         },
         {
           "id": "b",
-          "text": "sqrt(3):2"
+          "text": "$\\sqrt{3}:2$"
         },
         {
           "id": "c",
-          "text": "2:1"
+          "text": "$2:1$"
         },
         {
           "id": "d",
-          "text": "1:1"
+          "text": "$1:1$"
         }
       ],
       "correctAnswer": "d",
@@ -5485,7 +5487,7 @@
     {
       "id": "q157",
       "uuid": "e2a46dedf978",
-      "text": "A force $F = \\alpha + \\beta x^2$ acts on an object in the x-direction. The work done by the force is 5 J when the object is displaced by 1 m. If the constant $\\alpha = 1 N$ then $\\beta$ will be",
+      "text": "A force $F = \\alpha + \\beta x^2$ acts on an object in the x-direction. The work done by the force is 5 J when the object is displaced by 1 m. If the constant $\\alpha = 1$ N then $\\beta$ will be",
       "image": 0,
       "options": [
         {
@@ -5555,7 +5557,7 @@
     {
       "id": "q159",
       "uuid": "1fb8f9a3c44c",
-      "text": "A body of mass m kg slides from rest along the curve of vertical circle from point A to B in friction less path. The velocity of the body at B is: (given, R = 14 m, g = 10 m/s^2 and sqrt(2) = 1.4)",
+      "text": "A body of mass m kg slides from rest along the curve of vertical circle from point A to B in friction less path. The velocity of the body at B is: (given, $R = 14$ m, $g = 10 m/s^2$ and $\\sqrt{2} = 1.4$)",
       "image": 0,
       "options": [
         {
@@ -5590,24 +5592,24 @@
     {
       "id": "q160",
       "uuid": "270a563a8f45",
-      "text": "A bob of mass m is suspended by a light string of length L. It is imparted a minimum horizontal velocity at the lowest point A such that it just completes half circle reaching the top most position B. The ratio of kinetic energies (K.E.)_A/(K.E.)_B is:",
+      "text": "A bob of mass m is suspended by a light string of length L. It is imparted a minimum horizontal velocity at the lowest point A such that it just completes half circle reaching the top most position B. The ratio of kinetic energies $(K.E.)_A/(K.E.)_B$ is:",
       "image": "https://drive.google.com/file/d/1SDieg_GJy--iduRmdNuEEop4QGHoW8Lp/view?usp=sharing",
       "options": [
         {
           "id": "a",
-          "text": "3:2"
+          "text": "$3:2$"
         },
         {
           "id": "b",
-          "text": "5:1"
+          "text": "$5:1$"
         },
         {
           "id": "c",
-          "text": "2:5"
+          "text": "$2:5$"
         },
         {
           "id": "d",
-          "text": "1:5"
+          "text": "$1:5$"
         }
       ],
       "correctAnswer": "b",
@@ -5625,24 +5627,24 @@
     {
       "id": "q161",
       "uuid": "254b3a7128a7",
-      "text": "A piston of mass M is hung from a massless spring whose restoring force law goes as F = -k*x^3, where k is the spring constant of appropriate dimension. The piston separates the vertical chamber into two parts, where the bottom part is filled with 'n' moles of an ideal gas. An external work is done on the gas isothermally (at a constant temperature T) with the help of a heating filament (with negligible volume) mounted in lower part of the chamber, so that the piston goes up from a height L_0 to L_1, the total energy delivered by the filament is: (Assume spring to be in its natural length before heating)",
+      "text": "A piston of mass M is hung from a massless spring whose restoring force law goes as $F = -k \\cdot x^3$, where k is the spring constant of appropriate dimension. The piston separates the vertical chamber into two parts, where the bottom part is filled with 'n' moles of an ideal gas. An external work is done on the gas isothermally (at a constant temperature T) with the help of a heating filament (with negligible volume) mounted in lower part of the chamber, so that the piston goes up from a height $L_0$ to $L_1$, the total energy delivered by the filament is: (Assume spring to be in its natural length before heating)",
       "image": "https://drive.google.com/file/d/1hJM9pkVtwlyN_RWAN4Gm1FGT5N1zHi9a/view?usp=sharing",
       "options": [
         {
           "id": "a",
-          "text": "nRT*ln(L_1/L_0) + 2Mg(L_1 - L_0) + (k/4)(L_1^4 - L_0^4)"
+          "text": "$nRT \\cdot \\ln(L_1/L_0) + 2Mg(L_1 - L_0) + (k/4)(L_1^4 - L_0^4)$"
         },
         {
           "id": "b",
-          "text": "nRT*ln(L_1/L_0) + (Mg/2)(L_1 - L_0) + (k/4)(L_1^3 - L_0^3)"
+          "text": "$nRT \\cdot \\ln(L_1/L_0) + (Mg/2)(L_1 - L_0) + (k/4)(L_1^3 - L_0^3)$"
         },
         {
           "id": "c",
-          "text": "nRT*ln(L_1/L_0) + Mg(L_1 - L_0) + (k/4)(L_1^4 - L_0^4)"
+          "text": "$nRT \\cdot \\ln(L_1/L_0) + Mg(L_1 - L_0) + (k/4)(L_1^4 - L_0^4)$"
         },
         {
           "id": "d",
-          "text": "nRT*ln(L_1/L_0) + Mg(L_1 - L_0) + (3k/4)(L_1^4 - L_0^4)"
+          "text": "$nRT \\cdot \\ln(L_1/L_0) + Mg(L_1 - L_0) + (3k/4)(L_1^4 - L_0^4)$"
         }
       ],
       "correctAnswer": "c",
@@ -5660,24 +5662,24 @@
     {
       "id": "q162",
       "uuid": "222bb3047bb7",
-      "text": "The bob of a pendulum was released from a horizontal position. The length of the pendulum is 10 m. If it dissipates 10% of its initial energy against air resistance, the speed with which the bob arrives at the lowest point is: [Use, g = 10 ms^-2]",
+      "text": "The bob of a pendulum was released from a horizontal position. The length of the pendulum is 10 m. If it dissipates 10% of its initial energy against air resistance, the speed with which the bob arrives at the lowest point is: [Use, $g = 10 ms^{-2}$]",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "6*sqrt(5) ms^-1"
+          "text": "$6\\sqrt{5} ms^{-1}$"
         },
         {
           "id": "b",
-          "text": "5*sqrt(6) ms^-1"
+          "text": "$5\\sqrt{6} ms^{-1}$"
         },
         {
           "id": "c",
-          "text": "5*sqrt(5) ms^-1"
+          "text": "$5\\sqrt{5} ms^{-1}$"
         },
         {
           "id": "d",
-          "text": "2*sqrt(5) ms^-1"
+          "text": "$2\\sqrt{5} ms^{-1}$"
         }
       ],
       "correctAnswer": "a",
@@ -5765,7 +5767,7 @@
     {
       "id": "q165",
       "uuid": "5ddbf7d1fc04",
-      "text": "A block of mass 25 kg is pulled along a horizontal surface by a force at an angle 45 degree with the horizontal. The friction coefficient between the block and the surface is 0.25. The work done in displacement of 5 m of the block is:",
+      "text": "A block of mass 25 kg is pulled along a horizontal surface by a force at an angle $45^\\circ$ with the horizontal. The friction coefficient between the block and the surface is 0.25. The work done in displacement of 5 m of the block is:",
       "image": 0,
       "options": [
         {
@@ -5805,19 +5807,19 @@
       "options": [
         {
           "id": "a",
-          "text": "10*[1 - (2 - x)]^(3/2) m/s"
+          "text": "$10[1 - (2 - x)]^{3/2}$ m/s"
         },
         {
           "id": "b",
-          "text": "10*[1 - (2 - x)^2]^(1/2) m/s"
+          "text": "$10[1 - (2 - x)^2]^{1/2}$ m/s"
         },
         {
           "id": "c",
-          "text": "10*[1 - (2 - x)^2]^2 m/s"
+          "text": "$10[1 - (2 - x)^2]^2$ m/s"
         },
         {
           "id": "d",
-          "text": "10*[1 - (2 - x)^2] m/s"
+          "text": "$10[1 - (2 - x)^2]$ m/s"
         }
       ],
       "correctAnswer": "b",
@@ -5835,7 +5837,7 @@
     {
       "id": "q167",
       "uuid": "08b2a22248ff",
-      "text": "A force (3*x^2 + 2*x - 5) N displaces a body from x = 2 m to x = 4 m. Work done by this force is:",
+      "text": "A force $(3x^2 + 2x - 5)$ N displaces a body from $x = 2$ m to $x = 4$ m. Work done by this force is:",
       "image": 0,
       "options": [
         {
@@ -5870,7 +5872,7 @@
     {
       "id": "q168",
       "uuid": "818cafe27c3d",
-      "text": "The potential energy function (in J) of a particle in a region of space is given as U = (2*x^2 + 3*y^3 + 2*z). Here x, y and z are in meter. The magnitude of x-component of force (in N) acting on the particle at point P(1, 2, 3)m is:",
+      "text": "The potential energy function (in J) of a particle in a region of space is given as $U = (2x^2 + 3y^3 + 2z)$. Here x, y and z are in meter. The magnitude of x-component of force (in N) acting on the particle at point P(1, 2, 3)m is:",
       "image": 0,
       "options": [
         {
@@ -5940,7 +5942,7 @@
     {
       "id": "q170",
       "uuid": "de8accb35e3e",
-      "text": "Three balls of masses 2 kg, 4 kg and 6 kg respectively are arranged at centre of the edges of an equilateral triangle of side 2 m. The moment of inertia of the system about an axis through the centroid and perpendicular to the plane of triangle, will be (in kg*m^2):",
+      "text": "Three balls of masses 2 kg, 4 kg and 6 kg respectively are arranged at centre of the edges of an equilateral triangle of side 2 m. The moment of inertia of the system about an axis through the centroid and perpendicular to the plane of triangle, will be (in $kg \\cdot m^2$):",
       "image": 0,
       "options": [
         {
@@ -5975,24 +5977,24 @@
     {
       "id": "q171",
       "uuid": "6dc2d0910901",
-      "text": "A rod of linear mass density 'lambda' and length 'L' is bent to form a ring of radius 'R'. Moment of inertia of ring about any of its diameter is:",
+      "text": "A rod of linear mass density '$\\lambda$' and length 'L' is bent to form a ring of radius 'R'. Moment of inertia of ring about any of its diameter is:",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "(lambda*L^3)/(16*pi^2)"
+          "text": "$(\\lambda L^3)/(16\\pi^2)$"
         },
         {
           "id": "b",
-          "text": "(lambda*L^3)/12"
+          "text": "$(\\lambda L^3)/12$"
         },
         {
           "id": "c",
-          "text": "(lambda*L^3)/(4*pi^2)"
+          "text": "$(\\lambda L^3)/(4\\pi^2)$"
         },
         {
           "id": "d",
-          "text": "(lambda*L^3)/(8*pi^2)"
+          "text": "$(\\lambda L^3)/(8\\pi^2)$"
         }
       ],
       "correctAnswer": "d",
@@ -6080,7 +6082,7 @@
     {
       "id": "q174",
       "uuid": "2979d31335a7",
-      "text": "A circular disc reaches from top to bottom of an inclined plane of length l. When it slips down the plane, it takes t s. When it rolls down the plane then it takes (alpha/2)^(1/2)*t s, where alpha is:",
+      "text": "A circular disc reaches from top to bottom of an inclined plane of length l. When it slips down the plane, it takes t s. When it rolls down the plane then it takes $(\\alpha/2)^{1/2} \\cdot t$ s, where $\\alpha$ is:",
       "image": 0,
       "options": [
         {
@@ -6120,19 +6122,19 @@
       "options": [
         {
           "id": "a",
-          "text": "(1/2)*M*r^2"
+          "text": "$(1/2) \\cdot M \\cdot r^2$"
         },
         {
           "id": "b",
-          "text": "(3/8)*M*r^2"
+          "text": "$(3/8) \\cdot M \\cdot r^2$"
         },
         {
           "id": "c",
-          "text": "(3/2)*M*r^2"
+          "text": "$(3/2) \\cdot M \\cdot r^2$"
         },
         {
           "id": "d",
-          "text": "2*M*r^2"
+          "text": "$2 \\cdot M \\cdot r^2$"
         }
       ],
       "correctAnswer": "b",
@@ -6150,7 +6152,7 @@
     {
       "id": "q176",
       "uuid": "c57bb9b6a01b",
-      "text": "Two discs of moment of inertia I_1 = 4 kg m^2 and I_2 = 2 kg m^2 about their central axes & normal to their planes, rotating with angular speeds 10 rad/s & 4 rad/s respectively are brought into contact face to face with their axes of rotation coincident. The loss in kinetic energy of the system in the process is_____ J.",
+      "text": "Two discs of moment of inertia $I_1 = 4 kg \\cdot m^2$ and $I_2 = 2 kg \\cdot m^2$ about their central axes & normal to their planes, rotating with angular speeds 10 rad/s & 4 rad/s respectively are brought into contact face to face with their axes of rotation coincident. The loss in kinetic energy of the system in the process is_____ J.",
       "image": 0,
       "options": [
         {
@@ -6255,7 +6257,7 @@
     {
       "id": "q179",
       "uuid": "51aa2806397e",
-      "text": "M and R be the mass and radius of a disc. A small disc of radius R/3 is removed from the bigger disc as shown in figure. The moment of inertia of remaining part of bigger disc about an axis AB passing through the centre O and perpendicular to the plane of disc is (4/x)*M*R^2. The value of x is ________.",
+      "text": "M and R be the mass and radius of a disc. A small disc of radius R/3 is removed from the bigger disc as shown in figure. The moment of inertia of remaining part of bigger disc about an axis AB passing through the centre O and perpendicular to the plane of disc is $(4/x) \\cdot M \\cdot R^2$. The value of x is ________.",
       "image": "https://drive.google.com/file/d/1q6ArovxyEpGZaQ1Ba-xj7IejL-RjTrkD/view?usp=sharing",
       "options": [
         {
@@ -6290,7 +6292,7 @@
     {
       "id": "q180",
       "uuid": "5514ce7026e8",
-      "text": "A simple pendulum of length 1 m has a wooden bob of mass 1 kg. It is struck by a bullet of mass 10^-2 kg moving with a speed of 2*10^2 m/s. The bullet gets embedded into the bob. The height to which the bob rises before swinging back is (use g = 10 m/s^2):",
+      "text": "A simple pendulum of length 1 m has a wooden bob of mass 1 kg. It is struck by a bullet of mass $10^{-2}$ kg moving with a speed of $2 \\times 10^2$ m/s. The bullet gets embedded into the bob. The height to which the bob rises before swinging back is (use $g = 10 m/s^2$):",
       "image": 0,
       "options": [
         {
@@ -6325,7 +6327,7 @@
     {
       "id": "q181",
       "uuid": "e94ef8db9b2a",
-      "text": "A thin solid disk of 1 kg is rotating along its diameter axis at the speed of 1800 rpm. By applying an external torque of 25*pi Nm for 40 s, the speed increases to 2100 rpm. The diameter of the disk is ________ m.",
+      "text": "A thin solid disk of 1 kg is rotating along its diameter axis at the speed of 1800 rpm. By applying an external torque of $25\\pi$ Nm for 40 s, the speed increases to 2100 rpm. The diameter of the disk is ________ m.",
       "image": 0,
       "options": [
         {
@@ -6360,7 +6362,7 @@
     {
       "id": "q182",
       "uuid": "a1fbe37937bd",
-      "text": "The identical spheres each of mass 2M are placed at the corners of a right angled triangle with mutually perpendicular sides equal to 4 m each. Taking point of intersection of these two sides as origin, the magnitude of position vector of the centre of mass of the system is (4*sqrt(2))/x m, where the value of x is:",
+      "text": "The identical spheres each of mass 2M are placed at the corners of a right angled triangle with mutually perpendicular sides equal to 4 m each. Taking point of intersection of these two sides as origin, the magnitude of position vector of the centre of mass of the system is $(4\\sqrt{2})/x$ m, where the value of x is:",
       "image": 0,
       "options": [
         {
@@ -6500,7 +6502,7 @@
     {
       "id": "q186",
       "uuid": "76606af1ffa2",
-      "text": "A solid sphere and a hollow cylinder roll up without slipping on same inclined plane with same initial speed v. The sphere and the cylinder reaches upto maximum heights h_1 and h_2, respectively, above the initial level. The ratio h_1:h_2 is n/10. The value of n is:",
+      "text": "A solid sphere and a hollow cylinder roll up without slipping on same inclined plane with same initial speed v. The sphere and the cylinder reaches upto maximum heights $h_1$ and $h_2$, respectively, above the initial level. The ratio $h_1:h_2$ is n/10. The value of n is:",
       "image": 0,
       "options": [
         {
@@ -6535,24 +6537,24 @@
     {
       "id": "q187",
       "uuid": "20daec867998",
-      "text": "A thin circular disc of mass M and radius R is rotating in a horizontal plane about an axis passing through its centre and perpendicular to its plane with angular velocity omega. If another disc of same dimensions but of mass M/2 is placed gently on the first disc co-axially, then the new angular velocity of the system is:",
+      "text": "A thin circular disc of mass M and radius R is rotating in a horizontal plane about an axis passing through its centre and perpendicular to its plane with angular velocity $\\omega$. If another disc of same dimensions but of mass M/2 is placed gently on the first disc co-axially, then the new angular velocity of the system is:",
       "image": 0,
       "options": [
         {
           "id": "a",
-          "text": "2*omega/3"
+          "text": "$2\\omega/3$"
         },
         {
           "id": "b",
-          "text": "5*omega/4"
+          "text": "$5\\omega/4$"
         },
         {
           "id": "c",
-          "text": "2*omega/3"
+          "text": "$2\\omega/3$"
         },
         {
           "id": "d",
-          "text": "4*omega/5"
+          "text": "$4\\omega/5$"
         }
       ],
       "correctAnswer": "c",
@@ -6570,7 +6572,7 @@
     {
       "id": "q188",
       "uuid": "4aa37a714427",
-      "text": "The position vectors of two 1 kg particles, (A) and (B), are given by $\\vec{r}_A = (\\alpha_1t^2\\hat{i} + \\alpha_2t\\hat{j} + \\alpha_3t\\hat{k}) m$ and $\\vec{r}_B = (\\beta_1t\\hat{i} + \\beta_2t^2\\hat{j} + \\beta_3t\\hat{k}) m$, respectively; $(\\alpha_1 = 1 m/s^2, \\alpha_2 = 3n m/s, \\alpha_3 = 2 m/s, \\beta_1 = 2 m/s, \\beta_2 = -1 m/s^2, \\beta_3 = 4p m/s)$, where t is time, n and p are constants. At $t = 1 s$, velocities $|\\vec{V}_A|$ and $|\\vec{V}_B|$ of the particles are orthogonal to each other. At $t = 1 s$, the magnitude of angular momentum of particle (A) with respect to the position of particle (B) is $\\sqrt{L}kgm^2s^{-1}$. The value of L is _______.",
+      "text": "The position vectors of two 1 kg particles, (A) and (B), are given by $\\vec{r}_A = (\\alpha_1t^2\\hat{i} + \\alpha_2t\\hat{j} + \\alpha_3t\\hat{k})$ m and $\\vec{r}_B = (\\beta_1t\\hat{i} + \\beta_2t^2\\hat{j} + \\beta_3t\\hat{k})$ m, respectively; $(\\alpha_1 = 1 m/s^2, \\alpha_2 = 3n m/s, \\alpha_3 = 2 m/s, \\beta_1 = 2 m/s, \\beta_2 = -1 m/s^2, \\beta_3 = 4p m/s)$, where t is time, n and p are constants. At $t = 1$ s, velocities $|\\vec{V}_A|$ and $|\\vec{V}_B|$ of the particles are orthogonal to each other. At $t = 1$ s, the magnitude of angular momentum of particle (A) with respect to the position of particle (B) is $\\sqrt{L} kgm^2s^{-1}$. The value of L is _______.",
       "image": 0,
       "options": [
         {
@@ -6640,7 +6642,7 @@
     {
       "id": "q190",
       "uuid": "b8d11f9ae84c",
-      "text": "In a system two particles of masses m1 = 3 kg and m2 = 2 kg are placed at certain distance from each other. The particle of mass m1 is moved towards the center of mass of the system through a distance 2 cm. In order to keep the center of mass of the system at the original position, the particle of mass m2 should move towards the center of mass by the distance:",
+      "text": "In a system two particles of masses $m_1 = 3$ kg and $m_2 = 2$ kg are placed at certain distance from each other. The particle of mass $m_1$ is moved towards the center of mass of the system through a distance 2 cm. In order to keep the center of mass of the system at the original position, the particle of mass $m_2$ should move towards the center of mass by the distance:",
       "image": 0,
       "options": [
         {
@@ -6675,7 +6677,7 @@
     {
       "id": "q191",
       "uuid": "99ca5b62823e",
-      "text": "Ratio of radius of gyration of a hollow sphere to that of a solid cylinder of equal mass, for moment of Inertia about their diameter axis as shown in figure is sqrt(8/x). The value of x is:",
+      "text": "Ratio of radius of gyration of a hollow sphere to that of a solid cylinder of equal mass, for moment of Inertia about their diameter axis as shown in figure is $\\sqrt{8/x}$. The value of x is:",
       "image": 0,
       "options": [
         {
@@ -6710,7 +6712,7 @@
     {
       "id": "q192",
       "uuid": "4b7cb3368caa",
-      "text": "A wheel of radius 0.2 m rotates freely about its center when a string that is wrapped over its rim is pulled by force of 10 N as shown in figure. The established torque produces an angular acceleration of 2 rad/s^2. Moment of inertia of the wheel is _____ kgm^2. (Acceleration due to gravity = 10 m/s^2)",
+      "text": "A wheel of radius 0.2 m rotates freely about its center when a string that is wrapped over its rim is pulled by force of 10 N as shown in figure. The established torque produces an angular acceleration of 2 rad/s$^2$. Moment of inertia of the wheel is _____ kgm$^2$. (Acceleration due to gravity = 10 m/s$^2$)",
       "image": "https://drive.google.com/file/d/1sNP91GhlMPcW9mhpuVoxbXsvF1aMPbEX/view?usp=sharing",
       "options": [
         {
@@ -6745,7 +6747,7 @@
     {
       "id": "q193",
       "uuid": "18ee305398db",
-      "text": "A string is wrapped around the rim of a wheel of moment of inertia 0.40 kg*m^2 and radius 10 cm. The wheel is free to rotate about its axis. Initially the wheel is at rest. The string is now pulled by a force of 40 N. The angular velocity of the wheel after 10 s is x rad/s, where x is:",
+      "text": "A string is wrapped around the rim of a wheel of moment of inertia $0.40 kg \\cdot m^2$ and radius 10 cm. The wheel is free to rotate about its axis. Initially the wheel is at rest. The string is now pulled by a force of 40 N. The angular velocity of the wheel after 10 s is x rad/s, where x is:",
       "image": 0,
       "options": [
         {
@@ -6780,7 +6782,7 @@
     {
       "id": "q194",
       "uuid": "33a249c5abeb",
-      "text": "A cylinder is rolling down on an inclined plane of inclination 60 degree. Its acceleration during rolling down will be x*sqrt(3) m/s^2, where _____ (use g = 10 m/s^2).",
+      "text": "A cylinder is rolling down on an inclined plane of inclination $60^\\circ$. Its acceleration during rolling down will be $x\\sqrt{3}$ m/s$^2$, where _____ (use $g = 10 m/s^2$).",
       "image": 0,
       "options": [
         {
@@ -6815,7 +6817,7 @@
     {
       "id": "q195",
       "uuid": "813162096cf7",
-      "text": "A, B and C are disc, solid sphere and spherical shell respectively with same radii and masses. These masses are placed as shown in figure. The moment of inertia of the given system about PQ is (X/15)*I, where I is the moment of inertia of the disc about its diameter. The value of x is _______.",
+      "text": "A, B and C are disc, solid sphere and spherical shell respectively with same radii and masses. These masses are placed as shown in figure. The moment of inertia of the given system about PQ is $(X/15) \\cdot I$, where I is the moment of inertia of the disc about its diameter. The value of x is _______.",
       "image": "https://drive.google.com/file/d/1e6hOOGAN5TZDp5nrPXafuJ84s39Y8UQS/view?usp=sharing",
       "options": [
         {
@@ -6902,7 +6904,7 @@
         },
         {
           "id": "d",
-          "text": "10*sqrt(2) N"
+          "text": "$10\\sqrt{2}$ N"
         }
       ],
       "correctAnswer": "c",
@@ -6952,5 +6954,6 @@
         "year": "25"
       }
     }
+  
   ]
 }
