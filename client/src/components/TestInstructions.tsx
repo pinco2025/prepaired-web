@@ -5,7 +5,7 @@ interface TestInstructionsProps {
     id: string;
     title: string;
     description: string;
-    duration: string;
+    duration: number;
     totalQuestions: number;
     markingScheme: string;
     instructions: string[];
@@ -25,7 +25,7 @@ const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }
             <span className="material-icons-outlined text-primary text-3xl">timer</span>
             <div>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Duration</p>
-              <p className="font-semibold text-text-light dark:text-text-dark">{test.duration}</p>
+              <p className="font-semibold text-text-light dark:text-text-dark">{(test.duration / 3600)} Hour(s)</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

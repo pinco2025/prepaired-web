@@ -260,7 +260,7 @@ export interface Test {
   id: string;
   title: string;
   description: string;
-  duration: string;
+  duration: number;
   totalQuestions: number;
   markingScheme: string;
   instructions: string[];
