@@ -68,7 +68,7 @@ const TestPage: React.FC = () => {
     }
     switch (testStatus) {
       case 'inProgress':
-        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} />;
+        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} />;
       case 'submitted':
         return <TestSubmitted />;
       case 'instructions':
