@@ -265,6 +265,7 @@ export interface Test {
   markingScheme: string;
   instructions: string[];
   url: string;
+  exam?: 'Normal' | 'JEE' | 'NEET';
 }
 
 export interface TestCategory {

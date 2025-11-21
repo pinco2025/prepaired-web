@@ -16,6 +16,7 @@ interface LocalOption {
 
 interface LocalQuestion {
   id: string;
+  uuid: string;
   text: string;
   image?: string | null;
   options: LocalOption[];
@@ -38,20 +39,23 @@ interface LocalTest {
   instructions?: string[];
   sections: LocalSection[];
   questions: LocalQuestion[];
+  exam?: 'Normal' | 'JEE' | 'NEET';
 }
 
 interface TestInterfaceProps {
   test: Test;
   onSubmitSuccess: () => void;
+  exam?: 'Normal' | 'JEE' | 'NEET';
 }
 
 const escapeLatex = (s: string) => s.replace(/\\/g, "\\");
 
-const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) => {
+const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [numericalAnswer, setNumericalAnswer] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
@@ -179,6 +183,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
         sections: (data.sections ?? []) as LocalSection[],
         questions: (data.questions ?? []).map((q: any) => ({
           id: q.id,
+          uuid: q.uuid,
           text: q.text,
           image: (q.image && q.image !== 0 && q.image !== "0") ? String(q.image) : null,
           options: (q.options ?? []).map((o: any) => ({
@@ -188,6 +193,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
           })),
           section: q.section
         })),
+        exam: exam
       };
 
       setTestData(adaptedTestData);
@@ -316,11 +322,41 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
 
   const handleSelectOption = (optionId: string) => {
     if (!currentQuestion) return;
-    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+    setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
     setSelectedOption(optionId);
     const newQuestionStatuses = [...questionStatuses];
     newQuestionStatuses[currentQuestionIndex] = 'answered';
     setQuestionStatuses(newQuestionStatuses);
+  };
+
+  const handleNumericalChange = (value: string) => {
+    if (!currentQuestion) return;
+
+    // Allow positive/negative numbers and one decimal point, max 2 decimal places
+    // Matches:
+    // -?       Optional negative sign
+    // \d*      Zero or more digits
+    // \.?      Optional decimal point
+    // \d{0,2}  Zero to two decimal digits
+    const regex = /^-?\d*\.?\d{0,2}$/;
+    if (regex.test(value)) {
+      setNumericalAnswer(value);
+
+      // Only save if it's a valid number (not just "-" or ".")
+      // But we update local state so user can type
+      const isValidNumber = !isNaN(parseFloat(value)) && isFinite(Number(value));
+      if (isValidNumber || value === '') {
+          setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: value }));
+      }
+
+      const newQuestionStatuses = [...questionStatuses];
+      if (value.length > 0) {
+        newQuestionStatuses[currentQuestionIndex] = 'answered';
+      } else {
+        newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+      }
+      setQuestionStatuses(newQuestionStatuses);
+    }
   };
 
   const handleMarkForReview = () => {
@@ -329,7 +365,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
     if (newQuestionStatuses[currentQuestionIndex] !== 'markedForReview') {
       newQuestionStatuses[currentQuestionIndex] = 'markedForReview';
     } else {
-      newQuestionStatuses[currentQuestionIndex] = answers[currentQuestion.id] ? 'answered' : 'notAnswered';
+      newQuestionStatuses[currentQuestionIndex] = answers[currentQuestion.uuid] ? 'answered' : 'notAnswered';
     }
     setQuestionStatuses(newQuestionStatuses);
   };
@@ -350,9 +386,44 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
 
   useEffect(() => {
     if (currentQuestion) {
-      setSelectedOption(answers[currentQuestion.id] || null);
+      const savedAnswer = answers[currentQuestion.uuid];
+      setSelectedOption(savedAnswer || null);
+      setNumericalAnswer(savedAnswer || '');
     }
   }, [currentQuestion, answers]);
+
+  // Memoize section indices mapping to avoid recalculation on every render
+  const sectionIndices = React.useMemo(() => {
+    if (!testData?.sections || !testData?.questions) return {};
+
+    const indices: Record<string, number> = {}; // Map section name to its start index
+    let count = 0;
+
+    testData.sections.forEach(section => {
+      indices[section.name] = count;
+      const questionsInSection = testData.questions.filter(q => q.section === section.name);
+      count += questionsInSection.length;
+    });
+
+    return indices;
+  }, [testData]);
+
+  const isNumericalQuestion = () => {
+    if (testData?.exam !== 'JEE' || !currentQuestion || !currentQuestion.section) return false;
+
+    // Get the start index for the current question's section
+    const sectionStartIndex = sectionIndices[currentQuestion.section];
+
+    if (sectionStartIndex === undefined) return false;
+
+    // Calculate absolute index relative to section start
+    // We need to find the index of the current question in the global list
+    // currentQuestionIndex is the global index
+
+    const indexWithinSection = currentQuestionIndex - sectionStartIndex;
+
+    return indexWithinSection >= 20;
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
@@ -380,35 +451,54 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
                   />
                 </div>
               )}
-              <div className="space-y-4">
-                {currentQuestion.options.map((option) => (
-                  <button
-                    key={option.id}
-                    onClick={() => handleSelectOption(option.id)}
-                    className={`w-full flex items-start text-left p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
-                      ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
-                      : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
-                      }`}
-                  >
-                    <span
-                      className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
+              {isNumericalQuestion() ? (
+                <div className="space-y-4">
+                  <label htmlFor="numerical-input" className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
+                    Enter Numerical Answer:
+                  </label>
+                  <input
+                    type="text"
+                    id="numerical-input"
+                    value={numericalAnswer}
+                    onChange={(e) => handleNumericalChange(e.target.value)}
+                    placeholder="Enter your answer (e.g., 10.55)"
+                    className="w-full p-4 rounded-lg border-2 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:border-primary focus:ring-2 focus:ring-primary outline-none transition-all"
+                  />
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                    Note: Enter numerical value only (up to 2 decimal places).
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {currentQuestion.options.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => handleSelectOption(option.id)}
+                      className={`w-full flex items-start text-left p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
+                        ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
+                        : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
                         }`}
                     >
-                      {option.id.toUpperCase()}
-                    </span>
-                    <div className="flex flex-col w-full gap-3">
-                      <span className="text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
-                      {option.image && (
-                        <img
-                          src={option.image}
-                          alt={`Option ${option.id} Illustration`}
-                          className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
-                        />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
+                      <span
+                        className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
+                          }`}
+                      >
+                        {option.id.toUpperCase()}
+                      </span>
+                      <div className="flex flex-col w-full gap-3">
+                        <span className="text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
+                        {option.image && (
+                          <img
+                            src={option.image}
+                            alt={`Option ${option.id} Illustration`}
+                            className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                          />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -454,7 +544,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess }) 
           </div>
 
           <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
-          <div className="flex items-center justify-center space-x-2 mb-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
             {testData?.sections?.map((section, index) => (
               <button
                 key={index}
