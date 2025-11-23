@@ -59,6 +59,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
+  const [studentTestId, setStudentTestId] = useState<string | null>(null);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -129,10 +130,25 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         test_id: testData.testId,
         answers: answers,
         user_id: user.id,
-        started_at: new Date().toISOString()
+        submitted_at: new Date().toISOString()
       };
 
-      const { error } = await supabase.from('student_tests').insert([submission]);
+      let error;
+      if (studentTestId) {
+          const { error: updateError } = await supabase
+              .from('student_tests')
+              .update(submission)
+              .eq('id', studentTestId);
+          error = updateError;
+      } else {
+          // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
+          const { error: insertError } = await supabase.from('student_tests').insert([{
+              ...submission,
+              started_at: new Date().toISOString()
+          }]);
+          error = insertError;
+      }
+
       if (error) {
         console.error('Error submitting test:', error);
         isSubmittingRef.current = false;
@@ -212,7 +228,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         if (user) {
           const { data: studentTestData, error } = await supabase
             .from('student_tests')
-            .select('started_at')
+            .select('id, started_at, answers')
             .eq('user_id', user.id)
             .eq('test_id', data.testId)
             .single();
@@ -221,7 +237,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
             const { data: newStudentTest, error: insertError } = await supabase
               .from('student_tests')
               .insert({ test_id: data.testId, user_id: user.id })
-              .select('started_at')
+              .select('id, started_at')
               .single();
 
             if (insertError || !newStudentTest) {
@@ -229,9 +245,15 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
               testStartTimeISO = new Date().toISOString();
             } else {
               testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
+              setStudentTestId((newStudentTest as any).id);
             }
           } else {
             testStartTimeISO = (studentTestData as any).started_at ?? new Date().toISOString();
+            setStudentTestId((studentTestData as any).id);
+            // Load answers from DB if available
+            if ((studentTestData as any).answers) {
+                 setAnswers((studentTestData as any).answers);
+            }
           }
         } else {
           testStartTimeISO = new Date().toISOString();
@@ -298,12 +320,24 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
   useEffect(() => {
     if (!testData) return;
+    // Save to LocalStorage
     try {
       localStorage.setItem(`test-answers-${testData.testId}`, JSON.stringify(answers));
     } catch (e) {
       console.warn('Could not save answers to localStorage', e);
     }
-  }, [answers, testData]);
+
+    // Save to Database
+    if (studentTestId) {
+        supabase
+          .from('student_tests')
+          .update({ answers: answers })
+          .eq('id', studentTestId)
+          .then(({ error }) => {
+              if (error) console.error('Error auto-saving answers to DB:', error);
+          });
+    }
+  }, [answers, testData, studentTestId]);
 
   const handleNext = () => {
     if (testData && testData.questions && currentQuestionIndex < testData.questions.length - 1) {
@@ -322,11 +356,28 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
   const handleSelectOption = (optionId: string) => {
     if (!currentQuestion) return;
-    setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
-    setSelectedOption(optionId);
-    const newQuestionStatuses = [...questionStatuses];
-    newQuestionStatuses[currentQuestionIndex] = 'answered';
-    setQuestionStatuses(newQuestionStatuses);
+
+    // Check if already selected (toggle behavior)
+    if (answers[currentQuestion.uuid] === optionId) {
+        // Unmark
+        setAnswers((prev) => {
+            const newAnswers = { ...prev };
+            delete newAnswers[currentQuestion.uuid];
+            return newAnswers;
+        });
+        setSelectedOption(null);
+
+        const newQuestionStatuses = [...questionStatuses];
+        newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+        setQuestionStatuses(newQuestionStatuses);
+    } else {
+        // Mark
+        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
+        setSelectedOption(optionId);
+        const newQuestionStatuses = [...questionStatuses];
+        newQuestionStatuses[currentQuestionIndex] = 'answered';
+        setQuestionStatuses(newQuestionStatuses);
+    }
   };
 
   const handleNumericalChange = (value: string) => {
