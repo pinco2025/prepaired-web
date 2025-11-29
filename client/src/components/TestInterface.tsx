@@ -166,6 +166,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       console.log('Submitting data:', submissionData);
 
       let error;
+      let finalSubmissionId = currentStudentTestId;
+
       if (currentStudentTestId) {
           console.log('Updating existing record:', currentStudentTestId);
           const { data: updateResult, error: updateError } = await supabase
@@ -179,21 +181,63 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       } else {
           // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
           console.log('No student test ID, creating new entry (fallback)');
-          const { error: insertError } = await supabase.from('student_tests').insert([{
+          const { data: insertData, error: insertError } = await supabase.from('student_tests').insert([{
               test_id: currentTestData.testId,
               user_id: user.id,
               answers: currentAnswers,
               started_at: new Date().toISOString(),
               submitted_at: new Date().toISOString()
-          }]);
+          }])
+          .select('id')
+          .single();
+
+          if (insertData) {
+            finalSubmissionId = insertData.id;
+            // Update state so subsequent retries use this ID (prevent duplicate inserts)
+            setStudentTestId(insertData.id);
+          }
           error = insertError;
       }
 
-      if (error) {
+      if (error || !finalSubmissionId) {
         console.error('Error submitting test:', error);
         isSubmittingRef.current = false;
       } else {
-        console.log('Submission successful!');
+        console.log('Submission DB update successful! Now triggering grade calculation...');
+
+        // --- Grade Calculation Start ---
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData?.session?.access_token;
+
+          const response = await fetch('https://eznxtdzsvnfclgcavvhp.supabase.co/functions/v1/result-calc', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+              submission_id: finalSubmissionId
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.ok) {
+            throw new Error(result.error || 'Grading failed');
+          }
+
+          console.log('Grading successful:', result);
+
+        } catch (gradeError) {
+          console.error('Error during grading:', gradeError);
+          alert('Unable to grade test. Please try again.');
+          isSubmittingRef.current = false;
+          return; // Stop here, allow retry
+        }
+        // --- Grade Calculation End ---
+
+        console.log('Submission and grading successful!');
         try {
           localStorage.removeItem(`test-answers-${currentTestData.testId}`);
         } catch (e) {
