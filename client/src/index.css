@@ -37,3 +37,7 @@ h1, h2, h3, h4, h5, h6 {
     linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
   background-size: 3rem 3rem;
 }
+
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+}
