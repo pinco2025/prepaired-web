@@ -556,6 +556,21 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
   }, [currentQuestion, answers]);
 
+  // Sync Question Palette section with current question
+  useEffect(() => {
+    if (!testData?.questions || !testData?.sections) return;
+
+    const currentQ = testData.questions[currentQuestionIndex];
+    if (!currentQ) return;
+
+    const sectionName = currentQ.section;
+    const sectionIndex = testData.sections.findIndex(s => s.name === sectionName);
+
+    if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
+      setCurrentSectionIndex(sectionIndex);
+    }
+  }, [currentQuestionIndex, testData, currentSectionIndex]);
+
   const sectionIndices = React.useMemo(() => {
     if (!testData?.sections || !testData?.questions) return {};
 
@@ -586,7 +601,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
       <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 lg:h-[84vh]">
-        <div className="flex-grow overflow-y-auto min-h-0">
+        <div className="flex-grow overflow-y-auto min-h-0 scrollbar-stable">
           {currentQuestion && (
             <>
               <div className="flex items-start justify-between mb-6">
