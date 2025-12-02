@@ -13,6 +13,14 @@ interface TestInstructionsProps {
   onStartTest: () => void;
 }
 
+const formatDuration = (seconds: number) => {
+  if (seconds < 3600) {
+    return `${Math.floor(seconds / 60)} Minute(s)`;
+  }
+  return `${(seconds / 3600).toFixed(1)} Hour(s)`;
+};
+
+
 const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }) => {
   return (
     <div className="max-w-4xl mx-auto bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 md:p-12">
@@ -25,7 +33,7 @@ const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }
             <span className="material-icons-outlined text-primary text-3xl">timer</span>
             <div>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Duration</p>
-              <p className="font-semibold text-text-light dark:text-text-dark">{(test.duration / 3600)} Hour(s)</p>
+              <p className="font-semibold text-text-light dark:text-text-dark">{formatDuration(test.duration)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

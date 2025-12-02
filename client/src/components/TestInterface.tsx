@@ -59,9 +59,11 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
+  const [studentTestId, setStudentTestId] = useState<string | null>(null);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const initializationRef = useRef(false); // Use ref instead of state to prevent re-renders
 
   const currentQuestion = testData?.questions && testData.questions[currentQuestionIndex];
 
@@ -98,8 +100,39 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     );
   }
 
+  // Use ref to always have latest answers and testData
+  const answersRef = useRef(answers);
+  const testDataRef = useRef(testData);
+  const studentTestIdRef = useRef(studentTestId);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    testDataRef.current = testData;
+  }, [testData]);
+
+  useEffect(() => {
+    studentTestIdRef.current = studentTestId;
+  }, [studentTestId]);
+
   const handleSubmit = useCallback(async () => {
-    if (!testData) return;
+    // Use refs to get current values
+    const currentTestData = testDataRef.current;
+    const currentAnswers = answersRef.current;
+    const currentStudentTestId = studentTestIdRef.current;
+
+    console.log('handleSubmit called with:', {
+      testData: currentTestData?.testId,
+      answersCount: Object.keys(currentAnswers).length,
+      studentTestId: currentStudentTestId
+    });
+
+    if (!currentTestData) {
+      console.error('No test data available');
+      return;
+    }
 
     if (isSubmittingRef.current) {
       console.log('Submission already in progress, skipping...');
@@ -125,20 +158,88 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         return;
       }
 
-      const submission = {
-        test_id: testData.testId,
-        answers: answers,
-        user_id: user.id,
-        started_at: new Date().toISOString()
+      const submissionData = {
+        answers: currentAnswers,
+        submitted_at: new Date().toISOString()
       };
 
-      const { error } = await supabase.from('student_tests').insert([submission]);
-      if (error) {
+      console.log('Submitting data:', submissionData);
+
+      let error;
+      let finalSubmissionId = currentStudentTestId;
+
+      if (currentStudentTestId) {
+          console.log('Updating existing record:', currentStudentTestId);
+          const { data: updateResult, error: updateError } = await supabase
+              .from('student_tests')
+              .update(submissionData)
+              .eq('id', currentStudentTestId)
+              .select();
+          
+          console.log('Update result:', updateResult);
+          error = updateError;
+      } else {
+          // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
+          console.log('No student test ID, creating new entry (fallback)');
+          const { data: insertData, error: insertError } = await supabase.from('student_tests').insert([{
+              test_id: currentTestData.testId,
+              user_id: user.id,
+              answers: currentAnswers,
+              started_at: new Date().toISOString(),
+              submitted_at: new Date().toISOString()
+          }])
+          .select('id')
+          .single();
+
+          if (insertData) {
+            finalSubmissionId = insertData.id;
+            // Update state so subsequent retries use this ID (prevent duplicate inserts)
+            setStudentTestId(insertData.id);
+          }
+          error = insertError;
+      }
+
+      if (error || !finalSubmissionId) {
         console.error('Error submitting test:', error);
         isSubmittingRef.current = false;
       } else {
+        console.log('Submission DB update successful! Now triggering grade calculation...');
+
+        // --- Grade Calculation Start ---
         try {
-          localStorage.removeItem(`test-answers-${testData.testId}`);
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData?.session?.access_token;
+
+          const response = await fetch('https://eznxtdzsvnfclgcavvhp.supabase.co/functions/v1/result-calc', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+              submission_id: finalSubmissionId
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.ok) {
+            throw new Error(result.error || 'Grading failed');
+          }
+
+          console.log('Grading successful:', result);
+
+        } catch (gradeError) {
+          console.error('Error during grading:', gradeError);
+          alert('Unable to grade test. Please try again.');
+          isSubmittingRef.current = false;
+          return; // Stop here, allow retry
+        }
+        // --- Grade Calculation End ---
+
+        console.log('Submission and grading successful!');
+        try {
+          localStorage.removeItem(`test-answers-${currentTestData.testId}`);
         } catch (e) {
           console.warn('Could not remove answers from localStorage', e);
         }
@@ -154,11 +255,22 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       console.error('Submission failed', e);
       isSubmittingRef.current = false;
     }
-  }, [answers, testData, onSubmitSuccess, navigate]);
+  }, [onSubmitSuccess, navigate]); // Only depend on stable functions
 
   useEffect(() => {
+    // Prevent re-initialization using ref (survives re-renders and strict mode)
+    if (initializationRef.current) {
+      console.log('Initialization already done, skipping...');
+      return;
+    }
+
     const initializeTest = async () => {
       if (!test || !test.url) return;
+      
+      // Mark as initializing immediately
+      initializationRef.current = true;
+      console.log('Initializing test...');
+      
       const data = await fetchTestData(test.url);
 
       const adaptedTestData: LocalTest = {
@@ -205,36 +317,57 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       const user = (authData as any)?.user;
       if (!user) {
         console.error('User not logged in. Cannot fetch test start time.');
+        return;
       }
 
       let testStartTimeISO: string | null = null;
       try {
-        if (user) {
-          const { data: studentTestData, error } = await supabase
-            .from('student_tests')
-            .select('started_at')
-            .eq('user_id', user.id)
-            .eq('test_id', data.testId)
-            .single();
+        // First, try to find existing entry that hasn't been submitted
+        const { data: existingTests, error: fetchError } = await supabase
+          .from('student_tests')
+          .select('id, started_at, answers, submitted_at')
+          .eq('user_id', user.id)
+          .eq('test_id', data.testId)
+          .is('submitted_at', null) // Only get tests that haven't been submitted
+          .order('started_at', { ascending: false })
+          .limit(1);
 
-          if (error || !studentTestData) {
-            const { data: newStudentTest, error: insertError } = await supabase
-              .from('student_tests')
-              .insert({ test_id: data.testId, user_id: user.id })
-              .select('started_at')
-              .single();
+        if (fetchError) {
+          console.error('Error fetching student test:', fetchError);
+        }
 
-            if (insertError || !newStudentTest) {
-              console.error('Failed to create a new student test entry.', insertError);
-              testStartTimeISO = new Date().toISOString();
-            } else {
-              testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
-            }
-          } else {
-            testStartTimeISO = (studentTestData as any).started_at ?? new Date().toISOString();
+        const existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
+
+        if (existingTest) {
+          console.log('Found existing unsubmitted student test entry:', (existingTest as any).id);
+          testStartTimeISO = (existingTest as any).started_at ?? new Date().toISOString();
+          setStudentTestId((existingTest as any).id);
+          // Load answers from DB if available
+          if ((existingTest as any).answers) {
+               setAnswers((existingTest as any).answers);
           }
         } else {
-          testStartTimeISO = new Date().toISOString();
+          console.log('Creating new student test entry...');
+          const { data: newStudentTest, error: insertError } = await supabase
+            .from('student_tests')
+            .insert({ 
+              test_id: data.testId, 
+              user_id: user.id,
+              started_at: new Date().toISOString()
+            })
+            .select('id, started_at')
+            .single();
+
+          if (insertError) {
+            console.error('Failed to create a new student test entry.', insertError);
+            testStartTimeISO = new Date().toISOString();
+          } else if (newStudentTest) {
+            testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
+            setStudentTestId((newStudentTest as any).id);
+            console.log('Created new student test with ID:', (newStudentTest as any).id);
+          } else {
+            testStartTimeISO = new Date().toISOString();
+          }
         }
       } catch (e) {
         console.error('Error while fetching/creating student_tests entry', e);
@@ -249,13 +382,13 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
       if (remainingTime <= 0) {
         setTimeLeft(0);
-        // Don't call handleSubmit here - let the effect below handle it
         return;
       }
 
       setTimeLeft(remainingTime);
 
-      // Start the timer
+      // Start the timer only once
+      console.log('Starting timer with', remainingTime, 'seconds remaining');
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           if (prev === null || prev <= 1) {
@@ -269,24 +402,31 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         });
       }, 1000);
 
-      // Load saved answers
-      try {
-        const saved = localStorage.getItem(`test-answers-${data.testId}`);
-        if (saved) setAnswers(JSON.parse(saved));
-      } catch (e) {
-        console.warn('Could not read saved answers from localStorage', e);
+      // Load saved answers from localStorage (fallback)
+      // Only use if we didn't already load from DB
+      if (!studentTestId || !answers || Object.keys(answers).length === 0) {
+        try {
+          const saved = localStorage.getItem(`test-answers-${data.testId}`);
+          if (saved) {
+            const savedAnswers = JSON.parse(saved);
+            setAnswers(savedAnswers);
+          }
+        } catch (e) {
+          console.warn('Could not read saved answers from localStorage', e);
+        }
       }
     };
 
     initializeTest();
 
     return () => {
+      // Don't reset initializationRef on cleanup - we want it to persist
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
     };
-  }, [test]);
+  }, [test?.url, test?.markingScheme, exam]); // Dependencies are stable
 
   // Separate effect to handle submission when time runs out
   useEffect(() => {
@@ -297,13 +437,28 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   }, [timeLeft, testData, handleSubmit]);
 
   useEffect(() => {
-    if (!testData) return;
+    if (!testData || !studentTestId) return;
+    
+    // Save to LocalStorage
     try {
       localStorage.setItem(`test-answers-${testData.testId}`, JSON.stringify(answers));
     } catch (e) {
       console.warn('Could not save answers to localStorage', e);
     }
-  }, [answers, testData]);
+
+    // Save to Database (debounced to avoid too many requests)
+    const timeoutId = setTimeout(() => {
+      supabase
+        .from('student_tests')
+        .update({ answers: answers })
+        .eq('id', studentTestId)
+        .then(({ error }) => {
+            if (error) console.error('Error auto-saving answers to DB:', error);
+        });
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [answers, testData, studentTestId]);
 
   const handleNext = () => {
     if (testData && testData.questions && currentQuestionIndex < testData.questions.length - 1) {
@@ -322,28 +477,37 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
   const handleSelectOption = (optionId: string) => {
     if (!currentQuestion) return;
-    setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
-    setSelectedOption(optionId);
-    const newQuestionStatuses = [...questionStatuses];
-    newQuestionStatuses[currentQuestionIndex] = 'answered';
-    setQuestionStatuses(newQuestionStatuses);
+
+    // Check if already selected (toggle behavior)
+    if (answers[currentQuestion.uuid] === optionId) {
+        // Unmark
+        setAnswers((prev) => {
+            const newAnswers = { ...prev };
+            delete newAnswers[currentQuestion.uuid];
+            return newAnswers;
+        });
+        setSelectedOption(null);
+
+        const newQuestionStatuses = [...questionStatuses];
+        newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+        setQuestionStatuses(newQuestionStatuses);
+    } else {
+        // Mark
+        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
+        setSelectedOption(optionId);
+        const newQuestionStatuses = [...questionStatuses];
+        newQuestionStatuses[currentQuestionIndex] = 'answered';
+        setQuestionStatuses(newQuestionStatuses);
+    }
   };
 
   const handleNumericalChange = (value: string) => {
     if (!currentQuestion) return;
 
-    // Allow positive/negative numbers and one decimal point, max 2 decimal places
-    // Matches:
-    // -?       Optional negative sign
-    // \d*      Zero or more digits
-    // \.?      Optional decimal point
-    // \d{0,2}  Zero to two decimal digits
     const regex = /^-?\d*\.?\d{0,2}$/;
     if (regex.test(value)) {
       setNumericalAnswer(value);
 
-      // Only save if it's a valid number (not just "-" or ".")
-      // But we update local state so user can type
       const isValidNumber = !isNaN(parseFloat(value)) && isFinite(Number(value));
       if (isValidNumber || value === '') {
           setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: value }));
@@ -392,11 +556,10 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
   }, [currentQuestion, answers]);
 
-  // Memoize section indices mapping to avoid recalculation on every render
   const sectionIndices = React.useMemo(() => {
     if (!testData?.sections || !testData?.questions) return {};
 
-    const indices: Record<string, number> = {}; // Map section name to its start index
+    const indices: Record<string, number> = {};
     let count = 0;
 
     testData.sections.forEach(section => {
@@ -411,14 +574,9 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const isNumericalQuestion = () => {
     if (testData?.exam !== 'JEE' || !currentQuestion || !currentQuestion.section) return false;
 
-    // Get the start index for the current question's section
     const sectionStartIndex = sectionIndices[currentQuestion.section];
 
     if (sectionStartIndex === undefined) return false;
-
-    // Calculate absolute index relative to section start
-    // We need to find the index of the current question in the global list
-    // currentQuestionIndex is the global index
 
     const indexWithinSection = currentQuestionIndex - sectionStartIndex;
 
