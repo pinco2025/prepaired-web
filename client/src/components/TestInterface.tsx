@@ -586,6 +586,16 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     return indices;
   }, [testData]);
 
+  const handleSectionSwitch = (index: number) => {
+    if (!testData?.sections) return;
+
+    const sectionName = testData.sections[index]?.name;
+    if (sectionName && sectionIndices[sectionName] !== undefined) {
+      setCurrentSectionIndex(index);
+      setCurrentQuestionIndex(sectionIndices[sectionName]);
+    }
+  };
+
   const isNumericalQuestion = () => {
     // Primary check: No options
     if (currentQuestion && (!currentQuestion.options || currentQuestion.options.length === 0)) {
@@ -639,7 +649,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
       <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 lg:h-[84vh]">
-        <div className="flex-grow overflow-y-auto min-h-0 scrollbar-stable">
+        <div className="flex-grow overflow-y-auto min-h-0 no-scrollbar p-1">
           {currentQuestion && (
             <>
               <div className="flex items-start justify-between mb-6">
@@ -780,7 +790,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
             {testData?.sections?.map((section, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSectionIndex(index)}
+                onClick={() => handleSectionSwitch(index)}
                 className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
                   }`}
               >
