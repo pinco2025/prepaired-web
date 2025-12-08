@@ -76,14 +76,26 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   };
 
   function renderMixedMath(text: string) {
-    const parts = text.split(/\$([^$]+)\$/g);
+    const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g);
 
     return (
       <>
         {parts.map((part, i) => {
-          if (i % 2 === 1) {
+          if (part.startsWith('$$') && part.endsWith('$$')) {
             try {
-              const html = katex.renderToString(part, {
+              const html = katex.renderToString(part.slice(2, -2), {
+                throwOnError: false,
+                output: 'html',
+                displayMode: true
+              });
+              return <span key={i} dangerouslySetInnerHTML={{ __html: html }} />;
+            } catch (e) {
+              console.error('KaTeX error:', e);
+              return <span key={i}>{part}</span>;
+            }
+          } else if (part.startsWith('$') && part.endsWith('$')) {
+            try {
+              const html = katex.renderToString(part.slice(1, -1), {
                 throwOnError: false,
                 output: 'html',
                 displayMode: false
