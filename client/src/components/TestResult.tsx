@@ -81,7 +81,7 @@ const TestResult: React.FC = () => {
 
   const allQuestions = useMemo(() => {
     if (!test || !test.questions) return [];
-    return test.questions.flatMap((section: { questions: Question[] }) => section.questions);
+    return test.questions.flatMap((section: { questions: Question[] }) => section.questions).filter((q: Question | undefined) => q);
   }, [test]);
 
   const analysis = useMemo(() => {
@@ -95,6 +95,7 @@ const TestResult: React.FC = () => {
     const attemptedCount = Object.keys(answers).length;
 
     allQuestions.forEach((q: Question) => {
+      if (!q) return;
       const userAnswer = answers[q.uuid];
       if (userAnswer !== undefined) {
         if (q.correctOption === userAnswer) {
@@ -132,6 +133,7 @@ const TestResult: React.FC = () => {
       }
 
       section.questions.forEach((q: Question) => {
+        if (!q) return;
         const userAnswer = submission.answers[q.uuid];
         subjectMap[subjectName].totalQuestions++;
         subjectMap[subjectName].maxScore += markingScheme.correct;
