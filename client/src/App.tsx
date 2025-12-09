@@ -16,11 +16,12 @@ import Tests from './components/Tests';
 import TestPage from './components/TestPage';
 import TestSubmitted from './components/TestSubmitted'
 
-const AppContent: React.FC = () => {
+export const AppContent: React.FC = () => {
   const location = useLocation();
 
   const hideHeaderOnPaths = ['/login', '/register'];
-  const showHeader = !hideHeaderOnPaths.includes(location.pathname);
+  const isTestPage = location.pathname.startsWith('/tests/');
+  const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage;
 
   return (
     <div className="min-h-screen flex flex-col relative">

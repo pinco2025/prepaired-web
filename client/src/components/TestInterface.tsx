@@ -76,14 +76,26 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   };
 
   function renderMixedMath(text: string) {
-    const parts = text.split(/\$([^$]+)\$/g);
+    const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g);
 
     return (
       <>
         {parts.map((part, i) => {
-          if (i % 2 === 1) {
+          if (part.startsWith('$$') && part.endsWith('$$')) {
             try {
-              const html = katex.renderToString(part, {
+              const html = katex.renderToString(part.slice(2, -2), {
+                throwOnError: false,
+                output: 'html',
+                displayMode: true
+              });
+              return <span key={i} dangerouslySetInnerHTML={{ __html: html }} />;
+            } catch (e) {
+              console.error('KaTeX error:', e);
+              return <span key={i}>{part}</span>;
+            }
+          } else if (part.startsWith('$') && part.endsWith('$')) {
+            try {
+              const html = katex.renderToString(part.slice(1, -1), {
                 throwOnError: false,
                 output: 'html',
                 displayMode: false
@@ -556,6 +568,21 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
   }, [currentQuestion, answers]);
 
+  // Sync Question Palette section with current question
+  useEffect(() => {
+    if (!testData?.questions || !testData?.sections) return;
+
+    const currentQ = testData.questions[currentQuestionIndex];
+    if (!currentQ) return;
+
+    const sectionName = currentQ.section;
+    const sectionIndex = testData.sections.findIndex(s => s.name === sectionName);
+
+    if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
+      setCurrentSectionIndex(sectionIndex);
+    }
+  }, [currentQuestionIndex, testData, currentSectionIndex]);
+
   const sectionIndices = React.useMemo(() => {
     if (!testData?.sections || !testData?.questions) return {};
 
@@ -571,7 +598,23 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     return indices;
   }, [testData]);
 
+  const handleSectionSwitch = (index: number) => {
+    if (!testData?.sections) return;
+
+    const sectionName = testData.sections[index]?.name;
+    if (sectionName && sectionIndices[sectionName] !== undefined) {
+      setCurrentSectionIndex(index);
+      setCurrentQuestionIndex(sectionIndices[sectionName]);
+    }
+  };
+
   const isNumericalQuestion = () => {
+    // Primary check: No options
+    if (currentQuestion && (!currentQuestion.options || currentQuestion.options.length === 0)) {
+        return true;
+    }
+
+    // Fallback: Legacy JEE index check
     if (testData?.exam !== 'JEE' || !currentQuestion || !currentQuestion.section) return false;
 
     const sectionStartIndex = sectionIndices[currentQuestion.section];
@@ -583,10 +626,42 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     return indexWithinSection >= 20;
   };
 
+  const handleKeypadClick = (key: string) => {
+    if (!currentQuestion) return;
+
+    let newValue = numericalAnswer;
+
+    if (key === 'backspace') {
+      newValue = newValue.slice(0, -1);
+    } else if (key === '.') {
+      if (!newValue.includes('.')) {
+        newValue += '.';
+      }
+    } else {
+      // It's a digit
+      newValue += key;
+    }
+
+    setNumericalAnswer(newValue);
+
+    const isValidNumber = !isNaN(parseFloat(newValue)) && isFinite(Number(newValue));
+    if (isValidNumber || newValue === '') {
+        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: newValue }));
+    }
+
+    const newQuestionStatuses = [...questionStatuses];
+    if (newValue.length > 0) {
+      newQuestionStatuses[currentQuestionIndex] = 'answered';
+    } else {
+      newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+    }
+    setQuestionStatuses(newQuestionStatuses);
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
       <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 lg:h-[84vh]">
-        <div className="flex-grow overflow-y-auto min-h-0">
+        <div className="flex-grow overflow-y-auto min-h-0 no-scrollbar p-1">
           {currentQuestion && (
             <>
               <div className="flex items-start justify-between mb-6">
@@ -618,12 +693,33 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                     type="text"
                     id="numerical-input"
                     value={numericalAnswer}
-                    onChange={(e) => handleNumericalChange(e.target.value)}
-                    placeholder="Enter your answer (e.g., 10.55)"
-                    className="w-full p-4 rounded-lg border-2 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:border-primary focus:ring-2 focus:ring-primary outline-none transition-all"
+                    readOnly
+                    onPaste={(e) => e.preventDefault()}
+                    placeholder="Enter your answer using the keypad"
+                    className="w-full p-4 rounded-lg border-2 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:border-primary focus:ring-2 focus:ring-primary outline-none transition-all cursor-default"
                   />
-                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">
-                    Note: Enter numerical value only (up to 2 decimal places).
+
+                  <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto pt-4">
+                    {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'backspace'].map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => handleKeypadClick(key)}
+                        className={`
+                          flex items-center justify-center p-4 rounded-lg shadow-sm text-lg font-bold transition-all duration-100
+                          bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
+                          hover:bg-blue-50 dark:hover:bg-gray-700
+                          active:bg-blue-600 active:text-white dark:active:bg-blue-600
+                          text-text-light dark:text-text-dark
+                          ${key === 'backspace' ? 'text-red-500' : ''}
+                        `}
+                      >
+                        {key === 'backspace' ? '⌫' : key}
+                      </button>
+                    ))}
+                  </div>
+
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2 text-center">
+                    Use the keypad to enter your answer.
                   </p>
                 </div>
               ) : (
@@ -706,7 +802,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
             {testData?.sections?.map((section, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSectionIndex(index)}
+                onClick={() => handleSectionSwitch(index)}
                 className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
                   }`}
               >
