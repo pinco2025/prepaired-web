@@ -14,7 +14,8 @@ import SubjectDetails from './components/SubjectDetails';
 import ChapterDetails from './components/ChapterDetails';
 import Tests from './components/Tests';
 import TestPage from './components/TestPage';
-import TestSubmitted from './components/TestSubmitted'
+import TestSubmitted from './components/TestSubmitted';
+import TestResult from './components/TestResult';
 
 export const AppContent: React.FC = () => {
   const location = useLocation();
@@ -92,6 +93,11 @@ export const AppContent: React.FC = () => {
         <Route path="/test-submitted" element={
           <RequireAuth>
             <TestSubmitted />
+          </RequireAuth>
+        } />
+        <Route path="/results/:submissionId" element={
+          <RequireAuth>
+            <TestResult />
           </RequireAuth>
         } />
       </Routes>
