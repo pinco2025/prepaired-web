@@ -58,7 +58,7 @@ const TestResult: React.FC = () => {
         const { data: testData, error: testError } = await supabase
           .from('tests')
           .select('*')
-          .eq('testID', submissionData.testID)
+          .eq('testID', submissionData.test_id)
           .single();
 
         if (testError) throw testError;
