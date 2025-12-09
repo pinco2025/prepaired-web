@@ -5,7 +5,7 @@ import { Test, Question } from '../data';
 
 interface Submission {
   id: string;
-  testID: string;
+  test_id: string;
   answers: Record<string, any>;
   started_at: string;
   submitted_at: string;
@@ -62,7 +62,12 @@ const TestResult: React.FC = () => {
           .single();
 
         if (testError) throw testError;
-        setTest(testData as Test);
+
+        // Fetch the questions from the test URL
+        const response = await fetch(testData.url);
+        const questionsData = await response.json();
+
+        setTest({ ...testData, ...questionsData } as Test);
 
       } catch (error) {
         console.error('Error fetching result data:', error);
@@ -114,7 +119,12 @@ const TestResult: React.FC = () => {
     if (!test || !test.questions || !submission) return {};
 
     const subjectMap: Record<string, { correct: number; incorrect: number; skipped: number; score: number; totalQuestions: number; maxScore: number }> = {};
-    const markingScheme = JSON.parse(test.markingScheme)
+    let markingScheme = { correct: 0, incorrect: 0 };
+    try {
+      markingScheme = JSON.parse(test.markingScheme);
+    } catch (e) {
+      console.error("Failed to parse marking scheme", e)
+    }
     test.questions.forEach((section: {name: string, questions: Question[]}) => {
       const subjectName = section.name.replace(/ (A|B)$/, '').trim();
       if (!subjectMap[subjectName]) {
@@ -284,7 +294,7 @@ const TestResult: React.FC = () => {
                       </div>
                     </div>
                     <div className="relative w-full h-2 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
-                      <div className={`absolute top-0 left-0 h-full rounded-full ${style.bar}`} style={{ width: `${(data.score/data.maxScore)*100}%` }}></div>
+                      <div className={`absolute top-0 left-0 h-full rounded-full ${style.bar}`} style={{ width: `${Math.max(0, (data.score/data.maxScore)*100)}%` }}></div>
                     </div>
                   </div>
                 )
