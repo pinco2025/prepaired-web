@@ -261,7 +261,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
           console.warn('onSubmitSuccess threw:', e);
         }
 
-        navigate('/test-submitted');
+        navigate('/test-submitted', { state: { submissionId: finalSubmissionId } });
       }
     } catch (e) {
       console.error('Submission failed', e);

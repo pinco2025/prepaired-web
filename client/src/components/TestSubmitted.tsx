@@ -1,7 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const TestSubmitted: React.FC = () => {
+  const location = useLocation();
+  const submissionId = location.state?.submissionId;
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center">
       <div className="w-full max-w-lg text-center bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm p-8 md:p-12 rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark translate-y-[-40px]">
@@ -18,13 +21,23 @@ const TestSubmitted: React.FC = () => {
             <span className="material-icons-outlined">dashboard</span>
             Go to Dashboard
           </Link>
-          <Link
-            to="/dashboard"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
-          >
-            <span className="material-icons-outlined">bar_chart</span>
-            View Result
-          </Link>
+          {submissionId ? (
+            <Link
+              to={`/results/${submissionId}`}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
+            >
+              <span className="material-icons-outlined">bar_chart</span>
+              View Result
+            </Link>
+          ) : (
+            <Link
+              to="/dashboard"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
+            >
+              <span className="material-icons-outlined">bar_chart</span>
+              View Result
+            </Link>
+          )}
         </div>
       </div>
     </div>
