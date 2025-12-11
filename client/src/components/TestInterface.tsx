@@ -60,6 +60,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [studentTestId, setStudentTestId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -790,6 +791,13 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
       <div className="flex flex-col gap-4">
         <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark lg:sticky lg:top-6 lg:self-start max-h-[72vh] overflow-y-auto">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            disabled={isSubmittingRef.current}
+            className="w-full mb-6 bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            Submit Test
+          </button>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Time Left:</h3>
             <span className="text-lg font-semibold text-text-light dark:text-text-dark">
@@ -849,16 +857,47 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
             </div>
           </div>
         </aside>
-        <div className="lg:self-stretch">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmittingRef.current}
-            className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            Submit Test
-          </button>
-        </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-6">
+          <div className="absolute inset-0 bg-background-dark/70 backdrop-blur-sm transition-opacity"></div>
+          <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-surface-light dark:bg-surface-dark p-6 text-left align-middle shadow-2xl transition-all border border-border-light dark:border-border-dark">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-5 rounded-full bg-primary/10 p-4 text-primary">
+                <span className="material-icons-outlined text-4xl">assignment_turned_in</span>
+              </div>
+              <h3 className="text-xl font-bold leading-6 text-text-light dark:text-text-dark mb-2">
+                Submit Test
+              </h3>
+              <div className="mb-8">
+                <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">
+                  Are you sure you want to submit the test?
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 rounded-lg border border-border-light dark:border-border-dark bg-transparent px-5 py-3 text-base font-medium text-text-light dark:text-text-dark hover:bg-background-light dark:hover:bg-background-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  handleSubmit();
+                }}
+                className="flex-1 rounded-lg border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-opacity shadow-lg shadow-primary/20"
+                type="button"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
