@@ -218,37 +218,22 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       } else {
         console.log('Submission DB update successful! Now triggering grade calculation...');
 
-        // --- Grade Calculation Start ---
+        // Trigger Score Calculation
         try {
           const { data: sessionData } = await supabase.auth.getSession();
           const token = sessionData?.session?.access_token;
 
-          const response = await fetch('https://eznxtdzsvnfclgcavvhp.supabase.co/functions/v1/result-calc', {
+          await fetch(`https://prepaired-backend.onrender.com/api/v1/scores/${finalSubmissionId}/calculate`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-            },
-            body: JSON.stringify({
-              submission_id: finalSubmissionId
-            })
+            }
           });
-
-          const result = await response.json();
-
-          if (!response.ok || !result.ok) {
-            throw new Error(result.error || 'Grading failed');
-          }
-
-          console.log('Grading successful:', result);
-
-        } catch (gradeError) {
-          console.error('Error during grading:', gradeError);
-          alert('Unable to grade test. Please try again.');
-          isSubmittingRef.current = false;
-          return; // Stop here, allow retry
+        } catch (error) {
+          console.error('Failed to trigger score calculation', error);
+          // Proceed to navigation even if triggering calculation fails
         }
-        // --- Grade Calculation End ---
 
         console.log('Submission and grading successful!');
         try {
