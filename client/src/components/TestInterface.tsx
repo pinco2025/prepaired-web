@@ -180,6 +180,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
       let error;
       let finalSubmissionId = currentStudentTestId;
+      let shouldCalculateScore = true;
 
       if (currentStudentTestId) {
           console.log('Updating existing record:', currentStudentTestId);
@@ -187,9 +188,15 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
               .from('student_tests')
               .update(submissionData)
               .eq('id', currentStudentTestId)
-              .select();
+              .select('result_url');
           
           console.log('Update result:', updateResult);
+
+          if (updateResult && updateResult.length > 0 && updateResult[0].result_url) {
+            console.log('Result already exists, skipping calculation.');
+            shouldCalculateScore = false;
+          }
+
           error = updateError;
       } else {
           // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
@@ -216,23 +223,28 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         console.error('Error submitting test:', error);
         isSubmittingRef.current = false;
       } else {
-        console.log('Submission DB update successful! Now triggering grade calculation...');
+        console.log('Submission DB update successful!');
 
-        // Trigger Score Calculation
-        try {
-          const { data: sessionData } = await supabase.auth.getSession();
-          const token = sessionData?.session?.access_token;
+        if (shouldCalculateScore) {
+          console.log('Triggering grade calculation...');
+          // Trigger Score Calculation
+          try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const token = sessionData?.session?.access_token;
 
-          await fetch(`https://prepaired-backend.onrender.com/api/v1/scores/${finalSubmissionId}/calculate`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-            }
-          });
-        } catch (error) {
-          console.error('Failed to trigger score calculation', error);
-          // Proceed to navigation even if triggering calculation fails
+            await fetch(`https://prepaired-backend.onrender.com/api/v1/scores/${finalSubmissionId}/calculate`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+              }
+            });
+          } catch (error) {
+            console.error('Failed to trigger score calculation', error);
+            // Proceed to navigation even if triggering calculation fails
+          }
+        } else {
+          console.log('Skipping grade calculation as result already exists.');
         }
 
         console.log('Submission and grading successful!');
