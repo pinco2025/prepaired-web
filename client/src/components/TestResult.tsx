@@ -12,7 +12,7 @@ interface SectionScore {
 }
 
 interface TestResultData {
-  title: string;
+  testId: string;
   totalMarks: number;
   totalQuestions: number;
   sections: { name: string; marksPerQuestion: number }[];
@@ -134,7 +134,7 @@ const TestResult: React.FC = () => {
     <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Test Result: {result.title}</h1>
+          <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Test Result: {result.testId}</h1>
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2 flex items-center gap-2">
             <span className="material-icons-outlined text-sm">event</span>
             {submissionTime ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` : ''}
