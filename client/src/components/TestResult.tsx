@@ -166,7 +166,7 @@ const TestResult: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-6">
             <h3 className="text-lg font-semibold text-text-light dark:text-text-dark mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">analytics</span>
+              <span className="material-icons-outlined text-primary">analytics</span>
               Question Analysis
             </h3>
             <div className="space-y-4">
@@ -206,7 +206,7 @@ const TestResult: React.FC = () => {
 
           <div className="lg:col-span-2 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-6">
             <h3 className="text-lg font-semibold text-text-light dark:text-text-dark mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">subject</span>
+              <span className="material-icons-outlined text-primary">subject</span>
               Subject Breakdown
             </h3>
             <div className="space-y-6">
@@ -220,7 +220,7 @@ const TestResult: React.FC = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${style.bg} ${style.text}`}>
-                          <span className="material-symbols-outlined text-[20px]">{subjectIcons[subjectName] || 'subject'}</span>
+                          <span className="material-icons-outlined text-[20px]">{subjectIcons[subjectName] || 'subject'}</span>
                         </div>
                         <div>
                           <h4 className="font-medium text-text-light dark:text-text-dark">{sectionName}</h4>
@@ -229,15 +229,15 @@ const TestResult: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-1 text-success-light dark:text-success-dark">
-                          <span className="material-symbols-outlined text-[16px]">check</span>
+                          <span className="material-icons-outlined text-[16px]">check</span>
                           <span>{data.correct}</span>
                         </div>
                         <div className="flex items-center gap-1 text-error-light dark:text-error-dark">
-                          <span className="material-symbols-outlined text-[16px]">close</span>
+                          <span className="material-icons-outlined text-[16px]">close</span>
                           <span>{data.incorrect}</span>
                         </div>
                         <div className="flex items-center gap-1 text-text-secondary-light dark:text-text-secondary-dark">
-                          <span className="material-symbols-outlined text-[16px]">remove</span>
+                          <span className="material-icons-outlined text-[16px]">remove</span>
                           <span>{data.unattempted}</span>
                         </div>
                       </div>
@@ -256,7 +256,7 @@ const TestResult: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-primary/10 rounded-xl text-primary">
-                <span className="material-symbols-outlined text-3xl">fact_check</span>
+                <span className="material-icons-outlined text-3xl">fact_check</span>
               </div>
               <div>
                 <h3 className="text-lg font-bold text-text-light dark:text-text-dark">User Attempt vs. Answer Key</h3>
@@ -265,7 +265,7 @@ const TestResult: React.FC = () => {
             </div>
             <button className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity w-full md:w-auto justify-center">
               Start Review
-              <span className="material-symbols-outlined">arrow_forward</span>
+              <span className="material-icons-outlined">arrow_forward</span>
             </button>
           </div>
         </div>
