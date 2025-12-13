@@ -1,0 +1,1055 @@
+{
+  "test_id": "PPT 2",
+  "questions": [
+    {
+      "id": "q1",
+      "number": 1,
+      "solution_text": "Applying conservation of linear momentum let $v'$ \n be the final speed of the system \n $Mv = (2m + M)v'$ \n \n $v' = \\frac{mv}{2m + M}$ \n \n Initial kinetic energy $= \\frac{1}{2}mv^2$ \n \n Final kinetic energy \n $= \\frac{1}{2}(2m + M)\\left(\\frac{mv}{2m + M}\\right)^2$ \n \n Initial kinetic energy $-$ Final kinetic energy $= \\frac{3}{4}$  of initial kinetic energy \n $\\frac{1}{2}mv^2 - \\frac{1}{2}(2m + M)\\left(\\frac{mv}{2m + M}\\right)^2 = \\frac{3}{4} \\times \\frac{1}{2}mv^2$ \n \n $\\frac{1}{2}mv^2 - \\frac{3}{8}mv^2 = \\frac{1}{2}(2m + M)\\frac{m^2v^2}{(2m + M)^2}$ \n \n $\\frac{mv^2}{8} = \\frac{m^2v^2}{2(2m + M)}$ \n $\\Rightarrow 4m = 2m + M$ \n $\\Rightarrow \\frac{m}{M} = \\frac{1}{2}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q3",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWAITS05FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q2",
+      "number": 2,
+      "solution_text": "According to mechanical energy conservation between $A$ and $B$\n\n \n$mg(5) = 0 + \\frac{1}{2}mv^2$\n\n \n$v^2 = 10g$\n\n \nAccording to centripetal force equation\n\n \n$N + \\text{mg} = \\frac{mv^2}{r}$ [For $\\text{N} = \\text{mg}$]\n\n \n$2\\text{mg} = \\frac{mv^2}{r}$\n\n \n$r = \\frac{v^2}{2g} = \\frac{10g}{2g} = 5m$",
+      "solution_image_url": "https://lh3.googleusercontent.com/d/1POeSueOfjXnODRiBtxPBFuXRkuPqgxR6=w300-h300",
+      "tags": {
+        "tag1": "Q11",
+        "tag2": "WEP",
+        "tag3": "M",
+        "tag4": "",
+        "type": "jee_mock_test",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q3",
+      "number": 3,
+      "solution_text": "$F - T = \\left(m_2 + M\\right)a \\quad ..(1)$ \n $m_1 a - T = m_1 a'$ \n $T - m_2 g = m_2 a'$ \n $a' = \\frac{m_1 F - m_2 g\\left(m_1 + m_2 + M\\right)}{\\left(\\left(m_1 + m_2\\right)\\left(M + m_2\\right) + m_1 m_2\\right)}$ \n $a' = 2 \\, \\text{m/sec}^2$",
+      "solution_image_url": "https://lh3.googleusercontent.com/d/1xQDM8hTe4whoUQmOWKoeTgUH2irV-r_v=w600-h600",
+      "tags": {
+        "tag1": "Q2",
+        "tag2": "LOM",
+        "tag3": "M",
+        "tag4": "1",
+        "type": "PW99MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q4",
+      "number": 4,
+      "solution_text": "$N = (m_{child} + m_{platform})$ \n $N = 140 - T$ \n $f_{max} = \\mu \\cdot N$ \n $f_{max} = 0.4 \\cdot (140 - T)$ \n $= 0.4 \\, (140 - T)$ \n $T = \\frac{56}{1.4} = 40 \\text{N}$",
+      "solution_image_url": "https://lh3.googleusercontent.com/d/18ZeBkKLB-lx4RQqGbNTs3rWTlCMVwN58=w500-h500",
+      "tags": {
+        "tag1": "Q2",
+        "tag2": "LOM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS01FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q5",
+      "number": 5,
+      "solution_text": "Let for acceleration a block A is at rest w.r.t. to \n block B \n In block A you can conclude normal force will \n provide acceleration a and in vertical direction it \n is in equilibrium \n So $N = ma$, $f = mg$ \n $\\mu N = mg$ \n $\\mu ma = mg$ \n $a = g/\\mu$ \n As block A and B both are moving with same \n acceleration so you can consider a single mass \n system from FBD of block C and combined mass \n A and B you will get \n $T = 3ma$, $Mg - T = M a$ \n $Mg - 3ma = M a$ \n $M = \\frac{3m}{\\mu - 1}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q18",
+        "tag2": "LOM",
+        "tag3": "H",
+        "tag4": "",
+        "type": "jee_main_practice",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q6",
+      "number": 6,
+      "solution_text": "To completely straighten the rope, the angle \n between the rope and the horizontal becomes \n zero. \n In vertical equilibrium: \n $2T \\sin \\theta = 15 \\, \\text{N} \\Rightarrow T = \\frac{15}{2 \\sin \\theta}$ \n \n As $\\theta \\rightarrow 0^\\circ$, $\\sin \\theta \\rightarrow 0 = T \\rightarrow \\infty$ \n So, the tension needed becomes infinitely large \n to keep the rope perfectly horizontal.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q17",
+        "tag2": "LOM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "jee_main_practice",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q7",
+      "number": 7,
+      "solution_text": "Since net force on the system of two blocks is \n zero. \n $x_A + x_B = \\frac{x_0}{2}$ \n $mx_A = 2mx_B$ \n $\\Rightarrow x_B = \\frac{x_0}{6}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q2",
+        "tag2": "LOM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWPS06MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q8",
+      "number": 8,
+      "solution_text": "The particle experiences a damping force $F = -\\alpha x^{3/2}$. \n Applying Newton's second law: $ma = -\\alpha x^{3/2}$. \n Using the chain rule for acceleration: $a = v\\frac{dv}{dx}$. \n Therefore: $m \\cdot v\\frac{dv}{dx} = -\\alpha x^{3/2}$. \n Separating variables: $m \\cdot v \\, dv = -\\alpha x^{3/2} \\, dx$. \n Integrating both sides from initial to final states: \n $\\int_{v_0}^{v} m \\cdot v \\, dv = \\int_{0}^{x} -\\alpha x^{3/2} \\, dx$. \n Evaluating the integrals: \n $m\\left[\\frac{v^2}{2}\\right]_{v_0}^{v} = -\\alpha\\left[\\frac{x^{5/2}}{5/2}\\right]_{0}^{x}$. \n This gives: $m\\left(\\frac{v^2}{2} - \\frac{v_0^2}{2}\\right) = -\\alpha \\cdot \\frac{2x^{5/2}}{5}$. \n Simplifying: $\\frac{mv^2}{2} = \\frac{mv_0^2}{2} - \\frac{2\\alpha x^{5/2}}{5}$. \n At the point where the particle stops, $v = 0$: \n $0 = \\frac{mv_0^2}{2} - \\frac{2\\alpha x^{5/2}}{5}$. \n Solving for $x$: $\\frac{2\\alpha x^{5/2}}{5} = \\frac{mv_0^2}{2}$, \n which gives $x^{5/2} = \\frac{5mv_0^2}{4\\alpha}$. \n Therefore: $x = \\left(\\frac{5mv_0^2}{4\\alpha}\\right)^{2/5}$.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q9",
+      "number": 9,
+      "solution_text": "The object experiences a force $\\vec{F} = (3t^2)\\hat{i} + (4t)\\hat{j}$ N with mass $m = 2$ kg. \n Using Newton's second law to find acceleration: \n $\\vec{a} = \\frac{\\vec{F}}{m} = \\frac{(3t^2)\\hat{i} + (4t)\\hat{j}}{2} = \\left(\\frac{3t^2}{2}\\right)\\hat{i} + (2t)\\hat{j}$ m/s$^2$. \n To find velocity, integrate acceleration with respect to time: \n $\\vec{v} = \\int \\vec{a} \\, dt = \\int \\left[\\left(\\frac{3t^2}{2}\\right)\\hat{i} + (2t)\\hat{j}\\right] dt = \\left(\\frac{t^3}{2}\\right)\\hat{i} + (t^2)\\hat{j} + \\vec{C}$. \n Since the object starts from rest at $t = 0$, we have $\\vec{v}(0) = 0$, so $\\vec{C} = 0$. \n Therefore: $\\vec{v} = \\left(\\frac{t^3}{2}\\right)\\hat{i} + (t^2)\\hat{j}$ m/s. \n Power is given by the dot product of force and velocity: \n $P = \\vec{F} \\cdot \\vec{v} = \\left[(3t^2)\\hat{i} + (4t)\\hat{j}\\right] \\cdot \\left[\\left(\\frac{t^3}{2}\\right)\\hat{i} + (t^2)\\hat{j}\\right]$. \n $P = (3t^2)\\left(\\frac{t^3}{2}\\right) + (4t)(t^2) = \\frac{3t^5}{2} + 4t^3 = t^3\\left(\\frac{3t^2}{2} + 4\\right)$. \n At $t = 2$ seconds: \n $P = (2)^3\\left(\\frac{3(2)^2}{2} + 4\\right) = 8\\left(\\frac{3(4)}{2} + 4\\right) = 8(6 + 4) = 8(10) = 80$ W. \n Therefore, the power delivered at $t = 2$ seconds is $80$ W.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q10",
+      "number": 10,
+      "solution_text": "The rate at which sand is deposited on the belt is given by: \n $\\frac{dm}{dt} = k \\cdot v^{1/\\beta}$, \n where $k$ is a constant of proportionality. \n When sand falls vertically onto the moving belt, it must be accelerated horizontally from rest to velocity $v$. \n The force required to continuously accelerate the incoming sand is: \n $F = v \\cdot \\frac{dm}{dt}$. \n This is derived from Newton's second law in the form $F = \\frac{dp}{dt}$, where the rate of momentum change is: \n $\\frac{dp}{dt} = v \\cdot \\frac{dm}{dt}$. \n The power required to maintain constant belt speed is: \n $P = F \\cdot v = v \\cdot \\frac{dm}{dt} \\cdot v = v^2 \\cdot \\frac{dm}{dt}$. \n Substituting $\\frac{dm}{dt} = k \\cdot v^{1/\\beta}$: \n $P = v^2 \\cdot k \\cdot v^{1/\\beta} = k \\cdot v^{2 + 1/\\beta}$. \n Therefore: \n $P \\propto v^{2 + 1/\\beta}$. \n This can be rewritten by raising both sides to the power $\\beta$: \n $P^\\beta \\propto v^{\\beta(2 + 1/\\beta)} = v^{2\\beta + 1}$. \n Thus, the correct relationship is $P^\\beta \\propto v^{2\\beta + 1}$.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q11",
+      "number": 11,
+      "solution_text": "Examining Assertion A: When a body slides down a rough inclined plane, the friction force acts opposite to the direction of motion (up the incline). Since work is given by $W = \\vec{F} \\cdot \\vec{d} = Fd\\cos\\theta$, where $\\theta$ is the angle between force and displacement, and friction acts opposite to displacement ($\\theta = 180^\\circ$), we have $\\cos(180^\\circ) = -1$. Therefore, work done by friction is $W = -Fd$, which is always negative. Assertion A is TRUE.\n\n \nExamining Reason R: Kinetic friction always acts in a direction opposite to the relative motion between two surfaces. This is a fundamental property of frictional forces. When two surfaces are in relative motion, the friction force on each surface opposes its motion relative to the other surface. Reason R is TRUE.\n\n \nExamining the relationship: Reason R directly explains Assertion A. The reason friction does negative work (A) is precisely because it opposes the relative motion (R). Since friction acts opposite to the direction of displacement, the angle between the friction force and displacement is $180^\\circ$, making the work negative. The property stated in R is the direct cause of the result in A. Therefore, both A and R are true, and R is the correct explanation of A.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q12",
+      "number": 12,
+      "solution_text": "Taking the Earth's surface as reference (PE = $0$): \n Initial state (at height $H$): \n Potential energy: $\\text{PE}_1 = mgH$. \n Kinetic energy: $\\text{KE}_1 = 0$ (released from rest). \n Total mechanical energy: $E = mgH$. \n At height $h$ from the surface: \n Potential energy: $\\text{PE}_2 = mgh$. \n Kinetic energy: $\\text{KE}_2 = \\frac{1}{2}mv^2$. \n Given condition: $\\frac{\\text{KE}}{\\text{PE}} = \\frac{5}{2}$. \n Therefore: $\\frac{\\frac{1}{2}mv^2}{mgh} = \\frac{5}{2}$, \n which gives $\\frac{1}{2}mv^2 = \\frac{5}{2}mgh$, \n so $v^2 = 5gh$ (equation 1). \n Applying conservation of energy: \n $mgH = mgh + \\frac{1}{2}mv^2$. \n Substituting equation 1: \n $mgH = mgh + \\frac{5}{2}mgh = mgh\\left(1 + \\frac{5}{2}\\right) = mgh\\left(\\frac{7}{2}\\right)$. \n Therefore: $H = h\\left(\\frac{7}{2}\\right)$, \n which gives $h = \\frac{2H}{7}$. \n Since $h = xH$, we have: \n $xH = \\frac{2H}{7}$, so $x = \\frac{2}{7}$. \n Finding the speed: \n $v^2 = 5gh = 5g\\left(\\frac{2H}{7}\\right) = \\frac{10gH}{7}$. \n Since $v = \\sqrt{ygH}$, we have: \n $v^2 = ygH$, so $\\frac{10gH}{7} = ygH$, \n which gives $y = \\frac{10}{7}$. \n Finding $2x + y$: \n $2x + y = 2\\left(\\frac{2}{7}\\right) + \\frac{10}{7} = \\frac{4}{7} + \\frac{10}{7} = \\frac{14}{7} = 2$.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q13",
+      "number": 13,
+      "solution_text": "Given: \n Mass: $m = 5$ kg. \n Natural length: $l_0 = 3$ m. \n Spring constant: $k = 100$ N/m. \n Spring length at instant: $y$ meters ($y > 3$). \n When the spring length is $y$ meters: \n Since $y > 3$ m and natural length is $3$ m, the spring is stretched. \n Extension: $\\Delta y = y - 3$ meters. \n The spring exerts a restoring force on the block: \n $F = k \\times \\text{(extension)} = k(y - 3) = 100(y - 3)$ N. \n This force acts toward the wall (in the direction of decreasing $y$), trying to restore the spring to its natural length. \n Using Newton's second law: \n $F = ma$, so $100(y - 3) = 5a$, \n which gives $a = 20(y - 3)$ m/s$^2$. \n Therefore, the magnitude of acceleration when the spring length is $y$ meters is $a = 20(y - 3)$ m/s$^2$. \n Note: As $y$ decreases toward $3$ (natural length), the extension decreases, and so does the acceleration. \n When $y = 3$, $a = 0$ (no acceleration at natural length).",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q14",
+      "number": 14,
+      "solution_text": "Given: \n Mass: $m = 4$ kg. \n Power function: $P(t) = 8t$ watts. \n Particle starts from rest: $v_0 = 0$. \n Time: $t = 2$ s. \n Using the power-energy relationship: \n $P(t) = \\frac{dE}{dt} = \\frac{d}{dt}\\left(\\frac{1}{2}mv^2\\right) = mv\\frac{dv}{dt} = mva$. \n Therefore: $8t = 4va$, \n which gives $va = 2t$ (equation 1). \n To find velocity at time $t$, we use: \n $P(t) = mv\\frac{dv}{dt}$, so $8t = 4v\\frac{dv}{dt}$. \n Rearranging: $v \\, dv = 2t \\, dt$. \n Integrating from $t = 0$ ($v = 0$) to time $t$ (velocity $v$): \n $\\int_0^v v \\, dv = \\int_0^t 2t \\, dt$, \n which gives $\\frac{v^2}{2} = t^2$, \n so $v^2 = 2t^2$ and $v = t\\sqrt{2}$ (equation 2). \n At $t = 2$ s: $v = 2\\sqrt{2}$ m/s. \n From equation 1: $va = 2t$, \n so $(2\\sqrt{2}) \\cdot a = 2(2) = 4$. \n Therefore: $a = \\frac{4}{2\\sqrt{2}} = \\frac{2}{\\sqrt{2}} = \\frac{2\\sqrt{2}}{2} = \\sqrt{2}$ m/s$^2$. \n Thus, the acceleration at $t = 2$ seconds is $a = \\sqrt{2}$ m/s$^2$.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q15",
+      "number": 15,
+      "solution_text": "Given: \n Mass: $m = 2$ kg. \n Initial position P: $(2, 3)$ m. \n Final position Q: $(8, 9)$ m. \n Force: $\\vec{F} = (4\\hat{i} + 3\\hat{j})$ N. \n Step 1: Find the displacement vector. \n Displacement: $\\vec{s} = \\vec{Q} - \\vec{P} = (8 - 2)\\hat{i} + (9 - 3)\\hat{j} = 6\\hat{i} + 6\\hat{j}$ m. \n Step 2: Calculate work done. \n Work is given by the dot product of force and displacement: \n $W = \\vec{F} \\cdot \\vec{s} = (4\\hat{i} + 3\\hat{j}) \\cdot (6\\hat{i} + 6\\hat{j})$. \n $W = 4(6) + 3(6) = 24 + 18 = 42$ J. \n Therefore, the work done by the force is $42$ J.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q16",
+      "number": 16,
+      "solution_text": "Given: \n Mass of engine $m_1 = 5000$ kg, mass of wagon $m_2 = 15000$ kg, \n initial speed $v_0 = 72$ km/h $= 20$ m/s, maximum compression $x = 2.0$ m. \n Initial state: \n Engine velocity $v_1 = 20$ m/s, wagon velocity $v_2 = 0$ m/s (brakes applied). \n Final state: \n Both at rest. \n Initial kinetic energy (only engine moving): \n $KE_i = \\frac{1}{2}m_1v_1^2 = \\frac{1}{2}(5000)(20)^2 = 1,000,000$ J $= 10^6$ J. \n Final kinetic energy: \n $KE_f = 0$ J (both at rest). \n Energy stored in spring: \n $E_{\\text{spring}} = KE_i - KE_f = 10^6$ J. \n Using $E_{\\text{spring}} = \\frac{1}{2}kx^2$: \n $10^6 = \\frac{1}{2}k(2.0)^2 = 2k$. \n Therefore: \n $k = \\frac{10^6}{2} = 5 \\times 10^5$ N/m.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q17",
+      "number": 17,
+      "solution_text": "Assertion A: \n The spring force is $F = -kx$ (restoring force). \n Work done by spring force depends on the direction of displacement. \n When compressing a spring (displacement toward compressed state), the spring force opposes this motion, so work by spring is negative. \n However, when a compressed spring is released and returns to natural length, the spring force acts in the direction of displacement, so work by spring is positive. \n Similarly, when a stretched spring returns to natural length, work by spring is positive. \n Therefore, work done by spring force is NOT always negative. \n Assertion A is FALSE. \n Examining Reason R: \n The spring force $F = -kx$ always points toward the natural length position. \n If spring is stretched ($x > 0$), force is negative (toward natural length). \n If spring is compressed ($x < 0$), force is positive (toward natural length). \n This is the fundamental nature of restoring forces. \n Reason R is TRUE. \n Therefore: A is false, but R is true.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "XX",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q18",
+      "number": 18,
+      "solution_text": "Given Data: \n Initial velocity at A (going up): $v_0$, \n Final velocity at A (coming down): $nv_0$, \n Distance traveled up the plane: $L$, \n Angle of incline: $\\theta$, \n Coefficient of friction: $\\mu$ (same for upward and downward motion). \n Step 1 - Analyze forces during upward motion: \n During upward motion, \n component of weight along plane (downward): $mg\\sin\\theta$, \n friction force (downward, opposes motion): $f = \\mu mg\\cos\\theta$, \n net deceleration: $a_{\\text{up}} = g\\sin\\theta + \\mu g\\cos\\theta$. \n Using $v^2 = u^2 + 2as$ for upward journey ($v = 0$, $u = v_0$, $s = L$): \n $0 = v_0^2 - 2(g\\sin\\theta + \\mu g\\cos\\theta)L$. \n This gives $v_0^2 = 2gL(\\sin\\theta + \\mu\\cos\\theta)$ (equation 1). \n Step 2 - Analyze forces during downward motion: \n During downward motion, \n component of weight along plane (downward): $mg\\sin\\theta$, \n friction force (upward, opposes motion): $f = \\mu mg\\cos\\theta$, \n net acceleration: $a_{\\text{down}} = g\\sin\\theta - \\mu g\\cos\\theta$. \n Using $v^2 = u^2 + 2as$ for downward journey ($u = 0$, $v = nv_0$, $s = L$): \n $(nv_0)^2 = 2(g\\sin\\theta - \\mu g\\cos\\theta)L$. \n This gives $n^2v_0^2 = 2gL(\\sin\\theta - \\mu\\cos\\theta)$ (equation 2). \n Step 3 - Solve for coefficient of friction: \n Dividing equation 1 by equation 2: \n $\\frac{v_0^2}{n^2v_0^2} = \\frac{\\sin\\theta + \\mu\\cos\\theta}{\\sin\\theta - \\mu\\cos\\theta}$. \n Therefore: \n $\\frac{1}{n^2} = \\frac{\\sin\\theta + \\mu\\cos\\theta}{\\sin\\theta - \\mu\\cos\\theta}$. \n Cross-multiplying: \n $\\sin\\theta - \\mu\\cos\\theta = n^2(\\sin\\theta + \\mu\\cos\\theta)$. \n Expanding: \n $\\sin\\theta - \\mu\\cos\\theta = n^2\\sin\\theta + n^2\\mu\\cos\\theta$. \n Rearranging: \n $\\sin\\theta - n^2\\sin\\theta = \\mu\\cos\\theta + n^2\\mu\\cos\\theta$. \n Factoring: \n $\\sin\\theta(1 - n^2) = \\mu\\cos\\theta(1 + n^2)$. \n Therefore: \n $\\mu = \\frac{1 - n^2}{1 + n^2} \\cdot \\frac{\\sin\\theta}{\\cos\\theta} = \\frac{1 - n^2}{1 + n^2}\\tan\\theta$. \n Step 4 - Find value of k: \n Comparing with $\\mu = k\\tan\\theta$: \n $k = \\frac{1 - n^2}{1 + n^2}$. \n Verification: \n For $n = \\frac{1}{2}$: \n $k = \\frac{1 - \\frac{1}{4}}{1 + \\frac{1}{4}} = \\frac{3/4}{5/4} = \\frac{3}{5} = 0.6$. \n Physical interpretation: \n When $n \\to 0$ (very low return speed): $k \\to 1$ (high friction). \n When $n \\to 1$ (nearly same return speed): $k \\to 0$ (low friction).",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "PH",
+        "tag2": "WEP",
+        "tag3": "M",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q19",
+      "number": 19,
+      "solution_text": "$\\textbf{Step 1:}$ Find velocity at the lowest point when $T_{\\text{lowest}} = 9mg$: \n $$T_{\\text{lowest}} = \\frac{mv_{\\text{lowest}}^2}{R} + mg$$ \n $$9mg = \\frac{mv_{\\text{lowest}}^2}{R} + mg$$ \n $$\\frac{mv_{\\text{lowest}}^2}{R} = 8mg$$ \n $$v_{\\text{lowest}}^2 = 8gR$$ \n $\\textbf{Step 2:}$ Find velocity at horizontal position using energy conservation. \n Height gained from lowest point to horizontal position is $R$: \n $$\\frac{1}{2}mv_{\\text{horizontal}}^2 + mgR = \\frac{1}{2}m(8gR)$$ \n $$\\frac{1}{2}mv_{\\text{horizontal}}^2 = 4mgR - mgR = 3mgR$$ \n $$v_{\\text{horizontal}}^2 = 6gR$$ \n $\\textbf{Step 3:}$ Find tension at horizontal position. \n At this point, the string is horizontal and weight acts vertically downward (perpendicular to string). \n The tension only provides centripetal force: \n $$T_{\\text{horizontal}} = \\frac{mv_{\\text{horizontal}}^2}{R} = \\frac{m(6gR)}{R} = 6mg$$ \n $\\textbf{Key Insight:}$ At the horizontal position, weight and tension are perpendicular, \n so tension equals the centripetal force requirement only.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "PH",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q20",
+      "number": 20,
+      "solution_text": "$a = \\frac{14}{4 + 2 + 1}$ \n $= \\frac{14}{7} = 2 \\, \\text{m/s}^2$ \n $(14 - N) = 4 \\times 2$ \n $N = 14 - 8$ \n $= 6 \\, \\text{N}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q9",
+        "tag2": "LOM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "jee_main_practice",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q21",
+      "number": 21,
+      "solution_text": "$U(r) = \\frac{\\beta}{r^{12}} - \\frac{\\alpha}{r^7}$\n\n \n$\\frac{dU}{dr} = -12\\frac{\\beta}{r^{13}} + 7\\frac{\\alpha}{r^8} = 0$\n\n \n$-12\\frac{\\beta}{r^{13}} + 7\\frac{\\alpha}{r^8} = 0$\n\n \n$12\\frac{\\beta}{r^{13}} = 7\\frac{\\alpha}{r^8}$\n\n \n$12\\beta = 7\\alpha r^5$\n\n \n$r^5 = \\frac{12\\beta}{7\\alpha}$\n\n \n$r = \\left(\\frac{12\\beta}{7\\alpha}\\right)^{1/5}$\n\n \n$\\left[\\left(1 + \\frac{x}{7}\\right)\\frac{\\beta}{\\alpha}\\right]^{1/x} = \\left(\\frac{12\\beta}{7\\alpha}\\right)^{1/5}$\n\n \n$\\left(1 + \\frac{x}{7}\\right) = \\left(\\frac{12}{7}\\right)$\n\n \n$x = 5$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q30",
+        "tag2": "WEP",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWAITS01FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q22",
+      "number": 22,
+      "solution_text": "Here, $F = 100$ N, $d = 5$ m, \n frictional force $f_r = 40$ N \n $\\therefore F - f_r = ma$ \n $100 - 40 = ma$ \n Now kinetic energy gained is $= ma \\times d$ \n $= 60 \\times 5 = 300$ J",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q24",
+        "tag2": "WEP",
+        "tag3": "E",
+        "tag4": "",
+        "type": "PWPS07MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q23",
+      "number": 23,
+      "solution_text": "After the upper spring is cut, the block 1 and 2 \n will move with same acceleration. \n $\\therefore a = 2g$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q25",
+        "tag2": "LOM",
+        "tag3": "H",
+        "tag4": "1",
+        "type": "PW122MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q24",
+      "number": 24,
+      "solution_text": "$\\frac{T}{\\sin 90^\\circ} = \\frac{mg}{\\sin(90 + 37)}$ \n \n $T = \\frac{5mg}{4}$ \n \n $T' - mg = \\frac{mv^2}{l}$ \n \n $T' = \\frac{2mg}{5} + mg = \\frac{7mg}{5}$ \n \n $\\% \\Rightarrow \\frac{\\frac{7mg}{5} - \\frac{5mg}{4}}{\\frac{5mg}{4}} \\times 100$ \n \n $\\Rightarrow \\frac{3}{25} \\times 100$ \n \n $\\Rightarrow 12\\%$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q21",
+        "tag2": "LOM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS01FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q25",
+      "number": 25,
+      "solution_text": "$k = \\mu \\cdot mg$ \n $F = \\mu \\cdot mg$ \n \n $\\text{Moment}_F = F \\cdot \\left(\\frac{a}{2} + b\\right)$ \n \n $\\text{Moment}_{mg} = mg \\cdot \\frac{a}{2}$ \n \n $F \\cdot \\left(\\frac{a}{2} + b\\right) \\leq mg \\cdot \\frac{a}{2}$ \n \n $(\\mu \\cdot mg) \\cdot \\left(\\frac{a}{2} + b\\right) \\leq mg \\cdot \\frac{a}{2}$ \n \n $\\mu \\cdot \\left(\\frac{a}{2} + b\\right) \\leq \\frac{a}{2}$ \n \n $\\mu \\cdot b \\leq \\frac{a}{2}(1 - \\mu)$ \n \n $\\frac{b}{a} \\geq \\frac{1 - \\mu}{2\\mu}$ \n \n $\\frac{b}{a} \\geq \\frac{1 - 0.6}{2 \\times 0.6} = \\frac{0.4}{1.2} = \\frac{1}{3}$\n",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q29",
+        "tag2": "LOM",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWAITS01FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q26",
+      "number": 26,
+      "solution_text": "A) $\\text{N}_2$ (14 electrons): \n * MO configuration: $\\sigma_{1s}^2 \\sigma_{1s}^{*2} \\sigma_{2s}^2 \\sigma_{2s}^{*2} \\pi_{2p_x}^2 \\pi_{2p_y}^2 \\sigma_{2p_z}^2$ \n * All electrons paired $\\rightarrow$ Diamagnetic \n B) CO (14 electrons): \n * Isoelectronic with $\\text{N}_2$ \n * All electrons paired $\\rightarrow$ Diamagnetic \n C) $\\text{C}_2$ (12 electrons): \n * MO configuration: $\\sigma_{1s}^2 \\sigma_{1s}^{*2} \\sigma_{2s}^2 \\sigma_{2s}^{*2} \\pi_{2p_x}^2 \\pi_{2p_y}^2$ \n * All electrons paired $\\rightarrow$ Diamagnetic \n D) $\\text{O}_2$ (16 electrons): \n * MO configuration: $\\sigma_{1s}^2 \\sigma_{1s}^{*2} \\sigma_{2s}^2 \\sigma_{2s}^{*2} \\sigma_{2p_z}^2 \\pi_{2p_x}^2 \\pi_{2p_y}^2 \\pi_{2p_x}^{*1} \\pi_{2p_y}^{*1}$ \n * Two unpaired electrons in $\\pi^*$ orbitals $\\rightarrow$ Paramagnetic",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CBM",
+        "tag3": "E",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q27",
+      "number": 27,
+      "solution_text": "\nBond order of $\\text{N}_2$, $\\text{N}_2^+$, $\\text{NO}^+$, NO, $\\text{CN}^-$ and CN \n are 3, 2.5, 3, 2.5, 3, 2.5 respectively. Higher is \n bond order smaller is bond length. Bond order of \n CO and $\\text{CO}^-$ are 3 and 3.5.\n",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q39",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS02FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q28",
+      "number": 28,
+      "solution_text": "H−M−H Bond Angle Analysis \n Key factors: \n * Molecular geometry (VSEPR) \n * Lone pair repulsion \n * Electronegativity effects \n Bond Angles: \n * $\\text{BF}_3$: $120^\\circ$ (trigonal planar, no lone pairs) \n * $\\text{NH}_3$: $107^\\circ$ (pyramidal, 1 lone pair) \n * $\\text{NF}_3$: $102^\\circ$ (pyramidal, F atoms reduce angle) \n * $\\text{PH}_3$: $93-94^\\circ$ (pyramidal, less s-character) \n Order: $\\text{BF}_3 > \\text{NH}_3 > \\text{NF}_3 > \\text{PH}_3$ \n Answer: C ✓ \n The angle decreases due to: \n * $\\text{BF}_3$: $sp^2$ hybridization, planar \n * $\\text{NH}_3$: $sp^3$, lone pair repulsion \n * $\\text{NF}_3$: High F electronegativity compresses angle further \n * $\\text{PH}_3$: Larger P atom, minimal s-character, smallest angle",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q40",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS04FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q29",
+      "number": 29,
+      "solution_text": "Diatomic Oxygen ($\\text{O}_2$) Analysis \n Molecular Orbital Configuration of $\\text{O}_2$: \n * Total electrons: 16 \n * Configuration: $(\\sigma_{1s})^2 (\\sigma_{1s}^*)^2 (\\sigma_{2s})^2 (\\sigma_{2s}^*)^2 (\\sigma_{2p_z})^2 (\\pi_{2p_x})^2 (\\pi_{2p_y})^2 (\\pi_{2p_x}^*)^1 (\\pi_{2p_y}^*)^1$ \n Evaluating each statement: \n A) Paramagnetic ✓ CORRECT \n * Two unpaired electrons in $\\pi^*$ orbitals \n * $\\text{O}_2$ is paramagnetic \n B) LUMO is $\\pi_{2p_x}$ & $\\pi_{2p_y}$ ✗ INCORRECT \n * These are actually the HOMO (highest occupied) \n * The LUMO is $\\sigma_{2p_z}^*$ (next empty orbital) \n C) 1 sigma and 1 Pi bond ✓ CORRECT \n * Bond order = $(10 - 6)/2 = 2$ \n * 1 $\\sigma$ bond + 1 $\\pi$ bond (the second $\\pi$ is cancelled by $\\pi^*$) \n D) Bond order = 2 ✓ CORRECT \n * BO = (bonding - antibonding)/2 = $(10 - 6)/2 = 2$ \n Answer: B ✓ \n The HOMO (not LUMO) consists of the $\\pi_{2p_x}$ & $\\pi_{2p_y}$ antibonding orbitals.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q32",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS06FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q30",
+      "number": 30,
+      "solution_text": "\n$\\text{CN}^-$ (Cyanide Ion) Analysis \n Total electrons: 6 (C) + 7 (N) + 1 (negative charge) = 14 electrons \n Molecular Orbital Configuration: \n $(\\sigma_{1s})^2 (\\sigma_{1s}^*)^2 (\\sigma_{2s})^2 (\\sigma_{2s}^*)^2 (\\pi_{2p_x})^2 (\\pi_{2p_y})^2 (\\sigma_{2p_z})^2$ \n Bond Order Calculation: \n * Bonding electrons: 10 \n * Antibonding electrons: 4 \n * Bond order = $(10 - 4)/2 = 3$ \n Magnetic Properties: \n * All electrons are paired \n * Diamagnetic \n Answer: B  \n $\\text{CN}^-$ has a triple bond (bond order = 3) and is diamagnetic (no unpaired electrons).\n",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q26",
+        "tag2": "CBM",
+        "tag3": "E",
+        "tag4": "0",
+        "type": "PW44MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q31",
+      "number": 31,
+      "solution_text": "Analysis of Assertion and Reason \n \n $\\textbf{Assertion (A)}$: The covalent character of $\\text{FeCl}_3$ is more than that of $\\text{FeCl}_2$. \n \n $\\textbf{Reason (R)}$: The covalent character of the compound increases with increase in the charge of the cation. \n \n Fajans' Rules \n Covalent character in ionic compounds increases when: \n 1. Small cation (high charge density) \n 2. Large anion (easily polarizable) \n 3. High charge on cation (greater polarizing power) \n 4. High charge on anion \n \n Evaluation \n $\\text{FeCl}_3$ vs $\\text{FeCl}_2$: \n * $\\text{FeCl}_3$: $\\text{Fe}^{3+}$ (smaller, higher charge, higher charge density) \n * $\\text{FeCl}_2$: $\\text{Fe}^{2+}$ (larger, lower charge, lower charge density) \n \n $\\text{Fe}^{3+}$ has: \n * Higher charge (+3 vs +2) \n * Smaller ionic radius \n * Greater polarizing power \n * More covalent character \n \n $\\textbf{Assertion (A)}$: TRUE ✓ \n * $\\text{FeCl}_3$ has more covalent character than $\\text{FeCl}_2$ \n \n $\\textbf{Reason (R)}$: TRUE ✓ \n * Higher cation charge → greater polarizing power → more covalent character \n \n R correctly explains A ✓ \n \n Answer: Both A and R are true, and R is the correct explanation of A.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q45",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW44MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q32",
+      "number": 32,
+      "solution_text": "Bond Angle Analysis \n \n A) $\\text{BBr}_3$ \n * Geometry: Trigonal planar \n * Hybridization: $sp^2$ \n * Bond angle: $120^\\circ$ \n \n B) $\\text{CS}_2$ \n * Geometry: Linear \n * Hybridization: $sp$ \n * Bond angle: $180^\\circ$ \n \n C) $\\text{SO}_2$ \n * Geometry: Bent (1 lone pair) \n * Hybridization: $sp^2$ \n * Bond angle: $\\sim 119^\\circ$ (less than $120^\\circ$ due to lone pair) \n \n D) $\\text{SF}_4$ \n * Geometry: See-saw (1 lone pair) \n * Hybridization: $sp^3d$ \n * Bond angles: $\\sim 173^\\circ$ (axial-equatorial), $\\sim 101^\\circ$ (equatorial-equatorial) \n \n Comparison \n $180^\\circ > 173^\\circ > 120^\\circ > 119^\\circ > 101^\\circ$ \n \n $\\text{CS}_2$ has the highest bond angle $(180^\\circ)$ \n \n Answer: B  \n \n Linear molecules ($sp$ hybridization) always have the maximum bond angle of $180^\\circ$.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q42",
+        "tag2": "CBM",
+        "tag3": "E",
+        "tag4": "0",
+        "type": "PW122MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q33",
+      "number": 33,
+      "solution_text": "T−C−T Bond Angle Analysis \n \n Key Principle: Bond angle depends on: \n * Number of electron pairs (VSEPR) \n * Lone pair vs bonding pair repulsion \n * Electronegativity effects \n \n Option Analysis \n \n A) $\\text{NO}_2^+ < \\text{NO}_2^- < \\text{NO}_2$ \n * $\\text{NO}_2^+$: Linear, $180^\\circ$ (no lone pairs) \n * $\\text{NO}_2$: Bent, $\\sim 134^\\circ$ (1 unpaired electron) \n * $\\text{NO}_2^-$: Bent, $\\sim 115^\\circ$ (1 lone pair) \n * Order: $\\text{NO}_2^- < \\text{NO}_2 < \\text{NO}_2^+$  \n \n B) $\\text{F}_2\\text{O} < \\text{Cl}_2\\text{O} < \\text{H}_2\\text{O}$ \n * All bent with 2 lone pairs \n * $\\text{F}_2\\text{O}$: $\\sim 103^\\circ$ (high electronegativity compresses) \n * $\\text{H}_2\\text{O}$: $\\sim 104.5^\\circ$ \n * $\\text{Cl}_2\\text{O}$: $\\sim 111^\\circ$ (lower electronegativity) \n * Order: $\\text{F}_2\\text{O} < \\text{H}_2\\text{O} < \\text{Cl}_2\\text{O}$  \n \n C) $\\text{ClO}_2^- < \\text{OCl}_2 < \\text{ClO}_2$ \n * $\\text{ClO}_2^-$: Bent, $\\sim 110^\\circ$ (2 lone pairs) \n * $\\text{OCl}_2$: Bent, $\\sim 111^\\circ$ (2 lone pairs, similar to $\\text{Cl}_2\\text{O}$) \n * $\\text{ClO}_2$: Bent, $\\sim 118^\\circ$ (1 unpaired electron, less repulsion) \n * Order: $\\text{ClO}_2^- < \\text{OCl}_2 < \\text{ClO}_2$  \n \n D) $\\text{NH}_3 < \\text{PH}_3 < \\text{AsH}_3$ \n * All pyramidal with 1 lone pair \n * $\\text{NH}_3$: $\\sim 107^\\circ$ \n * $\\text{PH}_3$: $\\sim 93^\\circ$ \n * $\\text{AsH}_3$: $\\sim 92^\\circ$ \n * Order: $\\text{AsH}_3 < \\text{PH}_3 < \\text{NH}_3$  \n \n Answer: C  \n \n $\\text{ClO}_2^-$ ($\\sim 110^\\circ$) $<$ $\\text{OCl}_2$ ($\\sim 111^\\circ$) $<$ $\\text{ClO}_2$ ($\\sim 118^\\circ$)",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q39",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PWAI99",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q34",
+      "number": 34,
+      "solution_text": "Question: \n Bonding in which of the following diatomic molecule(s) become(s) stronger, on the basis of MO theory, by removal of an electron? \n $(i) \\text{NO} \\quad (ii) \\text{N}_2 \\quad (iii) \\text{O}_2 \\quad (iv) \\text{C}_2 \\quad (v) \\text{B}_2 \\quad (vi) \\text{F}_2 \\quad (vii) \\text{CN}$ \n Choose the most appropriate answer from the options given below. \n \n MO Theory: Effect of Electron Removal on Bond Strength \n \n Principle: Removing an electron strengthens the bond if removed from an antibonding orbital, and weakens the bond if removed from a bonding orbital. \n \n Analysis of Each Molecule \n \n $(i)$ NO (15 electrons) \n * Configuration: $(\\sigma_{1s})^2 (\\sigma_{1s}^*)^2 (\\sigma_{2s})^2 (\\sigma_{2s}^*)^2 (\\sigma_{2p_z})^2 (\\pi_{2p_x})^2 (\\pi_{2p_y})^2 (\\pi_{2p_x}^*)^1$ \n * HOMO: $\\pi^*$ (antibonding) \n * Bond order: $2.5 \\rightarrow 3$ ✓ STRONGER \n \n $(ii)$ $\\text{N}_2$ (14 electrons) \n * Configuration: $...(\\sigma_{2p_z})^2$ \n * HOMO: $\\sigma_{2p_z}$ (bonding) \n * Bond order: $3 \\rightarrow 2.5$ ✗ WEAKER \n \n $(iii)$ $\\text{O}_2$ (16 electrons) \n * Configuration: $...(\\pi_{2p_x})^2 (\\pi_{2p_y})^2 (\\pi_{2p_x}^*)^1 (\\pi_{2p_y}^*)^1$ \n * HOMO: $\\pi^*$ (antibonding) \n * Bond order: $2 \\rightarrow 2.5$ ✓ STRONGER \n \n $(iv)$ $\\text{C}_2$ (12 electrons) \n * Configuration: $...(\\pi_{2p_x})^2 (\\pi_{2p_y})^2$ \n * HOMO: $\\pi$ (bonding) \n * Bond order: $2 \\rightarrow 1.5$ ✗ WEAKER \n \n $(v)$ $\\text{B}_2$ (10 electrons) \n * Configuration: $...(\\pi_{2p_x})^1 (\\pi_{2p_y})^1$ \n * HOMO: $\\pi$ (bonding) \n * Bond order: $1 \\rightarrow 0.5$ ✗ WEAKER \n \n $(vi)$ $\\text{F}_2$ (18 electrons) \n * Configuration: $...(\\pi_{2p_x}^*)^2 (\\pi_{2p_y}^*)^2 (\\sigma_{2p_z}^*)^2$ \n * HOMO: $\\sigma^*$ (antibonding) \n * Bond order: $1 \\rightarrow 1.5$ ✓ STRONGER \n \n $(vii)$ CN (13 electrons) \n * Configuration: $...(\\sigma_{2p_z})^2 (\\pi_{2p_x})^2 (\\pi_{2p_y})^2 (\\pi_{2p_x}^*)^1$ \n * HOMO: $\\pi^*$ (antibonding) \n * Bond order: $2.5 \\rightarrow 3$ ✓ STRONGER \n \n Summary \n \n Bond strengthens upon electron removal: \n * $(i)$ NO: $2.5 \\rightarrow 3$ \n * $(iii)$ $\\text{O}_2$: $2 \\rightarrow 2.5$ \n * $(vi)$ $\\text{F}_2$: $1 \\rightarrow 1.5$ \n * $(vii)$ CN: $2.5 \\rightarrow 3$ \n \n Answer: $(i)$ NO, $(iii)$ $\\text{O}_2$, $(vi)$ $\\text{F}_2$, and $(vii)$ CN \n \n These four molecules have their highest energy electron(s) in antibonding orbitals. Removing an electron from an antibonding orbital increases bond order and strengthens the bond.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q44",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWPS07.2",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q35",
+      "number": 35,
+      "solution_text": "",
+      "solution_image_url": "https://lh3.googleusercontent.com/d/1SaVapckLqlotjC1WEbX8AwfPTnOql5bz=w300-h300",
+      "tags": {
+        "tag1": "Q36",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWPS07.2",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q36",
+      "number": 36,
+      "solution_text": " Analysis of Statements \n \n $\\textbf{Statement I Analysis:}$ \n * Down a group: Metallic character increases → Basic nature of oxides increases → Acidic nature DECREASES \n * Left to right: Non-metallic character increases → Acidic nature of oxides INCREASES \n * Statement I is INCORRECT ✗ \n \n $\\textbf{Statement II Analysis:}$ \n * Moving down a group: Atomic size increases → Ionization energy decreases → Metallic character increases \n * Statement II is CORRECT ✓ \n \n Correct Trends: \n * Acidic nature of oxides: DECREASES down the group, INCREASES left to right \n * Basic nature of oxides: INCREASES down the group, DECREASES left to right \n * Metallic character: INCREASES down the group, DECREASES left to right \n \n Answer: Statement I is incorrect, but Statement II is correct.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q41",
+        "tag2": "CEP",
+        "tag3": "E",
+        "tag4": "0",
+        "type": "PWAI66",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q37",
+      "number": 37,
+      "solution_text": "Ionic Radii Analysis \n \n Given: \n * $\\text{Cl}^-$ is 38% larger than $\\text{F}^-$ \n * $\\text{Br}^-$ is only 6.5% larger than $\\text{Cl}^-$ \n \n Electronic Configurations \n * $\\text{F}^-$: [Ne] = $1s^2 2s^2 2p^6$ \n * $\\text{Cl}^-$: [Ar] = [Ne] $3s^2 3p^6$ \n * $\\text{Br}^-$: [Kr] = [Ar] $3d^{10} 4s^2 4p^6$ \n \n Explanation \n \n $\\text{F}^- \\rightarrow \\text{Cl}^-$: New shell added, no d electrons → Large increase (38%) \n \n $\\text{Cl}^- \\rightarrow \\text{Br}^-$: New shell added BUT $3d^{10}$ electrons present \n * 3d electrons shield poorly (diffuse, penetrate less) \n * Higher effective nuclear charge felt by 4p electrons \n * Ionic radius contracts \n * Small increase (6.5%) \n \n Answer: A ✓ \n \n The ten 3d electrons in $\\text{Br}^-$ fail to shield the nuclear charge effectively, causing minimal size increase from $\\text{Cl}^-$ to $\\text{Br}^-$.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q28",
+        "tag2": "CEP",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW111MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q38",
+      "number": 38,
+      "solution_text": "$\\textbf{Diagonal Element Analysis}$\n \n$\\textbf{Given element:}$ $2s^2$ $2p^1$ (e.g., Boron, Group 13, Period 2)\n \n$\\textbf{Diagonal relationship:}$ One period down + one group right\n \n$\\textbf{Finding the Diagonal Element}$\n \n$\\textbf{Starting element (B):}$\n * Group 13, Period 2\n * Valence: $2s^2$ $2p^1$\n \n$\\textbf{Diagonal element:}$\n * Group 14, Period 3\n * Element: Silicon (Si)\n \n$\\textbf{Silicon configuration:}$\n * [Ne] $3s^2$ $3p^2$\n \n$\\textbf{Verification}$\n \nGroup 13, Period 2 $\\rightarrow$ Group 14, Period 3 $\\checkmark$\n \nDiagonal pairs show similar properties (e.g., B-Si, Li-Mg, Be-Al)\n \n$\\textbf{Answer: A}$ $\\checkmark$\n \nThe diagonal element has electronic configuration [Ne] $3s^2$ $3p^2$\n",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q32",
+        "tag2": "CEP",
+        "tag3": "E",
+        "tag4": "",
+        "type": "PWAITS05FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q39",
+      "number": 39,
+      "solution_text": "$\\textbf{Ionization Potential Analysis}$\n \n$\\textbf{Given configurations:}$\n * Element I: $1s^2$ $2s^2$ $2p^3$ (Nitrogen, N)\n * Element II: $1s^2$ $2s^2$ $2p^4$ (Oxygen, O)\n \n$\\textbf{Ionization Energy Factors}$\n \n$\\textbf{Element I (N):}$ $1s^2$ $2s^2$ $2p^3$\n * Half-filled p subshell $(2p^3)$ $\\rightarrow$ extra stability\n * Each p orbital has one electron ($\\uparrow$ $\\uparrow$ $\\uparrow$)\n * Maximum exchange energy\n * Higher $IP_1$\n \n$\\textbf{Element II (O):}$ $1s^2$ $2s^2$ $2p^4$\n * One p orbital has paired electrons ($\\uparrow\\downarrow$ $\\uparrow$ $\\uparrow$)\n * Electron-electron repulsion in paired orbital\n * Less stable than half-filled\n * Lower $IP_1$\n \n$\\textbf{Comparison}$\n \nN $(2p^3)$ has:\n * Half-filled stability\n * No pairing repulsion\n * Higher first ionization energy\n \nO $(2p^4)$ has:\n * One paired orbital\n * Electron repulsion makes removal easier\n * Lower first ionization energy\n \n$\\textbf{Answer: B}$ $\\checkmark$\n \n$IP_1$ of (I) $>$ $IP_1$ of (II)\n \nNitrogen's half-filled $2p^3$ configuration provides extra stability, making it harder to remove an electron compared to oxygen.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q28",
+        "tag2": "CEP",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS05FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q40",
+      "number": 40,
+      "solution_text": "$\\textbf{Electron Gain Enthalpy Analysis}$\n \n$\\textbf{Electron gain enthalpy:}$ Energy released when an electron is added to a neutral atom (more negative = more energy released)\n \n$\\textbf{Key Trends}$\n \n$\\textbf{General trend:}$ Increases (becomes more negative) across a period, decreases down a group\n \n$\\textbf{Exceptions:}$\n * F $<$ Cl: F is small, electron-electron repulsion in compact 2p orbital\n * O $<$ S: Similar reason - small size causes repulsion\n \n$\\textbf{Evaluation of Options}$\n \n$\\textbf{A}$ $ F $<$ Cl $<$ Br $<$ I$\n * F $<$ Cl $\\checkmark$ (exception)\n * Cl $>$ Br $>$ I (decreases down group) $\\times$\n * INCORRECT\n \n$\\textbf{B} O $<$ Se $<$ S$\n * O $<$ S $\\checkmark$ (exception - O is small)\n * Se $<$ S $\\checkmark$ (S more negative than Se)\n * Order: O $<$ Se $<$ S $\\checkmark$\n * CORRECT\n \n$\\textbf{C} Si $<$ P $<$ S $<$ Cl$\n * Increases across period $\\checkmark$\n * Could be correct but doesn't show key exceptions\n \n$\\textbf{D} C $<$ N $<$ O $<$ F$\n * Ignores O $<$ S and F $<$ Cl exceptions $\\times$\n * INCORRECT\n \n$\\textbf{Answer: B}$ $\\checkmark$\n \nO $<$ Se $<$ S\n \nThis correctly shows that oxygen (due to small size and repulsion) has lower electron gain enthalpy than both selenium and sulfur, with sulfur being the highest.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q31",
+        "tag2": "CEP",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS04FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q41",
+      "number": 41,
+      "solution_text": "$\\textbf{Atomic Radius Analysis}$\n \nThe answer is A because all four options are Period 3 elements (Mg, Al, P, Cl), and atomic radius decreases left to right across a period due to increasing nuclear charge.\n \nMagnesium (A) is leftmost, so it has the largest radius.\n \n$\\textbf{Answer: A}$ $\\checkmark$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q27",
+        "tag2": "CEP",
+        "tag3": "E",
+        "tag4": "",
+        "type": "PWPS07.2",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q42",
+      "number": 42,
+      "solution_text": "$\\textbf{Based on the solution provided:}$\n \n$\\textbf{Triad-I}$ $(N^{3-}, O^-, Na^+)$:\n * All isoelectronic with 10 electrons\n * $N^{3-}$: 7 protons, -3 charge $\\rightarrow$ electrons least tightly held\n * $O^-$: 8 protons, -1 charge $\\rightarrow$ electrons more tightly held\n * $Na^+$: 11 protons, +1 charge $\\rightarrow$ electrons most tightly held\n \n$\\textbf{Lowest IP:}$ $N^{3-}$\n \n$\\textbf{Triad-II}$ $(N, C, O)$:\n * $N^+$: $1s^2$ $2s^2$ $2p^3$ (half-filled $2p^3$ is stable)\n * $C^+$: $1s^2$ $2s^2$ $2p^1$\n * $O^+$: $1s^2$ $2s^2$ $2p^3$ (half-filled after ionization)\n \n$\\textbf{Highest IP:}$ $O^+$ (achieves stable half-filled $2p^3$ configuration after losing an electron)\n \n$\\textbf{Answer:}$ $N^{3-}$ (lowest IP from Triad-I) and $O^+$ (highest IP from Triad-II)",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q39",
+        "tag2": "CEP",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWPS07.1FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q43",
+      "number": 43,
+      "solution_text": "In general along the period from left to right, size decreases and metallic character decrease.\n \nIn general down the group, size increases and metallic character increases.\n \n$B' < A'$ (size) $C' > A'$ (size)\n \n$D' < C'$ (size) $D' > B'$ (size)\n \n$B' < A'$ (metallic character)\n \n$D' < C'$ (metallic character)\n \n$B'^+ < A'^+$ (size)\n \n$D'^+ < C'^+$ (size)\n \n$\\therefore$ A and  D statements are incorrect",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CEP",
+        "tag3": "H",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q44",
+      "number": 44,
+      "solution_text": "$\\textbf{Given data:}$\n * X ionization enthalpy: 418 kJ/mol\n * Electron gain enthalpies:\n   * P: -315 kJ/mol\n   * Q: -362 kJ/mol\n   * R: -298 kJ/mol\n   * S: -341 kJ/mol\n \n$\\textbf{Ionic character depends on electronegativity difference}$ $(\\Delta EN)$:\n \nMore negative electron gain enthalpy $\\rightarrow$ higher electronegativity $\\rightarrow$ greater ionic character when bonding with X\n \n$\\textbf{Electronegativity order (most to least negative):}$ Q (-362) $>$ S (-341) $>$ P (-315) $>$ R (-298)\n \n$\\textbf{Ionic character order (highest to lowest):}$ XQ $>$ XS $>$ XP $>$ XR\n \n$\\textbf{Answer: C}$ (XQ $>$ XS $>$ XP $>$ XR)\n \nThe compound with the most electronegative element (Q) has the highest ionic character, while the one with the least electronegative element (R) has the lowest ionic character.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CEP",
+        "tag3": "H",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q45",
+      "number": 45,
+      "solution_text": "$\\textbf{Atomic radii trends:}$\n * Across a period (left to right): atomic radius decreases\n * Down a group: atomic radius increases\n \n$\\textbf{Identifying the elements:}$\n * Ce = Cerium (Period 6, lanthanide)\n * Eu = Europium (Period 6, lanthanide)\n * Ho = Holmium (Period 6, lanthanide)\n * N = Nitrogen (Period 2, Group 15)\n \n$\\textbf{Analysis:}$\n \nWithin lanthanides (Ce, Eu, Ho) - all Period 6:\n * Atomic number: Ce (58) $<$ Eu (63) $<$ Ho (67)\n * Due to lanthanide contraction: radius decreases as atomic number increases\n * Order: Ce $>$ Eu $>$ Ho\n \nNitrogen (N) is in Period 2 (much smaller atom than lanthanides)\n \n$\\textbf{Complete order:}$ Eu $>$ Ce $>$ Ho $>$ N\n \n$\\textbf{Answer: D}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CEP",
+        "tag3": "M",
+        "tag4": "",
+        "type": "JM",
+        "year": "2019"
+      }
+    },
+    {
+      "id": "q46",
+      "number": 46,
+      "solution_text": "$\\textbf{Given species:}$ $PF_5, BrF_5, PCl_3, SF_6, [ICl_4]^-, ClF_3, IF_5$\n \n$\\textbf{Finding}$ $sp^3d^2$ $\\textbf{hybridization:}$\n \n1. $PF_5$: 5 bond pairs, 0 lone pairs $\\rightarrow$ $sp^3d$ (trigonal bipyramidal)\n2. $BrF_5$: 5 bond pairs, 1 lone pair $\\rightarrow$ $sp^3d^2$ (square pyramidal) $\\checkmark$\n3. $PCl_3$: 3 bond pairs, 1 lone pair $\\rightarrow$ $sp^3$ (trigonal pyramidal)\n4. $SF_6$: 6 bond pairs, 0 lone pairs $\\rightarrow$ $sp^3d^2$ (octahedral) $\\checkmark$\n5. $[ICl_4]^-$: 4 bond pairs, 2 lone pairs $\\rightarrow$ $sp^3d^2$ (square planar) $\\checkmark$\n6. $ClF_3$: 3 bond pairs, 2 lone pairs $\\rightarrow$ $sp^3d$ (T-shaped)\n7. $IF_5$: 5 bond pairs, 1 lone pair $\\rightarrow$ $sp^3d^2$ (square pyramidal) $\\checkmark$\n \nSpecies with $sp^3d^2$ = 4 $(BrF_5, SF_6, [ICl_4]^-, IF_5)$ So $x = 4$\n \n$\\textbf{Finding}$ $sp^3d$ $\\textbf{hybridization:}$\n \nFrom above:\n * $PF_5$: $sp^3d$ $\\checkmark$\n * $ClF_3$: $sp^3d$ $\\checkmark$\n \nSpecies with $sp^3d$ = 2 $(PF_5, ClF_3)$ So $y = 2$\n \n$\\textbf{Answer:}$ $x + 2y = 4 + 2(2) = 8$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "JM",
+        "year": "2022"
+      }
+    },
+    {
+      "id": "q47",
+      "number": 47,
+      "solution_text": "$\\textbf{Adding}$ $BF_3$ $\\textbf{to the analysis:}$\n \n$BF_3$ - Only B-F bonds, no H atoms at all $\\rightarrow$ NO\n \n$\\textbf{Complete list:}$\n \n(a) $NH_3$ - N-H bonds $\\rightarrow$ YES $\\checkmark$\n(b) $CH_4$ - Only C-H bonds $\\rightarrow$ NO\n(c) $H_2O$ - O-H bonds $\\rightarrow$ YES $\\checkmark$\n(d) HI - H-I bond (I not electronegative) $\\rightarrow$ NO\n(e) HF - H-F bond $\\rightarrow$ YES $\\checkmark$\n(f) HCOOH - O-H bond $\\rightarrow$ YES $\\checkmark$\n(g) $B(OH)_3$ - O-H bonds $\\rightarrow$ YES $\\checkmark$\n(h) $CH_3COOH$ - O-H bond $\\rightarrow$ YES $\\checkmark$\n(i) $BF_3$ - No H atoms $\\rightarrow$ NO\n \n$\\textbf{Answer:}$ 6 molecules $(NH_3, H_2O, HF, HCOOH, B(OH)_3, CH_3COOH)$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q49",
+        "tag2": "CBM",
+        "tag3": "E",
+        "tag4": "0",
+        "type": "PW166MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q48",
+      "number": 48,
+      "solution_text": "$\\textbf{Compounds/species with zero dipole moment:}$\n \nA molecule has zero dipole moment when it's symmetrical (bond dipoles cancel out).\n \n$\\textbf{Analysis:}$\n \n1. $BeCl_2$: Linear, symmetrical $\\rightarrow$ Zero $\\checkmark$\n2. $BCl_3$: Trigonal planar, symmetrical $\\rightarrow$ Zero $\\checkmark$\n3. $NF_3$: Trigonal pyramidal (lone pair), asymmetrical $\\rightarrow$ Non-zero\n4. $XeF_4$: Square planar, symmetrical $\\rightarrow$ Zero $\\checkmark$\n5. $CCl_4$: Tetrahedral, symmetrical $\\rightarrow$ Zero $\\checkmark$\n6. $H_2S$: Bent (lone pairs), asymmetrical $\\rightarrow$ Non-zero\n7. $HBr$: Diatomic, different atoms $\\rightarrow$ Non-zero\n8. $CO_2$: Linear, symmetrical $\\rightarrow$ Zero $\\checkmark$\n9. $H_2$: Diatomic, identical atoms $\\rightarrow$ Zero $\\checkmark$\n10. $HCl$: Diatomic, different atoms $\\rightarrow$ Non-zero\n \n$\\textbf{Zero dipole moment:}$ $BeCl_2, BCl_3, XeF_4, CCl_4, CO_2, H_2$\n \n$\\textbf{Answer:}$ 6",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2026"
+      }
+    },
+    {
+      "id": "q49",
+      "number": 49,
+      "solution_text": "",
+      "solution_image_url": "https://lh3.googleusercontent.com/d/1dM-cBCrZrM1iKiT-fdri4ejPDnaUgTc6=w300-h300",
+      "tags": {
+        "tag1": "ICH",
+        "tag2": "CBM",
+        "tag3": "M",
+        "tag4": "",
+        "type": "IPQ",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q50",
+      "number": 50,
+      "solution_text": "$\\textbf{Element with atomic number 70:}$\n \nAtomic number 70 = Ytterbium (Yb)\n \n$\\textbf{Electronic configuration:}$\n * Yb: [Xe] $4f^{14}$ $5d^0$ $6s^2$\n * It's a lanthanide (f-block element)\n \n$\\textbf{Period number:}$\n * Outermost shell = 6 $(6s^2)$\n * Period = 6\n \n$\\textbf{Group number:}$\n * Lanthanides are placed in Group 3 (by convention, all f-block elements are considered part of Group 3)\n \nSum = Group + Period = 3 + 6 = 9\n \n$\\textbf{Answer:}$ 9",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q47",
+        "tag2": "CEP",
+        "tag3": "E",
+        "tag4": "0",
+        "type": "PW166MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q51",
+      "number": 51,
+      "solution_text": "$\\displaystyle\\sum_{r=1}^{26} \\left( \\frac{2r}{(2r)! \\left[ 51-(2r-1) \\right]!} \\right)$\n \n$= \\displaystyle\\sum_{r=1}^{26} \\left( \\frac{2r}{2r(2r-1)! \\left[ 51-(2r-1) \\right]!} \\right)$\n \n$= \\displaystyle\\sum_{r=1}^{26} \\left( \\frac{1}{(2r-1)! \\left[ 51-(2r-1) \\right]!} \\right)$\n \n$= \\displaystyle\\sum_{r=1}^{26} \\left( ^{51}C_{2r-1} \\frac{1}{51!} \\right)$\n \n$= \\frac{1}{51!} \\left( ^{51}C_1 + ^{51}C_3 + .... + ^{51}C_{51} \\right)$\n \n$= \\frac{1}{51!} \\times 2^{50}$\n \n$= \\frac{2^{50}}{51!}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q59",
+        "tag2": "SQS",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWPS07FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q52",
+      "number": 52,
+      "solution_text": "$\\text{Let } S = \\sum_{k=0}^{119} \\left(\\left\\lfloor \\sqrt{k+1} \\right\\rfloor\\right)$\n $= \\left\\lfloor \\sqrt{1} \\right\\rfloor + \\left\\lfloor \\sqrt{2} \\right\\rfloor + \\left\\lfloor \\sqrt{3} \\right\\rfloor + ..... + \\left\\lfloor \\sqrt{100} \\right\\rfloor + ... + \\left\\lfloor \\sqrt{120} \\right\\rfloor$\n $= \\underbrace{1+1+1}_{3 \\text{ times}} + 2 + \\underbrace{2 + .... + 2}_{5 \\text{ times}} + \\underbrace{3 + 3 + ... + 3}_{7 \\text{ times}} + ... +$\n $\\underbrace{10 + 10 + ..... + 10}_{21 \\text{ times}}$\n $= 3 \\times 1 + 5 \\times 2 + 7 \\times 3 + .... + 10 \\times 21$\n $= \\sum_{r=1}^{10} (2r+1)r$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q66",
+        "tag2": "SQS",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWPS07FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q53",
+      "number": 53,
+      "solution_text": "$S = 2 + \\frac{7}{7} + \\frac{15}{7^2} + \\frac{26}{7^3} + \\frac{40}{7^4} + .... \\quad \\quad ....(\\text{i})$\n $\\Rightarrow \\quad \\frac{1}{7}S = \\frac{2}{7} + \\frac{7}{7^2} + \\frac{15}{7^3} + \\frac{26}{7^4} + ... \\quad \\quad ....(\\text{ii})$\n $\\text{Subtracting (ii) from (i) we get,}$\n $\\frac{6}{7}S = 2 + \\frac{5}{7} + \\frac{8}{7^2} + \\frac{11}{7^3} + \\quad \\quad ....(\\text{iii})$\n $\\Rightarrow \\quad \\frac{6}{7^2}S = \\frac{2}{7} + \\frac{5}{7^2} + \\frac{8}{7^3} + \\quad \\quad ....(\\text{iv})$\n $\\text{Subtracting (iv) from (iii) we get,}$\n $\\left(\\frac{6}{7}\\right)^2 S = 2 + \\frac{3}{7} + \\frac{3}{7^2} + \\frac{3}{7^3} + ...$\n $= 2 + \\frac{3}{7}\\left(\\frac{1}{1 - \\frac{1}{7}}\\right) = \\frac{5}{2}$\n $\\therefore \\quad \\frac{4S}{7} = \\frac{35}{18}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q79",
+        "tag2": "SQS",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWAITS01FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q54",
+      "number": 54,
+      "solution_text": "$\\frac{1}{(20-a)(40-a)} + \\frac{1}{(40-a)(60-a)} + \\frac{1}{(60-a)(80-a)}$\n $+ ..... + \\frac{1}{(380-a)(400-a)} = \\frac{1}{256}$\n $\\text{LHS}$\n $= \\frac{1}{20}\\left(\\frac{1}{20-a} - \\frac{1}{40-a}\\right) + \\frac{1}{20}\\left(\\frac{1}{40-a} - \\frac{1}{60-a}\\right) +$\n $\\frac{1}{20}\\left(\\frac{1}{380-a} - \\frac{1}{400-a}\\right)$\n $= \\frac{1}{20}\\left(\\frac{1}{20-a} - \\frac{1}{400-a}\\right) = \\frac{1}{20} \\cdot \\frac{380}{(20-a)(400-a)}$\n $\\frac{19}{(20-a)(400-a)} = \\frac{1}{256} \\quad \\text{(given)}$\n $\\therefore \\quad \\text{Product of roots} = 3136.$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q53",
+        "tag2": "SQS",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS06FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q55",
+      "number": 55,
+      "solution_text": "$x^2 + 9y^2 + 25z^2 = 15yz + 5zx + 3xy$\n $(x)^2 + (3y)^2 + (5z)^2 - (x)(3y) - (3y)(5z)$\n $-(x)(5z) = 0$\n $\\frac{1}{2}[2(x)^2 + 2(3y)^2 + 2(5z)^2 - 2(x)(3y) -$\n $2(3y)(5z) - 2(x)(5z)]$\n $= \\frac{1}{2}\\left[(x-3y)^2 + (3y-5z)^2 + (x-5z)^2\\right] = 0$\n $x - 3y = 0, 3y - 5z = 0, x - 5z = 0$\n $\\frac{1}{x} = \\frac{1}{3y}$ and $\\frac{5}{3y} = \\frac{1}{z}$ and $\\frac{1}{x} = \\frac{1}{5z}$\n $\\frac{1}{x} + \\frac{1}{z} = \\frac{1}{3y} + \\frac{5}{3y} = \\frac{2}{y}$\n $\\therefore \\quad \\frac{1}{x}, \\frac{1}{y}, \\frac{1}{z}$ are in A.P.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q69",
+        "tag2": "SQS",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW122MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q56",
+      "number": 56,
+      "solution_text": "$\\text{Finding the number of integral terms in } (3^{1/2} + 5^{1/8})^{256}$\n $\\text{General term in binomial expansion: }$\n $T_{r+1} = \\binom{256}{r} (3^{1/2})^{256-r} (5^{1/8})^r = \\binom{256}{r} \\cdot 3^{(256-r)/2} \\cdot 5^{r/8}$\n $\\text{For the term to be integral:}$\n $\\text{Both exponents must be non-negative integers:}$\n $\\text{1. For 3's exponent: } (256-r)/2 \\text{ must be a non-negative integer}$\n $\\quad \\bullet \\quad 256-r \\geq 0 \\text{ and } 256-r \\text{ must be even}$\n $\\quad \\bullet \\quad \\text{Since 256 is even, } r \\text{ must be even}$\n $\\quad \\bullet \\quad r = 0, 2, 4, ..., 256$\n $\\text{2. For 5's exponent: } r/8 \\text{ must be a non-negative integer}$\n $\\quad \\bullet \\quad r \\text{ must be divisible by 8}$\n $\\quad \\bullet \\quad r = 0, 8, 16, 24, ..., 256$\n $\\text{Finding r satisfying both conditions:}$\n $\\quad \\bullet \\quad r \\text{ must be even AND divisible by 8}$\n $\\quad \\bullet \\quad \\text{This means } r \\text{ must be divisible by 8}$\n $\\quad \\bullet \\quad r = 0, 8, 16, 24, 32, ..., 256$\n $\\text{Number of such values: }$\n $r = 8k \\text{ where } k = 0, 1, 2, ..., 32$\n $\\text{Number of values} = 32 - 0 + 1 = 33$\n $\\text{Answer: 33}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q70",
+        "tag2": "BNT",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW99MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q57",
+      "number": 57,
+      "solution_text": "$\\text{The expression appears to be:}$\n $\\lim_{n \\to \\infty} \\sum_{r=1}^{n} \\left( \\sum_{i=0}^{r-1} \\frac{1}{5^n} \\cdot {}^nC_r \\cdot {}^rC_i \\cdot 3^i \\right)$\n $\\text{Let me simplify this step by step:}$\n $\\text{Step 1: Simplify the inner sum}$\n $\\sum_{i=0}^{r-1} {}^rC_i \\cdot 3^i = \\sum_{i=0}^{r-1} \\binom{r}{i} 3^i$\n $\\text{This is part of the binomial expansion of } (1+3)^r = 4^r, \\text{ but missing the last term when } i=r.$\n $\\text{So: } \\sum_{i=0}^{r-1} \\binom{r}{i} 3^i = 4^r - 3^r$\n $\\text{Step 2: Substitute back}$\n $\\lim_{n \\to \\infty} \\sum_{r=1}^{n} \\frac{1}{5^n} \\cdot \\binom{n}{r} \\cdot (4^r - 3^r)$\n $= \\lim_{n \\to \\infty} \\frac{1}{5^n} \\sum_{r=1}^{n} \\binom{n}{r} (4^r - 3^r)$\n $= \\lim_{n \\to \\infty} \\frac{1}{5^n} \\left[\\sum_{r=1}^{n} \\binom{n}{r} 4^r - \\sum_{r=1}^{n} \\binom{n}{r} 3^r\\right]$\n $\\text{Step 3: Use binomial theorem}$\n $\\quad \\bullet \\quad \\sum_{r=0}^{n} \\binom{n}{r} 4^r = (1+4)^n = 5^n, \\text{ so } \\sum_{r=1}^{n} \\binom{n}{r} 4^r = 5^n - 1$\n $\\quad \\bullet \\quad \\sum_{r=0}^{n} \\binom{n}{r} 3^r = (1+3)^n = 4^n, \\text{ so } \\sum_{r=1}^{n} \\binom{n}{r} 3^r = 4^n - 1$\n $\\text{Step 4: Final calculation}$\n $\\lim_{n \\to \\infty} \\frac{1}{5^n} [(5^n - 1) - (4^n - 1)] = \\lim_{n \\to \\infty} \\frac{5^n - 4^n}{5^n}$\n $= \\lim_{n \\to \\infty} \\left[1 - \\left(\\frac{4}{5}\\right)^n\\right] = 1 - 0 = 1$\n $\\text{Answer: 1}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q63",
+        "tag2": "BNT",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "PW111MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q58",
+      "number": 58,
+      "solution_text": "$\\text{Given: } \\left[\\frac{x+1}{x^3-x^2+1} - \\frac{x-1}{x-x^2}\\right]^{10}$\n $\\text{Simplify:}$\n $\\quad \\bullet \\quad \\frac{x-1}{x-x^2} = \\frac{x-1}{x(1-x)} = \\frac{-1}{x}$\n $\\text{Expression becomes: }$\n $\\left[\\frac{x+1}{x^3-x^2+1} + \\frac{1}{x}\\right]^{10}$\n $\\text{Combining: }$\n $\\left[\\frac{x^3+x+1}{x(x^3-x^2+1)}\\right]^{10}$\n $\\text{For term independent of x in binomial expansion, after simplification:}$\n $\\text{Answer: 210}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q53",
+        "tag2": "BNT",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "PW122MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q59",
+      "number": 59,
+      "solution_text": "$\\text{General term} = \\frac{10!}{r!s!(10-r-s)!} 2^{\\frac{r}{2}}3^{\\frac{s}{3}}5^{\\frac{10-r-s}{6}}$\n $(r, s) = (4, 0), (10, 0), (4, 6) \\text{ for rational term.}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q63",
+        "tag2": "BNT",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "PW166MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q60",
+      "number": 60,
+      "solution_text": "$\\text{We need to find the degree of the polynomial in } x \\text{ for the expression:}$\n $\\left[\\left(\\frac{2x}{1+\\sqrt{4x+1}}\\right)^7 - \\left(\\frac{2x}{1-\\sqrt{4x+1}}\\right)^7\\right] \\frac{1}{\\sqrt{4x+1}}$\n $\\text{From my previous work, I found this simplifies to:}$\n $\\frac{1}{2^6}\\left[C_1^7 + C_3^7(4x+1) + C_5^7(4x+1)^2 + C_7^7(4x+1)^3\\right]$\n $\\text{Let me verify this form by working through the algebra more carefully.}$\n $\\text{Using } y = \\sqrt{4x+1}, \\text{ so } y^2 = 4x+1, \\text{ I have:}$\n $\\quad \\bullet \\quad \\frac{2x}{1+\\sqrt{4x+1}} = \\frac{y-1}{2}$\n $\\quad \\bullet \\quad \\frac{2x}{1-\\sqrt{4x+1}} = -\\frac{y+1}{2}$\n $\\text{The expression becomes:}$\n $\\left[\\left(\\frac{y-1}{2}\\right)^7 - \\left(-\\frac{y+1}{2}\\right)^7\\right] \\frac{1}{y}$\n $= \\left[\\frac{(y-1)^7}{128} + \\frac{(y+1)^7}{128}\\right] \\frac{1}{y}$\n $= \\frac{(y-1)^7 + (y+1)^7}{128y}$\n $\\text{When we expand } (y-1)^7 + (y+1)^7, \\text{ the even powers cancel and the odd powers double:}$\n $(y-1)^7 + (y+1)^7 = 2\\left[\\binom{7}{1}y^7 + \\binom{7}{3}y^5 + \\binom{7}{5}y^3 + \\binom{7}{7}y\\right]$\n $= 2\\left[C_1^7 y^7 + C_3^7 y^5 + C_5^7 y^3 + C_7^7 y\\right]$\n $\\text{So: }$\n $\\frac{(y-1)^7 + (y+1)^7}{128y} = \\frac{2\\left[C_1^7 y^7 + C_3^7 y^5 + C_5^7 y^3 + C_7^7 y\\right]}{128y}$\n $= \\frac{C_1^7 y^6 + C_3^7 y^4 + C_5^7 y^2 + C_7^7}{64}$\n $\\text{Now substituting } y^2 = 4x+1:$\n $= \\frac{1}{64}\\left[C_1^7(4x+1)^3 + C_3^7(4x+1)^2 + C_5^7(4x+1) + C_7^7\\right]$\n $= \\frac{1}{2^6}\\left[C_1^7(4x+1)^3 + C_3^7(4x+1)^2 + C_5^7(4x+1) + C_7^7\\right]$\n $\\text{The highest power term comes from } C_1^7(4x+1)^3 = 7(4x+1)^3.$\n $\\text{Expanding } (4x+1)^3 = 64x^3 + 48x^2 + 12x + 1$\n $\\text{The highest degree term is } 64x^3.$\n $\\text{Therefore, the polynomial has degree 3.}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q52",
+        "tag2": "BNT",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW44MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q61",
+      "number": 61,
+      "solution_text": "$T_{r+1} = {}^{15}C_r \\left(x^2(\\sin \\alpha)^{1/5}\\right)^{15-r} \\left(\\frac{(\\cos \\alpha)^{1/10}}{x}\\right)^r$\n $\\text{Put}$\n $r = 10, T_{11} = {}^{15}C_{10} \\cdot \\sin \\alpha \\cdot \\cos \\alpha = 15 {}^{C}_{10} \\times \\frac{\\sin 2\\alpha}{2}$\n $\\therefore m = {}^{15}C_{10} \\times \\frac{1}{2} \\Rightarrow 2m = {}^{15}C_{10} = \\frac{15 \\times 14 \\times 13 \\times 12 \\times 11}{120}$\n $\\Rightarrow 2m = 3 \\times 7 \\times 13 \\times 11 \\Rightarrow \\frac{2m}{3} = 7 \\times 13 \\times 11 = 1001$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q64",
+        "tag2": "BNT",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWAITS04FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q62",
+      "number": 62,
+      "solution_text": "$\\text{We need to find } |w| \\text{ and } \\arg(w) \\text{ where } w = \\frac{z^2 - 3z + 6}{z + 1} \\text{ and } z = 1 + i.$\n $\\text{Step 1: Substitute } z = 1 + i$\n $\\text{First, let me calculate the necessary values:}$\n $\\quad \\bullet \\quad z + 1 = (1 + i) + 1 = 2 + i$\n $\\quad \\bullet \\quad z^2 = (1 + i)^2 = 1 + 2i + i^2 = 1 + 2i - 1 = 2i$\n $\\quad \\bullet \\quad z^2 - 3z + 6 = 2i - 3(1 + i) + 6 = 2i - 3 - 3i + 6 = 3 - i$\n $\\text{So: }$\n $w = \\frac{3 - i}{2 + i}$\n $\\text{Step 2: Simplify by rationalizing}$\n $\\text{Multiply numerator and denominator by the conjugate of the denominator:}$\n $w = \\frac{3 - i}{2 + i} \\cdot \\frac{2 - i}{2 - i} = \\frac{(3 - i)(2 - i)}{(2 + i)(2 - i)}$\n $\\text{Denominator: } (2 + i)(2 - i) = 4 - i^2 = 4 + 1 = 5$\n $\\text{Numerator: } (3 - i)(2 - i) = 6 - 3i - 2i + i^2 = 6 - 5i - 1 = 5 - 5i$\n $\\text{Therefore: }$\n $w = \\frac{5 - 5i}{5} = 1 - i$\n $\\text{Step 3: Find } |w|$\n $|w| = |1 - i| = \\sqrt{1^2 + (-1)^2} = \\sqrt{1 + 1} = \\sqrt{2}$\n $\\text{Step 4: Find } \\arg(w)$\n $\\text{Since } w = 1 - i, \\text{ we have:}$\n $\\quad \\bullet \\quad \\text{Real part: } 1 > 0$\n $\\quad \\bullet \\quad \\text{Imaginary part: } -1 < 0$\n $\\text{So } w \\text{ is in the fourth quadrant.}$\n $\\arg(w) = \\arctan\\left(\\frac{-1}{1}\\right) = \\arctan(-1) = -\\frac{\\pi}{4}$\n $\\text{Or equivalently: } \\arg(w) = \\frac{7\\pi}{4} \\text{ (if using the range } [0, 2\\pi))$\n $\\text{Answer:}$\n $\\quad \\bullet \\quad |w| = \\sqrt{2}$\n $\\quad \\bullet \\quad \\arg(w) = -\\frac{\\pi}{4} \\text{ (or } \\frac{7\\pi}{4} \\text{ or } -45°)$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q54",
+        "tag2": "CMX",
+        "tag3": "M",
+        "tag4": "",
+        "type": "jee_prayas_practice_test",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q63",
+      "number": 63,
+      "solution_text": "$\\frac{\\overline{z_2} z_1}{z_2} = \\frac{44-62i}{34}$\n $\\Rightarrow$ Re$\\left[\\frac{\\overline{z_2} z_1}{z_2}\\right] = \\frac{22}{17}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q57",
+        "tag2": "CMX",
+        "tag3": "M",
+        "tag4": "",
+        "type": "jee_prayas_practice_test",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q64",
+      "number": 64,
+      "solution_text": "$\\frac{(e^{-i2\\theta})^7 (e^{i3\\theta})^{-5}}{(e^{i4\\theta})^{12} (e^{i5\\theta})^{-6}} = \\frac{e^{-i14\\theta} \\cdot e^{-i15\\theta}}{e^{i48\\theta} \\cdot e^{-i30\\theta}} = \\frac{e^{-i29\\theta}}{e^{i18\\theta}}$\n $= e^{-i47\\theta} = \\cos 47\\theta - i \\sin 47\\theta$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q51",
+        "tag2": "CMX",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWPS06.1",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q65",
+      "number": 65,
+      "solution_text": "Let $z = x + iy$\n We have\n $|z-1| = 3|z-2|$\n $\\Rightarrow \\sqrt{(x-1)^2 + y^2} = 3\\sqrt{(x-2)^2 + y^2}$\n $\\Rightarrow (x-1)^2 + y^2 = 9(x-2)^2 + 9y^2$\n $\\Rightarrow x^2 - 2x + 1 + y^2 = 9x^2 - 36x + 36 + 9y^2$\n $\\Rightarrow 8x^2 + 8y^2 - 34x + 35 = 0$\n $\\Rightarrow x^2 + y^2 - \\frac{34}{8}x + \\frac{35}{8} = 0$\n $P(a, b) = F\\left(\\frac{17}{8}, 0\\right)$\n $\\therefore k = \\sqrt{\\left(\\frac{17}{8}\\right)^2 - \\frac{35}{8}}$\n $\\Rightarrow K = \\frac{3}{8}$\n $64\\left(\\frac{17}{8} + 0 + 4 \\cdot \\frac{9}{64}\\right) = 172$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q56",
+        "tag2": "CMX",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWPS07FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q66",
+      "number": 66,
+      "solution_text": "It is given that $|z| = 1$\n $z = \\cos\\theta + i\\sin\\theta$ (let), $\\theta \\in (0, 2\\pi)$\n Now, $\\left|\\frac{z}{\\bar{z}} + \\frac{\\bar{z}}{z}\\right| = 1$ gives $2|\\cos 2\\theta| = 1$\n $\\Rightarrow \\cos 2\\theta = \\pm\\frac{1}{2} = \\frac{1}{2}, -\\frac{1}{2}$\n $\\Rightarrow \\theta = \\frac{\\pi}{6}, \\frac{5\\pi}{6}, \\frac{11\\pi}{6}, \\frac{\\pi}{6}, \\frac{2\\pi}{3}, \\frac{4\\pi}{3}, \\frac{5\\pi}{3}$ i.e. 8 values.",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q66",
+        "tag2": "CMX",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWPS11",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q67",
+      "number": 67,
+      "solution_text": " $z = \\alpha + i\\beta$\n Given, $|z + 2| = z + 5(1 + i)$\n $\\Rightarrow \\sqrt{(\\alpha+2)^2 + \\beta^2} = (\\alpha+5) + i(\\beta+5)$\n $\\Rightarrow \\sqrt{(\\alpha+2)^2 + \\beta^2} = \\alpha+5$ ....(i)\n $\\beta + 5 = 0 \\Rightarrow \\beta = -5$ ....(ii)\n From eq. $(i) \\Rightarrow \\sqrt{(\\alpha+2)^2 + 25} = \\alpha+5$\n $\\Rightarrow \\alpha^2 + 4\\alpha + 29 = \\alpha^2 + 10\\alpha + 25 \\Rightarrow 6\\alpha = 4$\n $\\Rightarrow \\alpha = \\frac{2}{3}$\n $3\\alpha + \\beta = 3, 3\\alpha\\beta = -10$\n Equation with roots $-3$ and $-10$ is\n $x^2 + 13x + 30 = 0$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q56",
+        "tag2": "CMX",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWAITS05FT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q68",
+      "number": 68,
+      "solution_text": "$\\left|\\frac{z+1}{z-1}\\right| < 1 \\Rightarrow |z+1| < |z-1| \\Rightarrow \\text{Re}(z) < 0$ and\n $\\arg\\left(\\frac{z-1}{z+1}\\right) = \\frac{2\\pi}{3}$\n is a part of circle as shown.\n [diagram showing a circle with center at $(-1, \\frac{1}{\\sqrt{3}})$ and a $60°$ angle marked]",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q54",
+        "tag2": "CMX",
+        "tag3": "H",
+        "tag4": "0",
+        "type": "PW88MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q69",
+      "number": 69,
+      "solution_text": "$0 \\leq \\arg z \\leq \\frac{\\pi}{4}$, represent the region of complex plane lying in the first quadrant and bounded by $x$ axis and the line $y = x$\n $|2z - 4i| = 2|z - 2i|$\n least value of $|z - 2i|$ is length of perpendicular from $(0, 2)$ to $y = x$, which is $\\sqrt{2}$\n So the least value of $\\sqrt{2}|2z-4i|$ is $4$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q65",
+        "tag2": "CMX",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW122MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q70",
+      "number": 70,
+      "solution_text": "For equilateral triangle\n $|z_2 - z_1| = |z_3 - z_2| = |z_1 - z_3| = a$\n Also $\\left|\\frac{z_2+z_3}{2} - z_1\\right|$ will be the length of median as\n well as altitude i.e. $\\left|\\frac{z_2+z_3}{2} - z_1\\right| = \\frac{a\\sqrt{3}}{2}$\n Hence,\n $\\sin\\theta = \\sqrt{\\frac{|z_2-z_1|^2 + |z_3-z_1|^2}{|z_2+z_3-2z_1|^2 + |z_3-z_2|^2}}$\n $= \\frac{1}{\\sqrt{2}}$\n $\\Rightarrow \\theta = \\frac{\\pi}{4}$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q58",
+        "tag2": "CNQ",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWPS06MT",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q71",
+      "number": 71,
+      "solution_text": "\n$\\frac{S_n}{\\Delta_n} = \\frac{2n+5}{3n+2}$\n $\\frac{\\frac{n}{2}[2A+(n-1)D]}{\\frac{n}{2}[2a+(n-1)d]} = \\frac{2n+5}{3n+2}$\n $\\frac{A+\\left(\\frac{n-1}{2}\\right)D}{a+\\left(\\frac{n-1}{2}\\right)d} = \\frac{2n+5}{3n+2}$\n $\\frac{n-1}{2} \\to n-1 \\Rightarrow n \\to 2n-1$\n $\\therefore \\frac{T_n}{t_n} = \\frac{A+(n-1)D}{a+(n-1)d} = \\frac{2(2n-1)+5}{3(2n-1)+2}$\n $= \\frac{4n+3}{6n-1}$\n Let $\\to T_n = k(4n+3)$\n $t_n = k(6n-1)$\n Now comparing gives\n For $T_n \\Rightarrow D = 4k, A - D = 3k$\n $A = 7k$\n For $t_n \\Rightarrow d = 6k, a - d = -k$\n $a = 5k$\n $\\therefore \\frac{T_{11}}{t_{10}} = \\frac{7k+10\\cdot 4k}{5k+9\\cdot 6k} = \\frac{47}{59} = \\frac{m_1}{m_2}$\n $\\therefore \\frac{m_2-m_1}{2} = \\frac{59-47}{2} = \\frac{12}{2} = 6$\n",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q74",
+        "tag2": "SQS",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW166MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q72",
+      "number": 72,
+      "solution_text": "Given,\n $\\Rightarrow \\frac{a}{18} = b^2 \\Rightarrow a = 18b^2$ ....(i)\n And\n $\\frac{1}{a} - \\frac{1}{b} = 20$\n $\\Rightarrow a + b = 20ab$, from eq. (i); we get\n $\\Rightarrow 18b^2 + b = 360 b^3$\n $\\Rightarrow 360b^3 - 18b - 1 = 0 \\{\\because b \\neq 0\\}$\n $\\Rightarrow b = \\frac{18 \\pm \\sqrt{324+1440}}{720}$\n $\\Rightarrow b = \\frac{18 + \\sqrt{1764}}{720} \\{\\because b > 0\\}$\n $\\Rightarrow b = \\frac{1}{12}$\n $\\Rightarrow a = 18 \\times \\frac{1}{144} = \\frac{1}{8}$\n Now, $8a + 12b = 2$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q86",
+        "tag2": "SQS",
+        "tag3": "M",
+        "tag4": "",
+        "type": "PWAITS01FT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q73",
+      "number": 73,
+      "solution_text": "If $\\sum_{k=1}^{12} 12k \\binom{12}{C_k} \\binom{11}{C_{k-1}}$\n $= \\frac{12 \\times 21 \\times 19 \\times 17 \\times \\ldots \\times 3}{11!} \\times 2^{12} \\times P$, then $P$ is equal to",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q73",
+        "tag2": "BNT",
+        "tag3": "H",
+        "tag4": "",
+        "type": "PWPS11",
+        "year": "2025"
+      }
+    },
+    {
+      "id": "q74",
+      "number": 74,
+      "solution_text": "$z = 1 + i$\n $z_1 = \\frac{1+1\\overline{z}}{\\overline{z}(1-z)+\\frac{1}{z}}$\n $z_1 = \\frac{1+i(1-i)}{(1-i)(1-1-i)+\\frac{1}{1+i}} = \\frac{1+i-i^2}{(1-i)(-i)+\\frac{1-i}{2}}$\n $\\frac{2+i}{\\frac{-3i-1}{2}} = \\frac{4+2i}{-3i-1} = \\frac{-(4+2i)(3i-1)}{(3i)^2-(1)^2} = -1+i$\n $\\text{Arg}(z_1) = \\frac{3\\pi}{4}$\n $\\therefore \\frac{12}{\\pi}\\arg(z_1) = \\frac{12}{\\pi} \\cdot \\frac{3\\pi}{4} = 9$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "Q72",
+        "tag2": "CMX",
+        "tag3": "M",
+        "tag4": "0",
+        "type": "PW166MT",
+        "year": "2024"
+      }
+    },
+    {
+      "id": "q75",
+      "number": 75,
+      "solution_text": "$\\left(\\frac{\\sqrt{x}}{5^{1/4}} + \\frac{\\sqrt{5}}{x^{1/3}}\\right)^{60}$\n $T_{r+1} = {}^{60}C_r \\left(\\frac{x^{1/2}}{5^{1/4}}\\right)^{60-r} \\left(\\frac{5^{1/2}}{x^{1/3}}\\right)^r$\n $= {}^{60}C_r 5^{\\frac{3r-60}{4}} \\cdot x^{\\frac{180-5r}{6}}$\n $\\frac{180-5r}{6} = 10 \\Rightarrow r = 24$\n Coeff. of $x^{10} = {}^{60}C_{24} 5^3 = \\frac{|60|}{|24|36} 5^3$\n Powers of $5$ in $= {}^{60}C_{24} \\cdot 5^3 = \\frac{5^{14}}{5^4 \\times 5^8} \\times 5^3 = 5^5$",
+      "solution_image_url": "",
+      "tags": {
+        "tag1": "MA",
+        "tag2": "BNT",
+        "tag3": "M",
+        "tag4": "",
+        "type": "JM",
+        "year": "2022"
+      }
+    }
+  ]
+}
