@@ -260,7 +260,8 @@ export interface Question {
   id: string;
   uuid: string;
   text: string;
-  options: { id: string; text: string }[];
+  image?: string;
+  options: { id: string; text: string; image?: string }[];
   correctOption: string;
   section: string;
 }
