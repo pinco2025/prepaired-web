@@ -236,38 +236,67 @@ const TestReview: React.FC = () => {
                                     </div>
                                 )}
                                 <div className="space-y-3">
-                                    {currentQuestion.options.map(option => {
-                                        const isCorrect = option.id === currentAnswer.correct_response;
-                                        const isUserChoice = option.id === currentAnswer.user_response;
-                                        return (
-                                            <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
-                                                {isCorrect && (
-                                                    <div className="absolute right-0 top-0 w-8 h-8 bg-success-light flex items-center justify-center rounded-bl-xl">
-                                                        <span className="material-icons-outlined text-white text-[18px]">check</span>
+                                    {(!currentQuestion.options || currentQuestion.options.length === 0) ? (
+                                        <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-sm">
+                                            {currentAnswer.status === 'Correct' ? (
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center gap-2 text-success-light font-bold text-lg">
+                                                        <span className="material-icons-outlined">check_circle</span>
+                                                        Correct Answer: {currentAnswer.correct_response}
                                                     </div>
-                                                )}
-                                                <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
-                                                <div className="flex-grow text-lg">
-                                                    {renderHtml(option.text)}
-                                                    {option.image && (
-                                                        <div className="mt-4 flex justify-center">
-                                                            <img src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                                    <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark ml-8">
+                                                        Your answer matched the correct answer.
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Your Answer</span>
+                                                        <div className="flex items-center gap-2 text-error-light font-bold text-lg">
+                                                            <span className="material-icons-outlined">cancel</span>
+                                                            {currentAnswer.user_response || "Not Attempted"}
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full h-px bg-border-light dark:bg-border-dark"></div>
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Correct Answer</span>
+                                                        <div className="flex items-center gap-2 text-success-light font-bold text-lg">
+                                                            <span className="material-icons-outlined">check_circle</span>
+                                                            {currentAnswer.correct_response}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        currentQuestion.options.map(option => {
+                                            const isCorrect = option.id.toLowerCase() === currentAnswer.correct_response.toLowerCase();
+                                            const isUserChoice = currentAnswer.user_response ? option.id.toLowerCase() === currentAnswer.user_response.toLowerCase() : false;
+                                            return (
+                                                <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
+                                                    <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
+                                                    <div className="flex-grow text-lg">
+                                                        {renderHtml(option.text)}
+                                                        {option.image && (
+                                                            <div className="mt-4 flex justify-center">
+                                                                <img src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {isUserChoice && (
+                                                        <div className={`text-xs font-bold uppercase tracking-wider ${currentAnswer.status === 'Correct' ? 'text-success-dark dark:text-success-light' : 'text-error-dark dark:text-error-light'}`}>
+                                                            Your Answer
+                                                        </div>
+                                                    )}
+                                                    {!isUserChoice && isCorrect && (
+                                                        <div className="text-xs font-bold uppercase tracking-wider text-success-dark dark:text-success-light">
+                                                            Correct Answer
                                                         </div>
                                                     )}
                                                 </div>
-                                                {isUserChoice && (
-                                                    <div className={`text-xs font-bold uppercase tracking-wider ${currentAnswer.status === 'Correct' ? 'text-success-dark dark:text-success-light' : 'text-error-dark dark:text-error-light'}`}>
-                                                        Your Answer
-                                                    </div>
-                                                )}
-                                                {!isUserChoice && isCorrect && (
-                                                    <div className="text-xs font-bold uppercase tracking-wider text-success-dark dark:text-success-light">
-                                                        Correct Answer
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })
+                                    )}
                                 </div>
                             </div>
 
