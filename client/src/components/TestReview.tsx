@@ -171,12 +171,12 @@ const TestReview: React.FC = () => {
 
     const getPaletteStyle = (questionId: string) => {
         const answer = userAnswers.find(a => a.question_id === questionId);
-        if (!answer) return "bg-gray-200 dark:bg-gray-700";
+        if (!answer) return "bg-gray-200 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark";
         switch (answer.status) {
             case 'Correct': return "bg-success-light text-white";
             case 'Incorrect': return "bg-error-light text-white";
-            case 'Unattempted': return "bg-gray-200 dark:bg-gray-700";
-            default: return "bg-gray-200 dark:bg-gray-700";
+            case 'Unattempted': return "bg-gray-200 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark";
+            default: return "bg-gray-200 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark";
         }
     };
 
@@ -216,26 +216,47 @@ const TestReview: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
-                                <div className="prose dark:prose-invert max-w-none text-lg leading-relaxed font-medium">
+                                <div className="text-xl text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
                                     {renderHtml(currentQuestion.text)}
                                 </div>
+                                {currentQuestion.image && (
+                                    <div className="flex justify-center">
+                                        <img src={currentQuestion.image} alt="Question" className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                    </div>
+                                )}
                                 <div className="space-y-3">
-                                    {currentQuestion.options.map(option => (
-                                        <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
-                                            {currentAnswer.correct_response === option.id && (
-                                                 <div className="absolute right-0 top-0 w-8 h-8 bg-success-light flex items-center justify-center rounded-bl-xl">
-                                                    <span className="material-icons-outlined text-white text-[18px]">check</span>
-                                                 </div>
-                                            )}
-                                            <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
-                                            <div className="flex-grow">{renderHtml(option.text)}</div>
-                                            {currentAnswer.user_response === option.id && (
-                                                <div className={`text-xs font-bold uppercase tracking-wider ${currentAnswer.status === 'Correct' ? 'text-success-dark' : 'text-error-dark'}`}>
-                                                    Your Answer
+                                    {currentQuestion.options.map(option => {
+                                        const isCorrect = option.id === currentAnswer.correct_response;
+                                        const isUserChoice = option.id === currentAnswer.user_response;
+                                        return (
+                                            <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
+                                                {isCorrect && (
+                                                    <div className="absolute right-0 top-0 w-8 h-8 bg-success-light flex items-center justify-center rounded-bl-xl">
+                                                        <span className="material-icons-outlined text-white text-[18px]">check</span>
+                                                    </div>
+                                                )}
+                                                <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
+                                                <div className="flex-grow text-lg">
+                                                    {renderHtml(option.text)}
+                                                    {option.image && (
+                                                        <div className="mt-4 flex justify-center">
+                                                            <img src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
+                                                {isUserChoice && (
+                                                    <div className={`text-xs font-bold uppercase tracking-wider ${currentAnswer.status === 'Correct' ? 'text-success-dark dark:text-success-light' : 'text-error-dark dark:text-error-light'}`}>
+                                                        Your Answer
+                                                    </div>
+                                                )}
+                                                {!isUserChoice && isCorrect && (
+                                                    <div className="text-xs font-bold uppercase tracking-wider text-success-dark dark:text-success-light">
+                                                        Correct Answer
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -249,7 +270,7 @@ const TestReview: React.FC = () => {
                                         {isSolutionVisible && (
                                             <div className="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-sm">
                                                 <h4 className="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide mb-3">Explanation</h4>
-                                                <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+                                                <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
                                                     {renderHtml(currentSolution.solution_text)}
                                                 </div>
                                                 {currentSolution.solution_image_url && <img src={currentSolution.solution_image_url} alt="Solution" className="mt-4 rounded-lg"/>}

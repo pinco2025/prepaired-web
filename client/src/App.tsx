@@ -23,8 +23,7 @@ export const AppContent: React.FC = () => {
 
   const hideHeaderOnPaths = ['/login', '/register'];
   const isTestPage = location.pathname.startsWith('/tests/');
-  const isReviewPage = location.pathname.startsWith('/review/');
-  const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage && !isReviewPage;
+  const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage;
 
   return (
     <div className="min-h-screen flex flex-col relative">
