@@ -645,8 +645,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   };
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
-      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 lg:h-[84vh]">
+    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
+      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 h-full">
         <div className="flex-grow overflow-y-auto min-h-0 no-scrollbar p-1">
           {currentQuestion && (
             <>
@@ -658,11 +658,11 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                   {currentQuestion.section}
                 </span>
               </div>
-              <p className="text-base text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
+              <p className="text-xl text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}
               </p>
               {currentQuestion.image && (
-                <div className="mb-8">
+                <div className="mb-8 flex justify-center">
                   <img
                     src={currentQuestion.image}
                     alt="Question Illustration"
@@ -726,7 +726,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                         {option.id.toUpperCase()}
                       </span>
                       <div className="flex flex-col w-full gap-3">
-                        <span className="text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
+                        <span className="text-lg text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
                         {option.image && (
                           <img
                             src={option.image}
@@ -774,8 +774,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark lg:sticky lg:top-6 lg:self-start max-h-[72vh] overflow-y-auto">
+      <div className="flex flex-col gap-4 h-full">
+        <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark h-full overflow-y-auto flex flex-col">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={isSubmittingRef.current}
