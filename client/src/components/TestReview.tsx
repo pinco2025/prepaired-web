@@ -108,6 +108,16 @@ const TestReview: React.FC = () => {
         );
     }, [sections, allQuestions]);
 
+    useEffect(() => {
+        const currentQuestion = allQuestions[currentQuestionIndex];
+        if (currentQuestion) {
+            const sectionIndex = sections.findIndex(s => s === currentQuestion.section);
+            if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
+                setCurrentSectionIndex(sectionIndex);
+            }
+        }
+    }, [currentQuestionIndex, allQuestions, sections, currentSectionIndex]);
+
     const handleQuestionSelect = (questionIndex: number) => {
         const question = questionsBySection[currentSectionIndex][questionIndex];
         const globalIndex = allQuestions.findIndex(q => q.id === question.id);
@@ -147,13 +157,16 @@ const TestReview: React.FC = () => {
         const isCorrect = optionId === currentAnswer.correct_response;
         const isUserChoice = optionId === currentAnswer.user_response;
 
-        if (isCorrect) {
-            return "border-2 border-success-light bg-success-light/10 dark:bg-success-dark/10";
+        if (isUserChoice && isCorrect) {
+            return "border-2 border-success-light bg-success-light/10 dark:bg-success-dark/10"; // User was correct
         }
         if (isUserChoice && !isCorrect) {
-            return "border-2 border-error-light bg-error-light/10 dark:bg-error-dark/10";
+            return "border-2 border-error-light bg-error-light/10 dark:bg-error-dark/10"; // User was incorrect
         }
-        return "border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800";
+        if (!isUserChoice && isCorrect) {
+            return "border-2 border-success-light bg-success-light/10 dark:bg-success-dark/10"; // This is the correct answer, which the user did not choose
+        }
+        return "border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800"; // Any other option
     };
 
     const getPaletteStyle = (questionId: string) => {
@@ -176,22 +189,18 @@ const TestReview: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col relative bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark antialiased">
             <div className="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10"></div>
-            <header className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm sticky top-0 z-50 border-b border-border-light dark:border-border-dark shadow-sm">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center gap-3">
-                            <img alt="prepAIred logo" className="h-8 w-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdzj_WfIjmmM52JXz4zKQrlQgJkA4UmPvuySjzEbq9Bsdj31RsY7ncfFrEi-fD-BWSo0ZTpLvMe7hOv0DP_1JXMQbL8BW_EgaawiBsr0daDGG68D4iJN_47bGlm98RGzILkKm4sgrjxbv04CENGDP2nGSO6OWmZ8vg5Q9-vdcYbpfJrfN1QRe-Abx_bYN4iP1dZnaJMNe-Jycl4XN4_crPSiEv3ULZH5fzZGU9CbUHu7gVaJ3NCZ4o0LRozC1uo6aoEl7HLrY5k_En" />
-                            <span className="text-xl font-bold">prep<span className="text-primary">AI</span>red</span>
-                        </div>
-                        <button onClick={() => navigate(`/results/${submissionId}`)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800 transition-colors">
-                            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
-                            <span className="text-sm font-medium">Back to Result</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
+            {/* Floating Back Button */}
+            <div className="absolute top-4 left-4 z-50">
+                <button
+                    onClick={() => navigate(`/results/${submissionId}`)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm hover:bg-background-light dark:hover:bg-gray-800 transition-colors shadow-md"
+                >
+                    <span className="material-icons-outlined text-[20px]">arrow_back</span>
+                    <span className="text-sm font-medium">Back to Result</span>
+                </button>
+            </div>
 
-            <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
                     {/* Left Column */}
                     <div className="lg:col-span-9 flex flex-col gap-6">
@@ -203,7 +212,7 @@ const TestReview: React.FC = () => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {/* Placeholder button */}
-                                    <span className="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark cursor-pointer hover:text-primary" title="Report Issue">flag</span>
+                                    <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark cursor-pointer hover:text-primary" title="Report Issue">flag</span>
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
@@ -215,7 +224,7 @@ const TestReview: React.FC = () => {
                                         <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
                                             {currentAnswer.correct_response === option.id && (
                                                  <div className="absolute right-0 top-0 w-8 h-8 bg-success-light flex items-center justify-center rounded-bl-xl">
-                                                    <span className="material-symbols-outlined text-white text-[18px]">check</span>
+                                                    <span className="material-icons-outlined text-white text-[18px]">check</span>
                                                  </div>
                                             )}
                                             <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
@@ -234,7 +243,7 @@ const TestReview: React.FC = () => {
                                 <div className="border-t border-border-light dark:border-border-dark bg-background-light/30 dark:bg-background-dark/30">
                                     <div className="p-6 md:p-8">
                                         <button onClick={() => setIsSolutionVisible(!isSolutionVisible)} className="flex items-center gap-2 text-primary font-semibold mb-4 hover:opacity-80 transition-opacity">
-                                            <span className="material-symbols-outlined">{isSolutionVisible ? 'expand_less' : 'expand_more'}</span>
+                                            <span className="material-icons-outlined">{isSolutionVisible ? 'expand_less' : 'expand_more'}</span>
                                             {isSolutionVisible ? 'Hide' : 'Show'} Solution
                                         </button>
                                         {isSolutionVisible && (
@@ -252,10 +261,10 @@ const TestReview: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-center">
                             <button onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))} disabled={currentQuestionIndex === 0} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border disabled:opacity-50">
-                                <span className="material-symbols-outlined">arrow_back</span> Previous
+                                <span className="material-icons-outlined">arrow_back</span> Previous
                             </button>
                             <button onClick={() => setCurrentQuestionIndex(Math.min(allQuestions.length - 1, currentQuestionIndex + 1))} disabled={currentQuestionIndex === allQuestions.length - 1} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white shadow-lg disabled:opacity-50">
-                                Next Question <span className="material-symbols-outlined">arrow_forward</span>
+                                Next Question <span className="material-icons-outlined">arrow_forward</span>
                             </button>
                         </div>
                     </div>
@@ -266,7 +275,12 @@ const TestReview: React.FC = () => {
                             <h3 className="text-lg font-bold mb-4 px-2">Question Palette</h3>
                             <div className="flex border-b mb-4">
                                 {sections.map((section, index) => (
-                                    <button key={section} onClick={() => handleSectionSelect(index)} className={`flex-1 pb-2 text-sm font-medium ${currentSectionIndex === index ? 'text-primary border-b-2 border-primary' : 'text-text-secondary-light hover:text-text-light'}`}>
+                                    <button
+                                        key={section}
+                                        onClick={() => handleSectionSelect(index)}
+                                        className={`flex-1 pb-2 text-sm font-medium truncate ${currentSectionIndex === index ? 'text-primary border-b-2 border-primary' : 'text-text-secondary-light hover:text-text-light'}`}
+                                        title={section}
+                                    >
                                         {section.split(' ')[0]}
                                     </button>
                                 ))}
