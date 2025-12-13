@@ -83,9 +83,14 @@ const TestPage: React.FC = () => {
     }
   };
 
+  const isTestInProgress = testStatus === 'inProgress';
+
   return (
-    <main className="flex-grow">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center">
+    <main className={`flex-grow ${isTestInProgress ? 'h-screen overflow-hidden' : ''}`}>
+      <div className={isTestInProgress
+        ? "w-full h-full p-4 bg-background-light dark:bg-background-dark"
+        : "container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center"
+      }>
         {renderContent()}
       </div>
     </main>
