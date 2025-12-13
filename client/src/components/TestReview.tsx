@@ -227,7 +227,7 @@ const TestReview: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
-                                <div className="text-xl text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
+                                <div className="text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
                                     {renderHtml(currentQuestion.text)}
                                 </div>
                                 {currentQuestion.image && (
@@ -310,7 +310,7 @@ const TestReview: React.FC = () => {
                                         {isSolutionVisible && (
                                             <div className="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-sm">
                                                 <h4 className="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide mb-3">Explanation</h4>
-                                                <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
+                                                <div className="prose dark:prose-invert max-w-none text-base leading-relaxed whitespace-pre-line">
                                                     {renderHtml(currentSolution.solution_text)}
                                                 </div>
                                                 {currentSolution.solution_image_url && <img src={currentSolution.solution_image_url} alt="Solution" className="mt-4 rounded-lg"/>}
@@ -319,14 +319,6 @@ const TestReview: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <button onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))} disabled={currentQuestionIndex === 0} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border disabled:opacity-50">
-                                <span className="material-icons-outlined">arrow_back</span> Previous
-                            </button>
-                            <button onClick={() => setCurrentQuestionIndex(Math.min(allQuestions.length - 1, currentQuestionIndex + 1))} disabled={currentQuestionIndex === allQuestions.length - 1} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white shadow-lg disabled:opacity-50">
-                                Next Question <span className="material-icons-outlined">arrow_forward</span>
-                            </button>
                         </div>
                     </div>
 
@@ -369,6 +361,15 @@ const TestReview: React.FC = () => {
                                     <span className="text-sm">Not Attempted</span>
                                     <span className="ml-auto font-bold">{stats['Unattempted'] || 0}</span>
                                 </div>
+                            </div>
+
+                            <div className="mt-6 grid grid-cols-2 gap-3">
+                                <button onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))} disabled={currentQuestionIndex === 0} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                                    <span className="material-icons-outlined">arrow_back</span> Prev
+                                </button>
+                                <button onClick={() => setCurrentQuestionIndex(Math.min(allQuestions.length - 1, currentQuestionIndex + 1))} disabled={currentQuestionIndex === allQuestions.length - 1} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-white shadow-lg disabled:opacity-50 hover:opacity-90 transition-opacity">
+                                    Next <span className="material-icons-outlined">arrow_forward</span>
+                                </button>
                             </div>
                         </div>
                     </div>
