@@ -257,8 +257,12 @@ export const subjectDetails: { [subject: string]: { [grade: string]: SubjectDeta
 };
 
 export interface Question {
+  id: string;
   uuid: string;
+  text: string;
+  options: { id: string; text: string }[];
   correctOption: string;
+  section: string;
 }
 
 export interface Test {
@@ -271,8 +275,9 @@ export interface Test {
   instructions: string[];
   url: string;
   exam?: 'Normal' | 'JEE' | 'NEET';
-  questions?: { name: string; questions: Question[] }[];
+  questions?: Question[];
   maximum_marks?: number;
+  sections?: { name: string }[];
 }
 
 export interface TestCategory {

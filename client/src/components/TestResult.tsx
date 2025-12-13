@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 
 // Define interfaces for the result data based on sample_result.json
@@ -58,6 +58,7 @@ const subjectIcons: Record<string, string> = {
 
 const TestResult: React.FC = () => {
   const { submissionId } = useParams<{ submissionId: string }>();
+  const navigate = useNavigate();
   const [result, setResult] = useState<TestResultData | null>(null);
   const [submissionTime, setSubmissionTime] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<string | null>(null);
@@ -281,7 +282,10 @@ const TestResult: React.FC = () => {
                 <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Review every question in detail to understand where you went wrong.</p>
               </div>
             </div>
-            <button className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity w-full md:w-auto justify-center">
+            <button
+              onClick={() => navigate(`/review/${submissionId}`)}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity w-full md:w-auto justify-center"
+            >
               Start Review
               <span className="material-icons-outlined">arrow_forward</span>
             </button>

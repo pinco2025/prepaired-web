@@ -16,6 +16,7 @@ import Tests from './components/Tests';
 import TestPage from './components/TestPage';
 import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
+import TestReview from './components/TestReview';
 
 export const AppContent: React.FC = () => {
   const location = useLocation();
@@ -98,6 +99,11 @@ export const AppContent: React.FC = () => {
         <Route path="/results/:submissionId" element={
           <RequireAuth>
             <TestResult />
+          </RequireAuth>
+        } />
+        <Route path="/review/:submissionId" element={
+          <RequireAuth>
+            <TestReview />
           </RequireAuth>
         } />
       </Routes>
