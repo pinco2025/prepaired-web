@@ -18,6 +18,10 @@ module.exports = {
         "text-secondary-dark": "#9ca3af",
         "border-light": "#e5e7eb",
         "border-dark": "#374151",
+        "success-light": "#22c55e",
+        "success-dark": "#4ade80",
+        "error-light": "#ef4444",
+        "error-dark": "#f87171",
       },
       fontFamily: {
         display: ["Poppins", "sans-serif"],

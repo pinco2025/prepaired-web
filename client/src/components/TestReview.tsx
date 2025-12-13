@@ -134,7 +134,12 @@ const TestReview: React.FC = () => {
     };
 
     const currentQuestion = allQuestions[currentQuestionIndex];
-    const currentAnswer = userAnswers.find(a => a.question_id === currentQuestion?.id);
+    const currentAnswer = userAnswers.find(a => {
+        if (a.question_uuid && currentQuestion?.uuid) {
+            return a.question_uuid === currentQuestion.uuid;
+        }
+        return a.question_id === currentQuestion?.id;
+    });
     const currentSolution = solutions.find(s => s.id === currentQuestion?.id);
 
     const renderHtml = (htmlString: string) => {
@@ -154,8 +159,8 @@ const TestReview: React.FC = () => {
     if (!testData || !currentQuestion || !currentAnswer) return <div className="flex justify-center items-center h-screen">Data not available.</div>;
 
     const getOptionStyle = (optionId: string) => {
-        const isCorrect = optionId === currentAnswer.correct_response;
-        const isUserChoice = optionId === currentAnswer.user_response;
+        const isCorrect = optionId.toLowerCase() === currentAnswer.correct_response.toLowerCase();
+        const isUserChoice = currentAnswer.user_response ? optionId.toLowerCase() === currentAnswer.user_response.toLowerCase() : false;
 
         if (isUserChoice && isCorrect) {
             return "border-2 border-success-light bg-success-light/10 dark:bg-success-dark/10"; // User was correct
@@ -169,8 +174,14 @@ const TestReview: React.FC = () => {
         return "border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800"; // Any other option
     };
 
-    const getPaletteStyle = (questionId: string) => {
-        const answer = userAnswers.find(a => a.question_id === questionId);
+    const getPaletteStyle = (question: Question) => {
+        const answer = userAnswers.find(a => {
+            if (a.question_uuid && question.uuid) {
+                return a.question_uuid === question.uuid;
+            }
+            return a.question_id === question.id;
+        });
+
         if (!answer) return "bg-gray-200 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark";
         switch (answer.status) {
             case 'Correct': return "bg-success-light text-white";
@@ -308,7 +319,7 @@ const TestReview: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-5 gap-3 mb-6 max-h-[60vh] overflow-y-auto p-1">
                                 {questionsBySection[currentSectionIndex].map((q, index) => (
-                                    <button key={q.id} onClick={() => handleQuestionSelect(index)} className={`w-10 h-10 rounded-lg text-sm font-bold transition-opacity ${getPaletteStyle(q.id)} ${q.id === currentQuestion.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+                                    <button key={q.id} onClick={() => handleQuestionSelect(index)} className={`w-10 h-10 rounded-lg text-sm font-bold transition-opacity ${getPaletteStyle(q)} ${q.id === currentQuestion.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
                                         {allQuestions.findIndex(aq => aq.id === q.id) + 1}
                                     </button>
                                 ))}
