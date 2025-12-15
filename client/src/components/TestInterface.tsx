@@ -61,6 +61,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [studentTestId, setStudentTestId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -153,6 +154,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
     
     isSubmittingRef.current = true;
+    setIsSubmitting(true);
     console.log('Starting submission...');
 
     // Clear timer immediately to prevent any further submissions
@@ -215,6 +217,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       if (error || !finalSubmissionId) {
         console.error('Error submitting test:', error);
         isSubmittingRef.current = false;
+        setIsSubmitting(false);
       } else {
         console.log('Submission DB update successful! Now triggering grade calculation...');
 
@@ -252,6 +255,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     } catch (e) {
       console.error('Submission failed', e);
       isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   }, [onSubmitSuccess, navigate]); // Only depend on stable functions
 
@@ -879,6 +883,27 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
               >
                 Submit
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isSubmitting && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-6">
+          <div className="absolute inset-0 bg-background-dark/70 backdrop-blur-sm transition-opacity"></div>
+          <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-surface-light dark:bg-surface-dark p-6 text-left align-middle shadow-2xl transition-all border border-border-light dark:border-border-dark">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-5 rounded-full bg-primary/10 p-4 text-primary">
+                <span className="material-icons-outlined text-4xl animate-spin">autorenew</span>
+              </div>
+              <h3 className="text-xl font-bold leading-6 text-text-light dark:text-text-dark mb-2">
+                Submitting Test...
+              </h3>
+              <div className="mb-4">
+                <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">
+                  Do not refresh/close your browser and please wait while we are submitting your test.
+                </p>
+              </div>
             </div>
           </div>
         </div>
