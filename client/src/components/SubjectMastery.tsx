@@ -61,11 +61,11 @@ const SubjectMastery: React.FC = () => {
                                 </span>
                             </div>
                             <div
-                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-90 ${styles['liquid-shape']} ${styles['animate-wave-1']} ${subject.colorClasses.liquid1}`}
+                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-90 ${styles['liquid-shape']} animate-wave-1 ${subject.colorClasses.liquid1}`}
                                 style={{ height: `${subject.percentage}%` }}
                             ></div>
                             <div
-                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-60 ${styles['liquid-shape']} ${styles['animate-wave-2']} ${subject.colorClasses.liquid2}`}
+                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-60 ${styles['liquid-shape']} animate-wave-2 ${subject.colorClasses.liquid2}`}
                                 style={{ height: `${subject.percentage > 4 ? subject.percentage - 4 : 0}%` }}
                             ></div>
                         </div>

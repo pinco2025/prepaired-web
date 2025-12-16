@@ -24,6 +24,41 @@ h1, h2, h3, h4, h5, h6 {
   speak: none;
 }
 
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes wave-1 {
+  0% { transform: rotate(0deg) translateX(0); }
+  50% { transform: rotate(-2deg) translateX(-5px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+
+@keyframes wave-2 {
+  0% { transform: rotate(0deg) translateX(0); }
+  50% { transform: rotate(3deg) translateX(5px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+
+.animate-wave-1 {
+  animation: wave-1 3s ease-in-out infinite alternate;
+}
+
+.animate-wave-2 {
+  animation: wave-2 3.5s ease-in-out infinite alternate;
+}
+
 .grid-bg-light {
   background-image:
     linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
