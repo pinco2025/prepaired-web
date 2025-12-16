@@ -1,6 +1,10 @@
 import React from 'react';
+import useCountUp from '../hooks/useCountUp';
 
 const ScoreAndStreak: React.FC = () => {
+    const score = useCountUp(842, 2500);
+    const scorePercentage = (score / 1000) * 100;
+
     return (
         <div className="flex flex-col gap-8 h-full">
             <div className="flex-1 relative group">
@@ -15,12 +19,15 @@ const ScoreAndStreak: React.FC = () => {
                     </div>
                     <div className="flex items-baseline gap-2">
                         <div className="text-5xl font-bold text-primary tracking-tighter leading-none" style={{ textShadow: '0 4px 20px rgba(0, 102, 255, 0.2)' }}>
-                            842
+                            {score}
                         </div>
                         <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark">/ 1000</span>
                     </div>
                     <div className="w-full h-1 bg-border-light dark:bg-border-dark mt-4 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary w-[84%] rounded-full"></div>
+                        <div
+                            className="h-full bg-primary rounded-full transition-all duration-100 ease-out"
+                            style={{ width: `${scorePercentage}%` }}
+                        ></div>
                     </div>
                 </div>
             </div>
