@@ -23,13 +23,13 @@ const Dashboard: React.FC = () => {
   return (
     <main className="flex-grow">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex flex-col justify-between gap-6">
+        <div className="mb-8 flex flex-col justify-between gap-6 animate-fade-in-up">
           <div>
             <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Welcome back, {authUser?.user_metadata?.full_name || 'Alex'}!</h1>
             <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1">Let's continue your journey to ace the {examType ?? 'JEE'} exam.</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 animate-fade-in-up delay-100">
           <div className="lg:col-span-2">
             <SubjectMastery />
           </div>
@@ -37,7 +37,9 @@ const Dashboard: React.FC = () => {
             <ScoreAndStreak />
           </div>
         </div>
-        <FocusAreas />
+        <div className="animate-fade-in-up delay-200">
+          <FocusAreas />
+        </div>
       </div>
     </main>
   );
