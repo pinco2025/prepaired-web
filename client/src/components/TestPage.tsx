@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Test } from '../data';
 import { supabase } from '../utils/supabaseClient';
 import TestInstructions from './TestInstructions';
@@ -10,28 +10,57 @@ type TestStatus = 'instructions' | 'inProgress' | 'submitted';
 
 const TestPage: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
+  const navigate = useNavigate();
   const [test, setTest] = useState<Test | null>(null);
   const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
+  const [checkingAttempt, setCheckingAttempt] = useState(true);
 
   useEffect(() => {
-    const fetchTest = async () => {
+    const initPage = async () => {
       if (!testId) return;
-      const { data, error } = await supabase
-        .from('tests')
-        .select('*')
-        .eq('testID', testId)
-        .single();
 
-      if (error) {
-        console.error('Error fetching test:', error);
-        setTest(null);
-      } else {
-        setTest(data as Test);
+      try {
+        // 1. Check for existing attempt
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: attempts } = await supabase
+            .from('student_tests')
+            .select('id, submitted_at')
+            .eq('test_id', testId)
+            .eq('user_id', user.id)
+            .not('submitted_at', 'is', null)
+            .limit(1);
+
+          if (attempts && attempts.length > 0) {
+            // Redirect to results if already attempted (submitted)
+            navigate(`/results/${attempts[0].id}`, { replace: true });
+            return;
+          }
+        }
+
+        // 2. If no completed attempt, fetch test details
+        const { data, error } = await supabase
+          .from('tests')
+          .select('*')
+          .eq('testID', testId)
+          .single();
+
+        if (error) {
+          console.error('Error fetching test:', error);
+          setTest(null);
+        } else {
+          setTest(data as Test);
+        }
+      } catch (error) {
+        console.error('Error initializing test page:', error);
+      } finally {
+        setCheckingAttempt(false);
       }
     };
 
-    fetchTest();
-  }, [testId]);
+    initPage();
+  }, [testId, navigate]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -49,6 +78,14 @@ const TestPage: React.FC = () => {
       window.removeEventListener('popstate', handlePopState);
     };
   }, [testStatus]);
+
+  if (checkingAttempt) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!test) {
     return <div>Test not found</div>;
@@ -69,9 +106,6 @@ const TestPage: React.FC = () => {
   };
 
   const renderContent = () => {
-    if (!test) {
-      return <div>Loading test...</div>;
-    }
     switch (testStatus) {
       case 'inProgress':
         return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} />;
