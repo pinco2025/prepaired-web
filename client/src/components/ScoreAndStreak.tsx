@@ -4,7 +4,7 @@ const ScoreAndStreak: React.FC = () => {
     return (
         <div className="flex flex-col gap-8 h-full">
             <div className="flex-1 relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-400 rounded-2xl opacity-30 blur-md transition duration-500 group-hover:opacity-50"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-400 rounded-2xl blur-md animate-pulse-glow"></div>
                 <div className="relative flex flex-col items-center justify-center bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-xl border border-white/50 dark:border-white/10 h-full">
                     <div className="w-full flex justify-between items-center mb-4">
                         <p className="text-xs font-bold uppercase tracking-widest text-text-secondary-light dark:text-text-secondary-dark">prepAIred Score</p>
