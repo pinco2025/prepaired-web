@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './SubjectMastery.module.css';
+import SubjectBubble from './SubjectBubble';
 
 const SubjectMastery: React.FC = () => {
     const subjects = [
@@ -51,35 +51,7 @@ const SubjectMastery: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 place-items-center relative z-10 flex-grow">
                 {subjects.map((subject) => (
-                    <div key={subject.name} className="flex flex-col items-center gap-4 group cursor-pointer">
-                        <div
-                            className={`relative w-36 h-36 rounded-full ${subject.colorClasses.bg} ${subject.colorClasses.border} border-4 overflow-hidden ${subject.colorClasses.shadow} shadow-lg transition-transform group-hover:scale-105`}
-                        >
-                            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-2xl font-bold text-text-light dark:text-text-dark bg-surface-light/60 dark:bg-surface-dark/40 backdrop-blur-md px-3 py-1 rounded-full shadow-sm border border-white/20">
-                                    {subject.percentage}%
-                                </span>
-                            </div>
-                            <div
-                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-90 overflow-hidden ${styles['liquid-shape']} animate-wave-1 ${subject.colorClasses.liquid1}`}
-                                style={{ height: `${subject.percentage}%` }}
-                            >
-                                <div className="bubble w-1.5 h-1.5 left-[20%]" style={{ animationDelay: '0s' }}></div>
-                                <div className="bubble w-2 h-2 left-[50%]" style={{ animationDelay: '1s' }}></div>
-                                <div className="bubble w-1 h-1 left-[70%]" style={{ animationDelay: '2.5s' }}></div>
-                                <div className="bubble w-2.5 h-2.5 left-[35%]" style={{ animationDelay: '1.5s' }}></div>
-                                <div className="bubble w-1.5 h-1.5 left-[80%]" style={{ animationDelay: '0.5s' }}></div>
-                            </div>
-                            <div
-                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-60 overflow-hidden ${styles['liquid-shape']} animate-wave-2 ${subject.colorClasses.liquid2}`}
-                                style={{ height: `${subject.percentage > 4 ? subject.percentage - 4 : 0}%` }}
-                            ></div>
-                        </div>
-                        <div className="text-center">
-                            <h3 className="font-bold text-lg text-text-light dark:text-text-dark">{subject.name}</h3>
-                            <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">{subject.topic}</p>
-                        </div>
-                    </div>
+                    <SubjectBubble key={subject.name} {...subject} />
                 ))}
             </div>
         </div>
