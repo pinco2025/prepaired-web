@@ -40,23 +40,39 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes wave-1 {
-  0% { transform: rotate(0deg) translateX(0); }
-  50% { transform: rotate(-2deg) translateX(-5px); }
-  100% { transform: rotate(0deg) translateX(0); }
+  0% { transform: rotate(0deg) translateX(0) scaleY(1); }
+  50% { transform: rotate(-8deg) translateX(-10px) scaleY(1.05); }
+  100% { transform: rotate(0deg) translateX(0) scaleY(1); }
 }
 
 @keyframes wave-2 {
-  0% { transform: rotate(0deg) translateX(0); }
-  50% { transform: rotate(3deg) translateX(5px); }
-  100% { transform: rotate(0deg) translateX(0); }
+  0% { transform: rotate(0deg) translateX(0) scaleY(1); }
+  50% { transform: rotate(8deg) translateX(10px) scaleY(1.05); }
+  100% { transform: rotate(0deg) translateX(0) scaleY(1); }
+}
+
+@keyframes bubble-rise {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
 }
 
 .animate-wave-1 {
-  animation: wave-1 3s ease-in-out infinite alternate;
+  animation: wave-1 4s ease-in-out infinite alternate;
 }
 
 .animate-wave-2 {
-  animation: wave-2 3.5s ease-in-out infinite alternate;
+  animation: wave-2 5s ease-in-out infinite alternate;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  animation: bubble-rise 4s infinite ease-in;
+  pointer-events: none;
 }
 
 .grid-bg-light {
