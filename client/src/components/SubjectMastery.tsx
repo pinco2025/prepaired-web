@@ -61,11 +61,17 @@ const SubjectMastery: React.FC = () => {
                                 </span>
                             </div>
                             <div
-                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-90 ${styles['liquid-shape']} animate-wave-1 ${subject.colorClasses.liquid1}`}
+                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-90 overflow-hidden ${styles['liquid-shape']} animate-wave-1 ${subject.colorClasses.liquid1}`}
                                 style={{ height: `${subject.percentage}%` }}
-                            ></div>
+                            >
+                                <div className="bubble w-1.5 h-1.5 left-[20%]" style={{ animationDelay: '0s' }}></div>
+                                <div className="bubble w-2 h-2 left-[50%]" style={{ animationDelay: '1s' }}></div>
+                                <div className="bubble w-1 h-1 left-[70%]" style={{ animationDelay: '2.5s' }}></div>
+                                <div className="bubble w-2.5 h-2.5 left-[35%]" style={{ animationDelay: '1.5s' }}></div>
+                                <div className="bubble w-1.5 h-1.5 left-[80%]" style={{ animationDelay: '0.5s' }}></div>
+                            </div>
                             <div
-                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-60 ${styles['liquid-shape']} animate-wave-2 ${subject.colorClasses.liquid2}`}
+                                className={`absolute bottom-0 left-[-10%] w-[120%] opacity-60 overflow-hidden ${styles['liquid-shape']} animate-wave-2 ${subject.colorClasses.liquid2}`}
                                 style={{ height: `${subject.percentage > 4 ? subject.percentage - 4 : 0}%` }}
                             ></div>
                         </div>
