@@ -2,23 +2,3 @@
 .liquid-shape {
     border-radius: 40% 45% 0 0 / 15% 20% 0 0;
 }
-
-@keyframes wave-1 {
-    0% { transform: rotate(0deg) translateX(0); }
-    50% { transform: rotate(-2deg) translateX(-5px); }
-    100% { transform: rotate(0deg) translateX(0); }
-}
-
-@keyframes wave-2 {
-    0% { transform: rotate(0deg) translateX(0); }
-    50% { transform: rotate(3deg) translateX(5px); }
-    100% { transform: rotate(0deg) translateX(0); }
-}
-
-.animate-wave-1 {
-    animation: wave-1 3s ease-in-out infinite alternate;
-}
-
-.animate-wave-2 {
-    animation: wave-2 3.5s ease-in-out infinite alternate;
-}
