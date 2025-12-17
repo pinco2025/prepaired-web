@@ -225,8 +225,8 @@ const Header: React.FC = () => {
                 </>
               ) : (
                 <div className="ml-4 flex items-center gap-3">
-                  <a href="/login" className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">Log in</a>
-                  <a href="/register" className="text-sm font-medium px-3 py-1.5 bg-primary text-white rounded-md">Sign up</a>
+                  <button onClick={() => navigate('/login')} className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary">Log in</button>
+                  <button onClick={() => navigate('/register')} className="text-sm font-medium px-3 py-1.5 bg-primary text-white rounded-md">Sign up</button>
                 </div>
               )}
             </div>

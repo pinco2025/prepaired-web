@@ -1,12 +1,12 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import RequireAuth from './components/RequireAuth';
 import ComingSoon from './components/ComingSoon';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
 import HomePlaceholder from './components/HomePlaceholder';
 import Subjects from './components/Subjects';
@@ -17,6 +17,16 @@ import TestPage from './components/TestPage';
 import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
 import TestReview from './components/TestReview';
+
+const RootRoute: React.FC = () => {
+  const { user, loading } = useAuth();
+  if (loading) return (
+      <div className="flex-grow flex items-center justify-center">
+         {/* Simple loading state */}
+      </div>
+  );
+  return user ? <Navigate to="/dashboard" replace /> : <HomePlaceholder />;
+};
 
 export const AppContent: React.FC = () => {
   const location = useLocation();
@@ -33,7 +43,7 @@ export const AppContent: React.FC = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<SignUp />} />
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<RootRoute />} />
         <Route
           path="/dashboard"
           element={
