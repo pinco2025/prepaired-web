@@ -134,12 +134,28 @@ const TestResult: React.FC = () => {
   return (
     <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Test Result: {result.testId}</h1>
-          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2 flex items-center gap-2">
-            <span className="material-icons-outlined text-sm">event</span>
-            {submissionTime ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` : ''}
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Test Result: {result.testId}</h1>
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2 flex items-center gap-2">
+              <span className="material-icons-outlined text-sm">event</span>
+              {submissionTime ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` : ''}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 bg-surface-light/50 dark:bg-surface-dark/50 p-2 pl-4 rounded-xl border border-border-light dark:border-border-dark backdrop-blur-sm">
+            <div className="hidden sm:block">
+              <p className="text-sm font-semibold text-text-light dark:text-text-dark">Analysis</p>
+              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Compare with key</p>
+            </div>
+            <button
+              onClick={() => navigate(`/review/${submissionId}`)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity shadow-sm"
+            >
+              Start Review
+              <span className="material-icons-outlined text-lg">arrow_forward</span>
+            </button>
+          </div>
         </div>
 
         <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8">
@@ -271,26 +287,6 @@ const TestResult: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-xl text-primary">
-                <span className="material-icons-outlined text-3xl">fact_check</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-text-light dark:text-text-dark">User Attempt vs. Answer Key</h3>
-                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Review every question in detail to understand where you went wrong.</p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigate(`/review/${submissionId}`)}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity w-full md:w-auto justify-center"
-            >
-              Start Review
-              <span className="material-icons-outlined">arrow_forward</span>
-            </button>
-          </div>
-        </div>
       </div>
     </main>
   );
