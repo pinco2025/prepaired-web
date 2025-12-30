@@ -227,7 +227,7 @@ const TestReview: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
-                                <div className="text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
+                                <div className="text-2xl text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
                                     {renderHtml(currentQuestion.text)}
                                 </div>
                                 {currentQuestion.image && (
@@ -275,7 +275,7 @@ const TestReview: React.FC = () => {
                                             return (
                                                 <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
                                                     <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
-                                                    <div className="flex-grow text-lg">
+                                                    <div className="flex-grow text-xl">
                                                         {renderHtml(option.text)}
                                                         {option.image && (
                                                             <div className="mt-4 flex justify-center">
@@ -313,7 +313,11 @@ const TestReview: React.FC = () => {
                                                 <div className="prose dark:prose-invert max-w-none text-base leading-relaxed whitespace-pre-line">
                                                     {renderHtml(currentSolution.solution_text)}
                                                 </div>
-                                                {currentSolution.solution_image_url && <img src={currentSolution.solution_image_url} alt="Solution" className="mt-4 rounded-lg"/>}
+                                                {currentSolution.solution_image_url && (
+                                                    <div className="flex justify-center mt-4">
+                                                        <img src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg"/>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
