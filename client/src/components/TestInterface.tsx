@@ -662,7 +662,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                   {currentQuestion.section}
                 </span>
               </div>
-              <p className="text-xl text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
+              <p className="text-2xl text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}
               </p>
               {currentQuestion.image && (
@@ -730,7 +730,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                         {option.id.toUpperCase()}
                       </span>
                       <div className="flex flex-col w-full gap-3">
-                        <span className="text-lg text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
+                        <span className="text-xl text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
                         {option.image && (
                           <img
                             src={option.image}
