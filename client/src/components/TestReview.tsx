@@ -313,7 +313,11 @@ const TestReview: React.FC = () => {
                                                 <div className="prose dark:prose-invert max-w-none text-base leading-relaxed whitespace-pre-line">
                                                     {renderHtml(currentSolution.solution_text)}
                                                 </div>
-                                                {currentSolution.solution_image_url && <img src={currentSolution.solution_image_url} alt="Solution" className="mt-4 rounded-lg"/>}
+                                                {currentSolution.solution_image_url && (
+                                                    <div className="flex justify-center mt-4">
+                                                        <img src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg"/>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
