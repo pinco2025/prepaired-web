@@ -227,7 +227,7 @@ const TestReview: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
-                                <div className="text-2xl text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
+                                <div className="text-[22px] text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
                                     {renderHtml(currentQuestion.text)}
                                 </div>
                                 {currentQuestion.image && (
@@ -275,7 +275,7 @@ const TestReview: React.FC = () => {
                                             return (
                                                 <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
                                                     <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
-                                                    <div className="flex-grow text-xl">
+                                                    <div className="flex-grow text-lg">
                                                         {renderHtml(option.text)}
                                                         {option.image && (
                                                             <div className="mt-4 flex justify-center">
