@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
@@ -36,87 +36,89 @@ export const AppContent: React.FC = () => {
   const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage;
 
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col md:flex-row relative">
       {/* Background layer: color + grid image */}
       <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark -z-10"></div>
-      {showHeader && <Header />}
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<SignUp />} />
-        <Route path="/" element={<RootRoute />} />
-        <Route
-          path="/dashboard"
-          element={
+      {showHeader && <Sidebar />}
+      <main className="flex-1 w-full relative">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<SignUp />} />
+          <Route path="/" element={<RootRoute />} />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/subjects/:subject/:grade/:chapter"
+            element={
+              <RequireAuth>
+                <ChapterDetails />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth>
+                <AdminPlaceholder />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/subjects"
+            element={
+              <RequireAuth>
+                <Subjects />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/subjects/:subject/:grade"
+            element={
+              <RequireAuth>
+                <SubjectDetails />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/tests"
+            element={
+              <RequireAuth>
+                <Tests />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/tests/:testId"
+            element={
+              <RequireAuth>
+                <TestPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/coming-soon" element={<ComingSoon />} />
+          <Route path="/test-submitted" element={
             <RequireAuth>
-              <Dashboard />
+              <TestSubmitted />
             </RequireAuth>
-          }
-        />
-        <Route
-          path="/subjects/:subject/:grade/:chapter"
-          element={
+          } />
+          <Route path="/results/:submissionId" element={
             <RequireAuth>
-              <ChapterDetails />
+              <TestResult />
             </RequireAuth>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
+          } />
+          <Route path="/review/:submissionId" element={
             <RequireAuth>
-              <AdminPlaceholder />
+              <TestReview />
             </RequireAuth>
-          }
-        />
-        <Route
-          path="/subjects"
-          element={
-            <RequireAuth>
-              <Subjects />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/subjects/:subject/:grade"
-          element={
-            <RequireAuth>
-              <SubjectDetails />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/tests"
-          element={
-            <RequireAuth>
-              <Tests />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/tests/:testId"
-          element={
-            <RequireAuth>
-              <TestPage />
-            </RequireAuth>
-          }
-        />
-        <Route path="/coming-soon" element={<ComingSoon />} />
-        <Route path="/test-submitted" element={
-          <RequireAuth>
-            <TestSubmitted />
-          </RequireAuth>
-        } />
-        <Route path="/results/:submissionId" element={
-          <RequireAuth>
-            <TestResult />
-          </RequireAuth>
-        } />
-        <Route path="/review/:submissionId" element={
-          <RequireAuth>
-            <TestReview />
-          </RequireAuth>
-        } />
-      </Routes>
+          } />
+        </Routes>
+      </main>
     </div>
   );
 };
