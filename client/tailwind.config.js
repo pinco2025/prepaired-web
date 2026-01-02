@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#0066ff",
-        "background-light": "#f9f9f9",
+        "background-light": "#f3f4f6",
         "background-dark": "#121212",
         "surface-light": "#ffffff",
         "surface-dark": "#1e1e1e",
@@ -25,27 +25,22 @@ module.exports = {
       },
       fontFamily: {
         display: ["Poppins", "sans-serif"],
-        sans: [
-          'ui-sans-serif',
-          'system-ui',
-          '-apple-system',
-          'Segoe UI',
-          'Roboto',
-          'Helvetica',
-          'Arial',
-          'sans-serif'
-        ],
       },
       borderRadius: {
         DEFAULT: "0.5rem",
         lg: "0.75rem",
         xl: "1rem",
+        '2xl': "1.5rem",
       },
       boxShadow: {
           'card-light': '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
           'card-dark': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          'glow': '0 0 15px rgba(0, 102, 255, 0.2)',
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/container-queries'),
+  ],
 }

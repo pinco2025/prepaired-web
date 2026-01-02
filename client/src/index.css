@@ -105,17 +105,36 @@ h1, h2, h3, h4, h5, h6 {
 .delay-300 { animation-delay: 300ms; }
 
 .grid-bg-light {
+  background-size: 40px 40px;
   background-image:
-    linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
-  background-size: 3rem 3rem;
+    linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
 }
 
 .grid-bg-dark {
+  background-size: 40px 40px;
   background-image:
-    linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
-  background-size: 3rem 3rem;
+    linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+}
+
+.liquid-shape {
+  border-radius: 40% 45% 0 0 / 15% 20% 0 0;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 102, 255, 0.2);
+  border-radius: 20px;
 }
 
 .scrollbar-stable {
@@ -128,4 +147,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
