@@ -20,23 +20,23 @@ const AverageScoreCard: React.FC = () => {
   }, []);
 
   return (
-    <div className="col-span-1 md:col-span-12 lg:col-span-4 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col min-h-[380px]">
-      <div className="flex justify-between items-center mb-4">
+    <div className="col-span-1 md:col-span-12 lg:col-span-4 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col h-full min-h-0">
+      <div className="flex justify-between items-center mb-2 lg:mb-4 shrink-0">
         <h2 className="text-sm font-bold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-2">
           <span className="material-symbols-outlined text-lg">equalizer</span> Average Score
         </h2>
       </div>
-      <div className="flex-1 flex flex-col justify-end">
-        <div className="mb-4">
-          <span className="text-3xl font-bold text-text-light dark:text-text-dark">154</span>
+      <div className="flex-1 flex flex-col justify-end min-h-0">
+        <div className="mb-2 lg:mb-4 shrink-0">
+          <span className="text-2xl lg:text-3xl font-bold text-text-light dark:text-text-dark">154</span>
           <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark"> / 300</span>
           <div className="text-xs text-text-secondary-light mt-1">Average score over last 5 tests</div>
         </div>
 
         {/* Chart Container */}
-        <div className="flex items-end justify-between h-48 gap-3 mt-auto w-full pb-2">
+        <div className="flex items-end justify-between flex-1 gap-3 mt-auto w-full pb-1 min-h-[60px]">
           {scores.map((test, index) => (
-            <div key={index} className="w-full h-full flex flex-col justify-end group gap-2">
+            <div key={index} className="w-full h-full flex flex-col justify-end group gap-1 lg:gap-2">
               <div className="w-full relative flex-1 flex flex-col justify-end">
                   {/* Bar */}
                   <div

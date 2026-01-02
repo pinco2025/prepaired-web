@@ -5,7 +5,7 @@ const weakAreasData = [
   { name: 'Integration', progress: 10, attempted: '1/10', color: 'orange' },
 ];
 
-const colorMap: { [key: string]: { [key: string]: string } } = {
+const colorMap: { [key: string]: { [key: string]: string; bg: string; border: string; tagBg: string; tagText: string; progressBg: string; progressFill: string; text: string } } = {
     red: {
       bg: 'bg-red-50 dark:bg-red-900/10',
       border: 'border-red-100 dark:border-red-800/20',
@@ -28,22 +28,22 @@ const colorMap: { [key: string]: { [key: string]: string } } = {
 
 const WeakAreasCard: React.FC = () => {
   return (
-    <div className="col-span-1 md:col-span-6 lg:col-span-4 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col">
-      <div className="flex justify-between items-center mb-4">
+    <div className="col-span-1 md:col-span-6 lg:col-span-4 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col h-full min-h-0">
+      <div className="flex justify-between items-center mb-2 lg:mb-4 shrink-0">
         <h2 className="text-sm font-bold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-2">
           <span className="material-symbols-outlined text-lg">priority_high</span> Weak Areas
         </h2>
       </div>
-      <div className="flex-1 flex flex-col justify-center gap-4">
-        <div className="text-center mb-2">
-          <span className="text-3xl font-bold text-text-light dark:text-text-dark">3<span className="text-text-secondary-light dark:text-text-secondary-dark text-xl font-normal">/10</span></span>
+      <div className="flex-1 flex flex-col justify-center gap-2 lg:gap-4 overflow-y-auto no-scrollbar">
+        <div className="text-center mb-1 lg:mb-2 shrink-0">
+          <span className="text-2xl lg:text-3xl font-bold text-text-light dark:text-text-dark">3<span className="text-text-secondary-light dark:text-text-secondary-dark text-lg lg:text-xl font-normal">/10</span></span>
           <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Basic Chapters Cleared</p>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2 lg:space-y-3">
           {weakAreasData.map((area, index) => {
             const colors = colorMap[area.color];
             return (
-                <div key={index} className={`rounded-lg p-3 border ${colors.bg} ${colors.border}`}>
+                <div key={index} className={`rounded-lg p-2 lg:p-3 border ${colors.bg} ${colors.border}`}>
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-bold text-text-light dark:text-text-dark">{area.name}</span>
                   {area.tag && <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${colors.tagBg} ${colors.tagText}`}>{area.tag}</span>}

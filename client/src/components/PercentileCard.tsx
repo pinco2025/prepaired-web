@@ -31,11 +31,11 @@ const PercentileCard: React.FC = () => {
     ];
 
   return (
-    <div className="col-span-1 md:col-span-12 lg:col-span-5 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col relative overflow-hidden group min-h-[380px]">
+    <div className="col-span-1 md:col-span-12 lg:col-span-5 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col relative overflow-hidden group h-full min-h-0">
       <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all"></div>
 
       {/* Header */}
-      <div className="flex justify-between items-start mb-6 relative z-10">
+      <div className="flex justify-between items-start mb-2 lg:mb-4 relative z-10 shrink-0">
         <div>
           <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">PrepAIred %ile</h2>
           <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Global Ranking</p>
@@ -47,14 +47,14 @@ const PercentileCard: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col flex-1 justify-between">
-        <div className="flex items-baseline gap-2 mb-2">
-          <span id={percentileId} className="text-6xl font-bold text-primary tracking-tight" />
-          <span className="text-xl text-text-secondary-light font-medium">%ile</span>
+      <div className="relative z-10 flex flex-col flex-1 min-h-0 justify-between">
+        <div className="flex items-baseline gap-2 mb-2 shrink-0">
+          <span id={percentileId} className="text-4xl lg:text-6xl font-bold text-primary tracking-tight" />
+          <span className="text-lg lg:text-xl text-text-secondary-light font-medium">%ile</span>
         </div>
 
         {/* Graph Container - Flex grow to fill space */}
-        <div className="flex-1 w-full min-h-[160px] relative">
+        <div className="flex-1 w-full relative min-h-0">
           <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 50">
             <defs>
               <linearGradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
@@ -110,7 +110,7 @@ const PercentileCard: React.FC = () => {
           )}
         </div>
 
-        <p className="text-xs text-center text-text-secondary-light dark:text-text-secondary-dark mt-4">Consistent growth over last 5 tests</p>
+        <p className="text-xs text-center text-text-secondary-light dark:text-text-secondary-dark mt-2 shrink-0">Consistent growth over last 5 tests</p>
       </div>
       <style>{`
         .path-animate {
