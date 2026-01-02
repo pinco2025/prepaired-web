@@ -7,6 +7,17 @@ body {
   @apply font-sans text-text-light dark:text-text-dark antialiased;
 }
 
+@layer base {
+  .math-text-scope {
+    @apply font-display font-medium;
+  }
+
+  .math-text-scope .katex,
+  .math-text-scope .katex * {
+    font-weight: normal;
+  }
+}
+
 /* Headings use Poppins (font-display) */
 h1, h2, h3, h4, h5, h6 {
   @apply font-display;

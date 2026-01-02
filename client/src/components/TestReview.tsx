@@ -227,7 +227,7 @@ const TestReview: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
-                                <div className="text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
+                                <div className="math-text-scope text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
                                     {renderHtml(currentQuestion.text)}
                                 </div>
                                 {currentQuestion.image && (
