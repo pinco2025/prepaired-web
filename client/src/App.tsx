@@ -31,7 +31,7 @@ const RootRoute: React.FC = () => {
 export const AppContent: React.FC = () => {
   const location = useLocation();
 
-  const hideHeaderOnPaths = ['/login', '/register'];
+  const hideHeaderOnPaths = ['/', '/login', '/register'];
   const isTestPage = location.pathname.startsWith('/tests/');
   const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage;
 

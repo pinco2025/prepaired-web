@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#0066ff",
+        "accent": "#35b2ff",
         "background-light": "#f3f4f6",
         "background-dark": "#121212",
         "surface-light": "#ffffff",
@@ -25,6 +26,7 @@ module.exports = {
       },
       fontFamily: {
         display: ["Inter", "Inter"],
+        serif: ["Space Grotesk"]
       },
       borderRadius: {
         DEFAULT: "0.5rem",
