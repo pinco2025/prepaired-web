@@ -40,7 +40,6 @@ const Sidebar: React.FC = () => {
 
     // @ts-ignore - View Transition API
     if (document.startViewTransition) {
-        // Get click coordinates
         const x = e.clientX;
         const y = e.clientY;
         const endRadius = Math.hypot(
@@ -59,7 +58,6 @@ const Sidebar: React.FC = () => {
                 `circle(${endRadius}px at ${x}px ${y}px)`,
             ];
 
-            // Animate the new view
             document.documentElement.animate(
                 {
                     clipPath: isDark ? clipPath : [...clipPath].reverse(),
@@ -85,6 +83,8 @@ const Sidebar: React.FC = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+    // Close user menu when toggling sidebar to prevent layout artifacts
+    setIsUserMenuOpen(false);
   };
 
   const toggleMobileMenu = () => {
@@ -120,20 +120,19 @@ const Sidebar: React.FC = () => {
   ];
 
   const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
-    <div className={`flex flex-col h-full bg-surface-light dark:bg-surface-dark ${!mobile ? 'border-r border-border-light dark:border-border-dark' : ''} transition-all duration-300`}>
+    <div className={`flex flex-col h-full bg-surface-light dark:bg-surface-dark transition-all duration-300 ${!mobile ? 'rounded-3xl' : ''}`}>
       {/* Header / Logo */}
-      <div className={`h-20 flex items-center ${isCollapsed && !mobile ? 'justify-center px-0' : 'px-6'} border-b border-border-light/50 dark:border-border-dark/50 transition-all duration-300 overflow-hidden`}>
+      <div className={`h-20 flex items-center ${isCollapsed && !mobile ? 'justify-center px-0' : 'px-6'} transition-all duration-300 overflow-hidden shrink-0`}>
         <div className="flex items-center gap-3 min-w-max">
-            {/* Old Logo */}
             <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
-            <span className={`text-xl font-bold text-text-light dark:text-text-dark transition-opacity duration-300 ${isCollapsed && !mobile ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>
+            <span className={`text-xl font-bold text-text-light dark:text-text-dark transition-all duration-300 ${isCollapsed && !mobile ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>
                 prep<span className="text-primary">AI</span>red
             </span>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto sidebar-scroll py-6 flex flex-col justify-between overflow-x-hidden">
+      <div className="flex-1 overflow-y-auto sidebar-scroll py-2 flex flex-col justify-between overflow-x-hidden">
         <div className="space-y-1 px-3">
             {menuItems.map((item) => (
                 <NavLink
@@ -141,10 +140,9 @@ const Sidebar: React.FC = () => {
                     to={item.to}
                     onClick={() => mobile && setIsMobileMenuOpen(false)}
                     className={({ isActive }) => {
-                        // Custom logic: if to is /coming-soon, never active
                         const isActuallyActive = isActive && item.to !== '/coming-soon';
 
-                        return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors whitespace-nowrap
+                        return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors whitespace-nowrap overflow-hidden
                         ${isActuallyActive
                             ? 'bg-primary/10 text-primary'
                             : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
@@ -153,10 +151,10 @@ const Sidebar: React.FC = () => {
                     }}
                     title={isCollapsed && !mobile ? item.label : undefined}
                 >
-                    <span className={`material-symbols-outlined ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
+                    <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
                         {item.icon}
                     </span>
-                    <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
+                    <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
                         {item.label}
                     </span>
                 </NavLink>
@@ -164,30 +162,17 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Bottom Actions */}
-        <div className="mt-4 px-3 space-y-4">
-             {/* Collapse Button (Desktop Only) */}
-             {!mobile && (
-                <button
-                    onClick={toggleSidebar}
-                    className="w-full flex items-center justify-center p-2 text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 rounded-xl transition-colors"
-                    title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                >
-                     <span className="material-symbols-outlined">
-                        {isCollapsed ? 'chevron_right' : 'chevron_left'}
-                     </span>
-                </button>
-             )}
-
+        <div className="mt-4 px-3 space-y-4 mb-6">
             {/* Dark Mode Toggle */}
              <button
                 onClick={toggleDarkMode}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 transition-colors ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 transition-colors whitespace-nowrap overflow-hidden ${isCollapsed && !mobile ? 'justify-center' : ''}`}
                 title="Toggle Dark Mode"
             >
-                <span className="material-symbols-outlined">
+                <span className="material-symbols-outlined shrink-0">
                     {darkMode ? 'light_mode' : 'dark_mode'}
                 </span>
-                <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
+                <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
                     {darkMode ? 'Light Mode' : 'Dark Mode'}
                 </span>
             </button>
@@ -196,7 +181,13 @@ const Sidebar: React.FC = () => {
           {/* User Menu */}
           <div className="relative" ref={userMenuRef}>
             {isUserMenuOpen && (
-              <div className={`absolute bottom-full mb-2 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark overflow-hidden z-20 ${isCollapsed && !mobile ? 'left-full ml-2 w-48' : 'w-full left-0'}`}>
+              <div
+                className={`absolute bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark overflow-hidden z-20
+                ${isCollapsed && !mobile
+                    ? 'left-full bottom-0 ml-4 w-48'
+                    : 'bottom-full left-0 w-full mb-2'
+                }`}
+              >
                 <div className="py-2">
                     <div className="px-4 py-2 border-b border-border-light dark:border-border-dark mb-1">
                         <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
@@ -211,18 +202,18 @@ const Sidebar: React.FC = () => {
             )}
             <button
               onClick={toggleUserMenu}
-              className={`w-full flex items-center gap-3 p-2 rounded-xl border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5 hover:bg-border-light/50 dark:hover:bg-white/10 transition-colors ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+              className={`w-full flex items-center gap-3 p-2 rounded-xl border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5 hover:bg-border-light/50 dark:hover:bg-white/10 transition-colors whitespace-nowrap overflow-hidden ${isCollapsed && !mobile ? 'justify-center' : ''}`}
             >
               <img
                 alt="User profile"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-white/10"
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-white/10 shrink-0"
                 src={user?.user_metadata?.avatar_url || 'https://lh3.googleusercontent.com/a/ACg8ocJ_Y_0_-8_j_Vf_w_X_Y_V_c_E_L_w_T_k_S_g_w=s96-c'}
               />
               <div className={`flex-1 min-w-0 text-left transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'block'}`}>
                 <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
               </div>
               <span
-                className={`material-symbols-outlined text-text-secondary-light text-lg transition-transform duration-300 ${isCollapsed && !mobile ? 'hidden' : 'block'}`}
+                className={`material-symbols-outlined text-text-secondary-light text-lg transition-transform duration-300 shrink-0 ${isCollapsed && !mobile ? 'hidden' : 'block'}`}
                 style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
               >
                 expand_less
@@ -249,8 +240,19 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      {/* Desktop Sidebar (Sticky) */}
-      <aside className={`hidden md:flex flex-col h-screen sticky top-0 z-40 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+      {/* Desktop Sidebar (Floating) */}
+      <aside className={`hidden md:flex flex-col h-[calc(100vh-2rem)] sticky top-4 ml-4 my-4 rounded-3xl border border-border-light dark:border-border-dark shadow-xl bg-surface-light dark:bg-surface-dark relative transition-all duration-300 ${isCollapsed ? 'w-24' : 'w-72'}`}>
+        {/* Collapse Button (Floating on edge) */}
+        <button
+            onClick={toggleSidebar}
+            className="absolute top-8 -right-3 z-50 w-6 h-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer text-text-secondary-light dark:text-text-secondary-dark hover:text-primary"
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+             <span className="material-symbols-outlined text-sm font-bold">
+                {isCollapsed ? 'chevron_right' : 'chevron_left'}
+             </span>
+        </button>
+
         <SidebarContent />
       </aside>
 
