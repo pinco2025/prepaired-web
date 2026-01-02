@@ -36,11 +36,11 @@ const SubjectBubble: React.FC<SubjectProps> = ({ name, topic, percentage, colorC
                     className={`absolute bottom-0 left-[-10%] w-[120%] opacity-90 overflow-hidden ${styles['liquid-shape']} animate-wave-1 ${colorClasses.liquid1}`}
                     style={{ height: `${animatedPercentage}%`, transition: 'height 0.1s linear' }}
                 >
-                    <div className="bubble w-1.5 h-1.5 left-[20%]" style={{ animationDelay: '0s' }}></div>
-                    <div className="bubble w-2 h-2 left-[50%]" style={{ animationDelay: '1s' }}></div>
-                    <div className="bubble w-1 h-1 left-[70%]" style={{ animationDelay: '2.5s' }}></div>
-                    <div className="bubble w-2.5 h-2.5 left-[35%]" style={{ animationDelay: '1.5s' }}></div>
-                    <div className="bubble w-1.5 h-1.5 left-[80%]" style={{ animationDelay: '0.5s' }}></div>
+                    <div className="bubble w-1 h-1 left-[20%]" style={{ animationDelay: '0s' }}></div>
+                    <div className="bubble w-1.5 h-1.5 left-[50%]" style={{ animationDelay: '1s' }}></div>
+                    <div className="bubble w-0.5 h-0.5 left-[70%]" style={{ animationDelay: '2.5s' }}></div>
+                    <div className="bubble w-1.5 h-1.5 left-[35%]" style={{ animationDelay: '1.5s' }}></div>
+                    <div className="bubble w-1 h-1 left-[80%]" style={{ animationDelay: '0.5s' }}></div>
                 </div>
                 <div
                     className={`absolute bottom-0 left-[-10%] w-[120%] opacity-60 overflow-hidden ${styles['liquid-shape']} animate-wave-2 ${colorClasses.liquid2}`}
