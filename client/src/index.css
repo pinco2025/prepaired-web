@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  /* Background color is handled by the app-level background layer so the grid shows through. */
+html, body {
+  height: 100%;
+  overflow: hidden;
   @apply font-sans text-text-light dark:text-text-dark antialiased;
 }
 
@@ -15,6 +16,12 @@ body {
   .math-text-scope .katex,
   .math-text-scope .katex * {
     font-weight: normal;
+  }
+}
+
+@layer utilities {
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
   }
 }
 

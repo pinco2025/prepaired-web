@@ -5,7 +5,7 @@ const LandingPage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="bg-background text-text-main overflow-x-hidden min-h-screen flex flex-col pt-28">
+        <div className="bg-background text-text-main h-screen flex flex-col pt-28 overflow-y-auto overflow-x-hidden no-scrollbar scroll-momentum">
             <header className="fixed top-4 left-0 right-0 z-50 px-4 flex justify-center w-full pointer-events-none">
                 <div className="pointer-events-auto w-full max-w-4xl bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full py-2.5 pl-5 pr-2.5 flex items-center justify-between gap-4 transition-transform hover:scale-[1.005] duration-300">
                     <div className="flex items-center gap-3 shrink-0">
@@ -246,7 +246,7 @@ const LandingPage: React.FC = () => {
                                             <div className="relative z-10 w-full">
                                                 <div className="h-1 w-16 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"></div>
                                                 <p className="text-sm font-bold text-slate-600 uppercase tracking-widest">Full Syllabus Tests</p>
-                                                <p className="text-xs text-slate-400 mt-2 font-medium">Verified by Top Educators</p>
+                                                <p className="text-xs text-slate-400 mt-2 font-medium">Verified by IITians</p>
                                             </div>
                                             <div className="absolute -top-6 -right-6 size-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center shadow-lg shadow-blue-400/30 animate-pulse-slow border-4 border-white z-30">
                                                 <span className="text-white text-xs font-black text-center leading-tight uppercase transform -rotate-12 [text-shadow:-0.5px_-0.5px_0_#000,0.5px_-0.5px_0_#000,-0.5px_0.5px_0_#000,0.5px_0.5px_0_#000]">Best<br />Seller</span>
