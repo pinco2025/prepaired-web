@@ -24,7 +24,7 @@ module.exports = {
         "error-dark": "#f87171",
       },
       fontFamily: {
-        display: ["Poppins", "sans-serif"],
+        display: ["Inter", "Inter"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",
