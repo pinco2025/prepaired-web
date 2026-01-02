@@ -38,7 +38,7 @@ export const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
       {/* Background layer: color + grid image */}
-      <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark -z-10"></div>
+      <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg -z-10"></div>
       {showHeader && <Sidebar />}
       <main className="flex-1 w-full relative">
         <Routes>
