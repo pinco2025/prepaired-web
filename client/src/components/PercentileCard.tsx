@@ -1,23 +1,50 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useCountUp } from "react-countup";
 
-type Point = {
+// --- Types ---
+interface ChartData {
+  label: string;
+  date: string;
+  value: number;
+}
+
+interface Point {
   x: number;
   y: number;
-  label: string;
-  value: string;
-};
+  data: ChartData;
+}
 
-const CHART_PADDING = 6;
+// --- Mock Data ---
+const MOCK_HISTORY: ChartData[] = [
+  { label: "Test 1", date: "2023-10-01", value: 76.2 },
+  { label: "Test 2", date: "2023-10-05", value: 75.1 },
+  { label: "Test 3", date: "2023-10-12", value: 77.0 },
+  { label: "Test 4", date: "2023-10-20", value: 80.4 },
+  { label: "Test 5", date: "2023-10-28", value: 83.0 },
+  { label: "Test 6", date: "2023-11-05", value: 87.2 },
+  { label: "Test 7", date: "2023-11-12", value: 90.1 },
+  { label: "Test 8", date: "2023-11-20", value: 92.4 },
+  { label: "Test 9", date: "2023-11-28", value: 94.8 },
+  { label: "Test 10", date: "2023-12-05", value: 96.9 },
+  { label: "Current", date: "2023-12-15", value: 98.5 }
+];
+
+// --- Constants ---
+const VIEWBOX_WIDTH = 100;
+const VIEWBOX_HEIGHT = 50;
+const PADDING_TOP = 5;
+const PADDING_BOTTOM = 5;
+
+// --- Helpers ---
 
 /**
- * Catmull–Rom → Bezier smoothing
- * Produces a natural curve without inventing momentum
+ * Catmull–Rom to Cubic Bezier conversion for smooth SVG paths.
  */
 function buildSmoothPath(points: Point[]) {
   if (points.length < 2) return "";
 
-  let d = `M ${points[0].x} ${points[0].y}`;
+  // Start at the first point
+  let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
 
   for (let i = 0; i < points.length - 1; i++) {
     const p0 = points[i - 1] || points[i];
@@ -27,10 +54,11 @@ function buildSmoothPath(points: Point[]) {
 
     const cp1x = p1.x + (p2.x - p0.x) / 6;
     const cp1y = p1.y + (p2.y - p0.y) / 6;
+
     const cp2x = p2.x - (p3.x - p1.x) / 6;
     const cp2y = p2.y - (p3.y - p1.y) / 6;
 
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
   }
 
   return d;
@@ -40,9 +68,10 @@ const PercentileCard: React.FC = () => {
   const percentileId = "percentile-counter";
   const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
 
+  // --- Animation ---
   const { start } = useCountUp({
     ref: percentileId,
-    end: 98.5,
+    end: MOCK_HISTORY[MOCK_HISTORY.length - 1].value,
     duration: 2,
     decimals: 1,
     startOnMount: false
@@ -53,33 +82,51 @@ const PercentileCard: React.FC = () => {
     return () => clearTimeout(t);
   }, [start]);
 
-  /**
-   * Visually dense, believable progression
-   * (not jumpy, not fabricated)
-   */
-  const dataPoints: Point[] = useMemo(
-    () => [
-      { x: 0, y: 42, label: "Test 1", value: "76.2%" },
-      { x: 10, y: 44, label: "Test 2", value: "75.1%" },
-      { x: 20, y: 41, label: "Test 3", value: "77.0%" },
-      { x: 30, y: 38, label: "Test 4", value: "80.4%" },
-      { x: 40, y: 35, label: "Test 5", value: "83.0%" },
-      { x: 50, y: 30, label: "Test 6", value: "87.2%" },
-      { x: 60, y: 26, label: "Test 7", value: "90.1%" },
-      { x: 70, y: 22, label: "Test 8", value: "92.4%" },
-      { x: 80, y: 18, label: "Test 9", value: "94.8%" },
-      { x: 90, y: 12, label: "Test 10", value: "96.9%" },
-      { x: 100, y: 8, label: "Current", value: "98.5%" }
-    ],
-    []
-  );
+  // --- Data Processing ---
+  const { points, gridLines } = useMemo(() => {
+    const values = MOCK_HISTORY.map((d) => d.value);
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
 
-  const linePath = useMemo(
-    () => buildSmoothPath(dataPoints),
-    [dataPoints]
-  );
+    // Create a dynamic Y-domain with some buffer
+    // Range: [min - buffer, max + buffer], clamped to [0, 100]
+    const buffer = (maxVal - minVal) * 0.2 || 5;
+    const domainMin = Math.max(0, Math.floor(minVal - buffer));
+    const domainMax = Math.min(100, Math.ceil(maxVal + buffer));
+    const domainRange = domainMax - domainMin || 1; // Avoid divide by zero
 
-  const areaPath = `${linePath} L 100 50 L 0 50 Z`;
+    // Grid lines: 3 lines (min, mid, max)
+    const gridValues = [
+      domainMin,
+      domainMin + domainRange * 0.5,
+      domainMax,
+    ];
+
+    const gridLines = gridValues.map((val) => ({
+        value: val,
+        y: VIEWBOX_HEIGHT - PADDING_BOTTOM - ((val - domainMin) / domainRange) * (VIEWBOX_HEIGHT - PADDING_TOP - PADDING_BOTTOM)
+    }));
+
+    // Calculate Points
+    const calculatedPoints: Point[] = MOCK_HISTORY.map((d, i) => {
+        // X: Distributed evenly
+        const x = (i / (MOCK_HISTORY.length - 1)) * VIEWBOX_WIDTH;
+
+        // Y: Scaled to available height inside padding
+        // Invert Y because SVG coordinates go down
+        const normalizedVal = (d.value - domainMin) / domainRange;
+        const y = VIEWBOX_HEIGHT - PADDING_BOTTOM - (normalizedVal * (VIEWBOX_HEIGHT - PADDING_TOP - PADDING_BOTTOM));
+
+        return { x, y, data: d };
+    });
+
+    return { points: calculatedPoints, gridLines };
+  }, []);
+
+  const linePath = useMemo(() => buildSmoothPath(points), [points]);
+
+  // Close the path for the area fill
+  const areaPath = `${linePath} L ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT} L 0 ${VIEWBOX_HEIGHT} Z`;
 
   return (
     <div className="col-span-1 md:col-span-12 lg:col-span-5 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col relative overflow-hidden h-full">
@@ -106,7 +153,7 @@ const PercentileCard: React.FC = () => {
       </div>
 
       {/* Value */}
-      <div className="flex items-baseline gap-2 mb-2 relative z-10">
+      <div className="flex items-baseline gap-2 mb-1 relative z-10">
         <span
           id={percentileId}
           className="text-5xl lg:text-6xl font-bold text-primary tracking-tight"
@@ -116,22 +163,54 @@ const PercentileCard: React.FC = () => {
         </span>
       </div>
 
-      {/* Chart */}
-      <div className="relative mt-3 h-[140px]">
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent rounded-xl" />
+      {/* Chart Container */}
+      <div className="relative mt-auto flex-1 w-full min-h-[120px]">
+        {/* Y-Axis Labels (Absolute positioned on the left/right or inline) */}
+        {/* We can render them inside the SVG or as HTML overlays. HTML allows easier styling. */}
+        <div className="absolute inset-0 pointer-events-none">
+             {/* Render labels for grid lines */}
+             {gridLines.map((line, i) => (
+                 <div
+                    key={i}
+                    className="absolute right-0 text-[10px] text-text-secondary-light/50 dark:text-text-secondary-dark/50 transform translate-y-1/2"
+                    style={{ bottom: `${((VIEWBOX_HEIGHT - line.y) / VIEWBOX_HEIGHT) * 100}%`, transform: 'translateY(50%)' }}
+                 >
+                     {Math.round(line.value)}
+                 </div>
+             ))}
+        </div>
 
         <svg
-          className="w-full h-full"
-          viewBox={`${-CHART_PADDING} ${-CHART_PADDING} ${100 +
-            CHART_PADDING * 2} ${50 + CHART_PADDING * 2}`}
-          preserveAspectRatio="xMidYMid meet"
+          className="w-full h-full overflow-visible"
+          viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+          preserveAspectRatio="none"
         >
           <defs>
             <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0066ff" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#0066ff" stopOpacity="0.01" />
+              <stop offset="0%" stopColor="#0066ff" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#0066ff" stopOpacity="0.0" />
             </linearGradient>
+            {/* Glow filter for the line */}
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
+
+          {/* Grid Lines */}
+          {gridLines.map((line, i) => (
+             <line
+                key={`grid-${i}`}
+                x1="0"
+                y1={line.y}
+                x2={VIEWBOX_WIDTH}
+                y2={line.y}
+                stroke="currentColor"
+                strokeOpacity="0.05"
+                strokeDasharray="2 2"
+                className="text-text-secondary-light dark:text-text-secondary-dark"
+             />
+          ))}
 
           {/* Area */}
           <path d={areaPath} fill="url(#areaGradient)" />
@@ -141,55 +220,79 @@ const PercentileCard: React.FC = () => {
             d={linePath}
             fill="none"
             stroke="#0066ff"
-            strokeWidth="2"
+            strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="path-animate"
+            filter="url(#glow)"
           />
 
-          {/* Points */}
-          {dataPoints.map((p, i) => {
-            const isFirst = i === 0;
-            const isLast = i === dataPoints.length - 1;
+          {/* Interactive Layer */}
+          {points.map((p, i) => {
+            const isLast = i === points.length - 1;
+            const isHovered = hoveredPoint === p;
 
             return (
               <g
                 key={i}
                 onMouseEnter={() => setHoveredPoint(p)}
                 onMouseLeave={() => setHoveredPoint(null)}
-                className="cursor-pointer"
+                className="cursor-pointer group"
               >
-                {/* hover hit area */}
-                <circle cx={p.x} cy={p.y} r="6" fill="transparent" />
+                {/* Invisible Hit Area */}
+                <rect
+                    x={p.x - (VIEWBOX_WIDTH / points.length / 2)}
+                    y="0"
+                    width={VIEWBOX_WIDTH / points.length}
+                    height={VIEWBOX_HEIGHT}
+                    fill="transparent"
+                />
 
-                {/* visible point */}
+                {/* Visible Point (Only last or hovered) */}
                 <circle
                   cx={p.x}
                   cy={p.y}
-                  r={isFirst || isLast ? 3 : 1.5}
-                  fill={isLast ? "#0066ff" : "white"}
-                  stroke="#0066ff"
-                  strokeWidth={isFirst || isLast ? 1.5 : 1}
-                  opacity={isFirst || isLast ? 1 : 0.4}
+                  r={isHovered ? 2.5 : (isLast ? 2 : 0)}
+                  fill={isLast || isHovered ? "#0066ff" : "transparent"}
+                  stroke="white"
+                  strokeWidth={0.5}
+                  className={`transition-all duration-200 ${isHovered || isLast ? 'opacity-100' : 'opacity-0'}`}
                 />
+
+                {/* Vertical Cursor Line (Only hovered) */}
+                 {isHovered && (
+                    <line
+                        x1={p.x}
+                        y1={p.y}
+                        x2={p.x}
+                        y2={VIEWBOX_HEIGHT}
+                        stroke="#0066ff"
+                        strokeWidth="0.5"
+                        strokeDasharray="2 2"
+                        className="opacity-50"
+                    />
+                 )}
               </g>
             );
           })}
         </svg>
 
-        {/* Tooltip */}
+        {/* Floating Tooltip */}
         {hoveredPoint && (
           <div
-            className="absolute bg-surface-dark text-white text-xs rounded px-2 py-1 pointer-events-none shadow-lg"
+            className="absolute bg-surface-dark/90 backdrop-blur-sm text-white text-xs rounded-md px-2 py-1 pointer-events-none shadow-xl border border-white/10 z-20 whitespace-nowrap transition-all duration-75"
             style={{
-              left: `${hoveredPoint.x}%`,
-              top: `${(hoveredPoint.y / 50) * 100}%`,
-              transform: "translate(-50%, -120%)"
+              left: `${(hoveredPoint.x / VIEWBOX_WIDTH) * 100}%`,
+              top: `${(hoveredPoint.y / VIEWBOX_HEIGHT) * 100}%`,
+              transform: `translate(${hoveredPoint.x > VIEWBOX_WIDTH / 2 ? '-100%' : '0%'}, -130%)`,
+              marginLeft: hoveredPoint.x > VIEWBOX_WIDTH / 2 ? '-8px' : '8px'
             }}
           >
-            <div className="font-bold">{hoveredPoint.value}</div>
-            <div className="text-[10px] opacity-80">
-              {hoveredPoint.label}
+            <div className="font-bold flex items-center gap-2">
+                <span>{hoveredPoint.data.value}%</span>
+            </div>
+            <div className="text-[10px] text-gray-300">
+              {hoveredPoint.data.label}
             </div>
           </div>
         )}
@@ -203,7 +306,7 @@ const PercentileCard: React.FC = () => {
         .path-animate {
           stroke-dasharray: 300;
           stroke-dashoffset: 300;
-          animation: draw 1.8s ease-out forwards 0.4s;
+          animation: draw 2s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.2s;
         }
 
         @keyframes draw {
