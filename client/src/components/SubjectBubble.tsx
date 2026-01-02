@@ -15,19 +15,20 @@ interface SubjectProps {
     topic: string;
     percentage: number;
     colorClasses: SubjectColorClasses;
+    sizeClass?: string;
 }
 
-const SubjectBubble: React.FC<SubjectProps> = ({ name, topic, percentage, colorClasses }) => {
+const SubjectBubble: React.FC<SubjectProps> = ({ name, topic, percentage, colorClasses, sizeClass = "w-36 h-36" }) => {
     // Animate percentage from 0 to target over 2 seconds
     const animatedPercentage = useCountUp(percentage, 2000);
 
     return (
         <div className="flex flex-col items-center gap-4 group cursor-pointer">
             <div
-                className={`relative w-36 h-36 rounded-full ${colorClasses.bg} ${colorClasses.border} border-4 overflow-hidden ${colorClasses.shadow} shadow-lg transition-transform group-hover:scale-105`}
+                className={`relative ${sizeClass} rounded-full ${colorClasses.bg} ${colorClasses.border} border-4 overflow-hidden ${colorClasses.shadow} shadow-lg transition-transform group-hover:scale-105`}
             >
                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold text-text-light dark:text-text-dark bg-surface-light/60 dark:bg-surface-dark/40 backdrop-blur-md px-3 py-1 rounded-full shadow-sm border border-white/20">
+                    <span className="text-xl lg:text-2xl font-bold text-text-light dark:text-text-dark bg-surface-light/60 dark:bg-surface-dark/40 backdrop-blur-md px-3 py-1 rounded-full shadow-sm border border-white/20">
                         {animatedPercentage}%
                     </span>
                 </div>
