@@ -44,9 +44,148 @@ const LandingPage: React.FC = () => {
                         <p className="text-text-muted text-lg md:text-xl font-light leading-relaxed mb-10 max-w-2xl mx-auto">
                             Experience the difference between traditional rote memorization and AI-powered adaptive learning designed specifically for JEE and NEET aspirants.
                         </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <button className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-600/20 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-blue-600/30">
+                                Try a Question Now
+                                <span className="material-symbols-outlined">arrow_forward</span>
+                            </button>
+                            <button className="w-full sm:w-auto px-8 py-4 bg-white border border-gray-200 hover:border-gray-300 text-text-main hover:bg-gray-50 rounded-xl font-medium text-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <span className="material-symbols-outlined text-gray-400">play_circle</span>
+                                Watch Demo
+                            </button>
+                        </div>
                     </div>
 
                     <div className="relative mt-8 max-w-5xl mx-auto">
+                        <div className="w-full aspect-video bg-white rounded-2xl border border-blue-100 shadow-[0_20px_50px_-12px_rgba(0,102,255,0.15)] overflow-hidden relative group cursor-pointer mb-16">
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-blue-50/50"></div>
+                            <div className="absolute inset-0 bg-grid-pattern opacity-[0.6] mix-blend-multiply"></div>
+                            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200/20 rounded-full blur-[60px]"></div>
+                            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-indigo-200/20 rounded-full blur-[60px]"></div>
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                                <div className="relative flex items-center justify-center size-24 bg-white rounded-full shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-all duration-300 border border-blue-50">
+                                    <div className="absolute inset-0 rounded-full border border-blue-100 animate-[ping_2s_ease-in-out_infinite] opacity-20"></div>
+                                    <span className="material-symbols-outlined text-4xl text-primary ml-1">play_arrow</span>
+                                </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-6 z-10 bg-gradient-to-t from-white/90 via-white/50 to-transparent pt-12">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                        <div className="w-[35%] h-full bg-primary rounded-full"></div>
+                                    </div>
+                                    <span className="text-xs font-bold text-slate-500 font-display">01:45 / 03:20</span>
+                                </div>
+                            </div>
+                            <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-start">
+                                <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-blue-50 shadow-sm">
+                                    <span className="text-sm font-bold text-slate-700">Platform Walkthrough</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid lg:grid-cols-2 gap-8 items-start relative">
+                            <div className="relative bg-white rounded-2xl border border-gray-200 shadow-sm p-8 flex flex-col h-full">
+                                <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Original Question</h3>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">PYQ</span>
+                                        <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">JEE Main 2023</span>
+                                    </div>
+                                </div>
+                                <div className="relative mb-6 text-base text-gray-600 font-body leading-relaxed">
+                                    <p className="mb-4">
+                                        Q. A particle moves along a straight line such that its displacement at any time t is given by
+                                        <span className="border-b-2 border-gray-300 pb-0.5">s = t³ - 6t² + 3t + 4</span> meters.
+                                        The velocity when the <span className="border-b-2 border-gray-300 pb-0.5">acceleration is zero</span> is:
+                                    </p>
+                                </div>
+                                <div className="relative mb-6">
+                                    <div className="border-2 border-dashed border-red-200 bg-red-50/50 rounded-lg p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
+                                        <span className="material-symbols-outlined text-red-300 text-3xl">visibility_off</span>
+                                        <span className="text-xs font-bold uppercase tracking-wide text-red-400">No Context / Hint</span>
+                                        <p className="text-[10px] text-red-300">Traditional questions often lack guidance on approach.</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 mt-auto">
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-gray-50 opacity-60">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-500">A</span>
+                                        <span className="text-sm text-gray-500">3 m/s</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-gray-50 opacity-60">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-500">B</span>
+                                        <span className="text-sm text-gray-500">-12 m/s</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-gray-50 opacity-60">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-500">C</span>
+                                        <span className="text-sm text-gray-500">42 m/s</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-gray-50 opacity-60">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-500">D</span>
+                                        <span className="text-sm text-gray-500">-9 m/s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="relative bg-white rounded-2xl border-2 border-primary/20 shadow-xl shadow-blue-900/10 p-8 flex flex-col h-full ring-4 ring-blue-50/50">
+                                <div className="flex items-center justify-between mb-6 pb-4 border-b border-blue-50">
+                                    <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-base">auto_awesome</span>
+                                        prepAIred Enhanced
+                                    </h3>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold text-white bg-primary px-3 py-1 rounded-full shadow-sm">AI Enhanced</span>
+                                    </div>
+                                </div>
+                                <div className="relative mb-6 text-base text-gray-800 font-body leading-relaxed font-medium">
+                                    <p className="mb-4">
+                                        Q. A particle moves along a straight line such that its displacement at any time t is given by
+                                        <span className="bg-blue-50 border border-blue-200 rounded px-1 text-blue-700 font-mono text-sm mx-1">s = t³ - 6t² + 3t + 4</span> meters.
+                                        The velocity when the <span className="decoration-green-500 decoration-2 underline underline-offset-4 bg-green-50 px-1 rounded">acceleration is zero</span> is:
+                                    </p>
+                                </div>
+                                <div className="relative mb-6">
+                                    <div className="border border-green-200 bg-green-50/40 rounded-lg p-5 flex gap-4 items-start relative overflow-hidden">
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-400"></div>
+                                        <div className="bg-white p-2 rounded-lg text-green-600 shadow-sm border border-green-100 shrink-0">
+                                            <span className="material-symbols-outlined text-xl">lightbulb</span>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-[11px] text-green-700 font-bold uppercase tracking-wide mb-1">Breakdown Hint</p>
+                                            <p className="text-sm text-slate-700 leading-relaxed">
+                                                1. Find acceleration <span className="font-mono text-xs bg-white border border-gray-200 px-1 rounded mx-0.5">a(t) = d²s/dt²</span>.<br />
+                                                2. Solve <span className="font-mono text-xs bg-white border border-gray-200 px-1 rounded mx-0.5">a(t) = 0</span> to find 't'.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 mt-auto">
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-white opacity-40 grayscale">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-400">A</span>
+                                        <span className="text-sm text-gray-400">3 m/s</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-white opacity-40 grayscale">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-400">B</span>
+                                        <span className="text-sm text-gray-400">-12 m/s</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 rounded border border-gray-200 bg-white opacity-40 grayscale">
+                                        <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 rounded-full text-gray-400">C</span>
+                                        <span className="text-sm text-gray-400">42 m/s</span>
+                                    </div>
+                                    <div className="col-span-1 relative">
+                                        <div className="absolute -inset-0.5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg opacity-30 blur-[2px]"></div>
+                                        <div className="relative flex items-center justify-between p-3 rounded border-2 border-green-500 bg-green-50">
+                                            <div className="flex items-center gap-2">
+                                                <div className="size-5 rounded-full bg-green-500 flex items-center justify-center text-white shadow-sm">
+                                                    <span className="material-symbols-outlined text-[14px] font-bold">check</span>
+                                                </div>
+                                                <span className="text-sm font-bold text-gray-900">-9 m/s</span>
+                                            </div>
+                                            <span className="text-[9px] font-bold text-green-700 bg-white px-1.5 py-0.5 rounded border border-green-200 uppercase tracking-tight">Correct</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="mt-16 w-full max-w-5xl mx-auto px-4">
                             <div className="relative overflow-hidden rounded-3xl bg-white border-2 border-blue-500/20 shadow-[0_30px_80px_-20px_rgba(0,102,255,0.2)] group hover:shadow-[0_40px_90px_-20px_rgba(0,102,255,0.3)] transition-all duration-500">
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-bl-[150px] -z-0 opacity-40"></div>
