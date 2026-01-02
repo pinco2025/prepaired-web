@@ -122,13 +122,25 @@ const Sidebar: React.FC = () => {
   const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
     <div className={`flex flex-col h-full bg-surface-light dark:bg-surface-dark transition-all duration-300 ${!mobile ? 'rounded-3xl' : ''}`}>
       {/* Header / Logo */}
-      <div className={`h-20 flex items-center ${isCollapsed && !mobile ? 'justify-center px-0' : 'px-6'} transition-all duration-300 overflow-hidden shrink-0`}>
-        <div className="flex items-center gap-3 min-w-max">
+      <div className={`h-20 flex items-center ${isCollapsed && !mobile ? 'justify-center px-0' : 'px-6 justify-between'} transition-all duration-300 overflow-hidden shrink-0`}>
+        <div className={`flex items-center gap-3 min-w-max ${isCollapsed && !mobile ? 'hidden' : 'flex'}`}>
             <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
-            <span className={`text-xl font-bold text-text-light dark:text-text-dark transition-all duration-300 ${isCollapsed && !mobile ? 'opacity-0 w-0 hidden' : 'opacity-100'}`}>
+            <span className={`text-xl font-bold text-text-light dark:text-text-dark transition-all duration-300`}>
                 prep<span className="text-primary">AI</span>red
             </span>
         </div>
+
+        {!mobile && (
+            <button
+                onClick={toggleSidebar}
+                className={`p-2 rounded-xl hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors ${isCollapsed ? 'w-full flex justify-center' : ''}`}
+                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+                <span className="material-symbols-outlined">
+                    {isCollapsed ? 'menu' : 'menu_open'}
+                </span>
+            </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -246,17 +258,6 @@ const Sidebar: React.FC = () => {
 
       {/* Desktop Sidebar (Floating) */}
       <aside className={`hidden md:flex flex-col h-[calc(100vh-2rem)] sticky top-4 ml-4 my-4 rounded-3xl border border-border-light dark:border-border-dark shadow-xl bg-surface-light dark:bg-surface-dark relative transition-all duration-300 ${isCollapsed ? 'w-24' : 'w-72'}`}>
-        {/* Collapse Button (Floating on edge) */}
-        <button
-            onClick={toggleSidebar}
-            className="absolute top-8 -right-3 z-50 w-6 h-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer text-text-secondary-light dark:text-text-secondary-dark hover:text-primary"
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
-             <span className="material-symbols-outlined text-sm font-bold">
-                {isCollapsed ? 'chevron_right' : 'chevron_left'}
-             </span>
-        </button>
-
         <SidebarContent />
       </aside>
 

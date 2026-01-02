@@ -216,7 +216,7 @@ const TestReview: React.FC = () => {
                     {/* Left Column */}
                     <div className="lg:col-span-9 flex flex-col gap-6">
                         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col overflow-hidden">
-                            <div className="px-6 py-4 border-b flex flex-wrap items-center justify-between gap-4 bg-background-light/50">
+                            <div className="px-6 py-4 border-b flex flex-wrap items-center justify-between gap-4 bg-background-light/50 dark:bg-white/5">
                                 <div className="flex items-center gap-4">
                                     <span className="text-lg font-bold text-primary">Question {allQuestions.findIndex(q => q.id === currentQuestion.id) + 1}</span>
                                     <span className="px-2.5 py-0.5 rounded-full bg-text-secondary-light/10 text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium uppercase tracking-wide">{currentQuestion.section}</span>
@@ -227,7 +227,7 @@ const TestReview: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 md:p-8 space-y-8">
-                                <div className="text-[22px] text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
+                                <div className="text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
                                     {renderHtml(currentQuestion.text)}
                                 </div>
                                 {currentQuestion.image && (
@@ -330,19 +330,19 @@ const TestReview: React.FC = () => {
                     <div className="lg:col-span-3">
                         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border p-4 sticky top-24">
                             <h3 className="text-lg font-bold mb-4 px-2">Question Palette</h3>
-                            <div className="flex border-b mb-4">
+                            <div className="flex border-b mb-4 overflow-x-auto no-scrollbar">
                                 {sections.map((section, index) => (
                                     <button
                                         key={section}
                                         onClick={() => handleSectionSelect(index)}
-                                        className={`flex-1 pb-2 text-sm font-medium truncate ${currentSectionIndex === index ? 'text-primary border-b-2 border-primary' : 'text-text-secondary-light hover:text-text-light'}`}
+                                        className={`flex-1 pb-2 text-sm font-medium whitespace-nowrap px-3 ${currentSectionIndex === index ? 'text-primary border-b-2 border-primary' : 'text-text-secondary-light hover:text-text-light'}`}
                                         title={section}
                                     >
-                                        {section.split(' ')[0]}
+                                        {section}
                                     </button>
                                 ))}
                             </div>
-                            <div className="grid grid-cols-5 gap-3 mb-6 max-h-[60vh] overflow-y-auto p-1">
+                            <div className="grid grid-cols-5 gap-3 mb-6 max-h-[60vh] overflow-y-auto p-4">
                                 {questionsBySection[currentSectionIndex].map((q, index) => (
                                     <button key={q.id} onClick={() => handleQuestionSelect(index)} className={`w-10 h-10 rounded-lg text-sm font-bold transition-opacity ${getPaletteStyle(q)} ${q.id === currentQuestion.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
                                         {allQuestions.findIndex(aq => aq.id === q.id) + 1}
