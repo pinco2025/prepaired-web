@@ -5,41 +5,26 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    fontSize: {
-      sm: '0.750rem',
-      base: '1rem',
-      xl: '1.333rem',
-      '2xl': '1.777rem',
-      '3xl': '2.369rem',
-      '4xl': '3.158rem',
-      '5xl': '4.210rem',
-    },
-    fontFamily: {
-      heading: '',
-      body: 'Inter',
-    },
-    fontWeight: {
-      normal: '400',
-      bold: '700',
-    },
     extend: {
       colors: {
-        primary: "var(--primary)",
-        "background-light": "var(--background)",
-        "background-dark": "var(--background)",
-        "surface-light": "#ffffff", // Keeping these as hex as user didn't specify surface color, or should I map to background? Usually surface is different.
+        primary: "#0066ff",
+        "background-light": "#f3f4f6",
+        "background-dark": "#121212",
+        "surface-light": "#ffffff",
         "surface-dark": "#1e1e1e",
-        "text-light": "var(--text)",
-        "text-dark": "var(--text)",
-        "text-secondary-light": "var(--secondary)",
-        "text-secondary-dark": "var(--secondary)",
-        "border-light": "#e5e7eb", // Keeping as is
-        "border-dark": "#374151", // Keeping as is
+        "text-light": "#252627",
+        "text-dark": "#dee1e7",
+        "text-secondary-light": "#6b7280",
+        "text-secondary-dark": "#9ca3af",
+        "border-light": "#e5e7eb",
+        "border-dark": "#374151",
         "success-light": "#22c55e",
         "success-dark": "#4ade80",
         "error-light": "#ef4444",
         "error-dark": "#f87171",
-        accent: "var(--accent)",
+      },
+      fontFamily: {
+        display: ["Poppins", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",

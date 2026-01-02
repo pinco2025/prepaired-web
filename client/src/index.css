@@ -2,31 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --text: #090b11;
-    --background: #f0f2fa;
-    --primary: #35b1de;
-    --secondary: #86bee9;
-    --accent: #2133d4;
-  }
-  .dark {
-    --text: #eef0f6;
-    --background: #05070f;
-    --primary: #219dca;
-    --secondary: #164e79;
-    --accent: #2b3dde;
-  }
-}
-
 body {
   /* Background color is handled by the app-level background layer so the grid shows through. */
-  @apply font-body text-text-light dark:text-text-dark antialiased bg-background-light dark:bg-background-dark;
+  @apply font-sans text-text-light dark:text-text-dark antialiased;
 }
 
 /* Headings use Poppins (font-display) */
 h1, h2, h3, h4, h5, h6 {
-  @apply font-heading;
+  @apply font-display;
 }
 
 /* Utility class to use the Material Icons Outlined font for icon ligatures */
