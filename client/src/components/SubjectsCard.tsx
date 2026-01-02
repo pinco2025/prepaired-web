@@ -51,7 +51,7 @@ const SubjectsCard: React.FC = () => {
                 topic={subject.topic}
                 percentage={subject.percentage}
                 colorClasses={colors}
-                sizeClass="w-24 h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40"
+                sizeClass="w-20 h-20 lg:w-28 lg:h-28 xl:w-32 xl:h-32"
             />
           );
         })}
