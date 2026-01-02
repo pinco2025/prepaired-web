@@ -662,7 +662,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                   {currentQuestion.section}
                 </span>
               </div>
-              <p className="math-text-scope text-2xl text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
+              <p className="math-text-scope text-xl text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}
               </p>
               {currentQuestion.image && (
