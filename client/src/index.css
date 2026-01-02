@@ -104,7 +104,7 @@ h1, h2, h3, h4, h5, h6 {
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 
-.grid-bg-light {
+.grid-bg {
   background-size: 40px 40px;
   background-image:
     linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px),
@@ -113,13 +113,10 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
 }
 
-.grid-bg-dark {
-  background-size: 40px 40px;
+.dark .grid-bg {
   background-image:
     linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
 }
 
 .liquid-shape {

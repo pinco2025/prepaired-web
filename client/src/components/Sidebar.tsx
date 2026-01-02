@@ -202,19 +202,23 @@ const Sidebar: React.FC = () => {
             )}
             <button
               onClick={toggleUserMenu}
-              className={`w-full flex items-center gap-3 p-2 rounded-xl border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5 hover:bg-border-light/50 dark:hover:bg-white/10 transition-colors whitespace-nowrap overflow-hidden ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+              className={`w-full flex items-center gap-3 rounded-xl transition-colors whitespace-nowrap overflow-hidden
+                ${isCollapsed && !mobile
+                  ? 'justify-center p-2 hover:bg-background-light dark:hover:bg-white/5'
+                  : 'p-2 border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5 hover:bg-border-light/50 dark:hover:bg-white/10'
+                }`}
             >
               <img
                 alt="User profile"
                 className="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-white/10 shrink-0"
                 src={user?.user_metadata?.avatar_url || 'https://lh3.googleusercontent.com/a/ACg8ocJ_Y_0_-8_j_Vf_w_X_Y_V_c_E_L_w_T_k_S_g_w=s96-c'}
               />
-              <div className={`flex-1 min-w-0 text-left transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'block'}`}>
+              <div className={`flex-1 min-w-0 text-left transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'block'}`} style={{ display: isCollapsed && !mobile ? 'none' : 'block' }}>
                 <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
               </div>
               <span
                 className={`material-symbols-outlined text-text-secondary-light text-lg transition-transform duration-300 shrink-0 ${isCollapsed && !mobile ? 'hidden' : 'block'}`}
-                style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: isCollapsed && !mobile ? 'none' : 'block' }}
               >
                 expand_less
               </span>
