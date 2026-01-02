@@ -54,10 +54,11 @@ const PercentileCard: React.FC = () => {
         </div>
 
         {/* Graph Container - Flex grow to fill space */}
-        <div className="flex-1 w-full relative min-h-0">
-          <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 50">
-            <defs>
-              <linearGradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+        <div className="flex-1 w-full relative min-h-0 flex items-center justify-center">
+          <div className="w-full h-[80%] max-h-32 lg:max-h-40 relative">
+            <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 50">
+              <defs>
+                <linearGradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
                 <stop offset="0%" style={{ stopColor: '#0066ff', stopOpacity: 0.2 }}></stop>
                 <stop offset="100%" style={{ stopColor: '#0066ff', stopOpacity: 0 }}></stop>
               </linearGradient>
@@ -68,46 +69,47 @@ const PercentileCard: React.FC = () => {
             {/* Line Path */}
             <path d="M0 40 Q 20 45, 40 30 T 70 15 T 100 5" fill="none" stroke="#0066ff" strokeLinecap="round" strokeWidth="2" className="path-animate"></path>
 
-            {/* Interactive Points */}
-            {dataPoints.map((point, index) => (
-                <g key={index}
-                   className="cursor-pointer group/point"
-                   onMouseEnter={() => setHoveredPoint({ x: point.cx, y: point.cy, value: point.value, label: point.label })}
-                   onMouseLeave={() => setHoveredPoint(null)}
+              {/* Interactive Points */}
+              {dataPoints.map((point, index) => (
+                  <g key={index}
+                     className="cursor-pointer group/point"
+                     onMouseEnter={() => setHoveredPoint({ x: point.cx, y: point.cy, value: point.value, label: point.label })}
+                     onMouseLeave={() => setHoveredPoint(null)}
+                  >
+                      {/* Invisible larger hit area */}
+                      <circle cx={point.cx} cy={point.cy} r="8" fill="transparent" />
+
+                      {/* Visible point */}
+                      <circle
+                          cx={point.cx}
+                          cy={point.cy}
+                          fill={index === dataPoints.length - 1 ? "#0066ff" : "white"}
+                          r={index === dataPoints.length - 1 ? "2.5" : "1.5"}
+                          stroke={index === dataPoints.length - 1 ? "white" : "#0066ff"}
+                          strokeWidth="1"
+                          className={`transition-all duration-300 ${index === dataPoints.length - 1 ? 'animate-pulse' : 'opacity-0 animate-fade-in-up'}`}
+                          style={{ animationDelay: `${200 + index * 100}ms` }}
+                      />
+                  </g>
+              ))}
+            </svg>
+
+            {/* Tooltip Overlay */}
+            {hoveredPoint && (
+                <div
+                  className="absolute bg-surface-dark text-white text-xs rounded px-2 py-1 pointer-events-none transform -translate-x-1/2 -translate-y-full z-20 shadow-lg"
+                  style={{
+                      left: `${hoveredPoint.x}%`,
+                      top: `${(hoveredPoint.y / 50) * 100}%`,
+                      marginTop: '-8px'
+                  }}
                 >
-                    {/* Invisible larger hit area */}
-                    <circle cx={point.cx} cy={point.cy} r="8" fill="transparent" />
-
-                    {/* Visible point */}
-                    <circle
-                        cx={point.cx}
-                        cy={point.cy}
-                        fill={index === dataPoints.length - 1 ? "#0066ff" : "white"}
-                        r={index === dataPoints.length - 1 ? "2.5" : "1.5"}
-                        stroke={index === dataPoints.length - 1 ? "white" : "#0066ff"}
-                        strokeWidth="1"
-                        className={`transition-all duration-300 ${index === dataPoints.length - 1 ? 'animate-pulse' : 'opacity-0 animate-fade-in-up'}`}
-                        style={{ animationDelay: `${200 + index * 100}ms` }}
-                    />
-                </g>
-            ))}
-          </svg>
-
-          {/* Tooltip Overlay */}
-          {hoveredPoint && (
-              <div
-                className="absolute bg-surface-dark text-white text-xs rounded px-2 py-1 pointer-events-none transform -translate-x-1/2 -translate-y-full z-20 shadow-lg"
-                style={{
-                    left: `${hoveredPoint.x}%`,
-                    top: `${(hoveredPoint.y / 50) * 100}%`,
-                    marginTop: '-8px'
-                }}
-              >
-                  <div className="font-bold">{hoveredPoint.value}</div>
-                  <div className="text-[10px] opacity-80">{hoveredPoint.label}</div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-surface-dark"></div>
-              </div>
-          )}
+                    <div className="font-bold">{hoveredPoint.value}</div>
+                    <div className="text-[10px] opacity-80">{hoveredPoint.label}</div>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-surface-dark"></div>
+                </div>
+            )}
+          </div>
         </div>
 
         <p className="text-xs text-center text-text-secondary-light dark:text-text-secondary-dark mt-2 shrink-0">Consistent growth over last 5 tests</p>
