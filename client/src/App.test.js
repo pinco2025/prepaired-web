@@ -10,8 +10,6 @@ test('renders welcome message', async () => {
       </AuthProvider>
     );
   });
-  // "Welcome to prepAIred" is split across elements, so we look for "Welcome to"
-  // or use a custom function if strictness is needed.
-  const linkElement = await screen.findByText(/Welcome to/i);
+  const linkElement = await screen.findByText(/Stop Guessing./i);
   expect(linkElement).toBeInTheDocument();
 });
