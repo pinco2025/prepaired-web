@@ -21,13 +21,19 @@ import AppLayout from "./components/AppLayout";
 import PaymentPage from './components/PaymentPage';
 
 const RootRoute: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, subscriptionType } = useAuth();
   if (loading) return (
       <div className="flex-grow flex items-center justify-center">
          {/* Simple loading state */}
       </div>
   );
-  return user ? <Navigate to="/dashboard" replace /> : <HomePlaceholder />;
+  if (user) {
+    if (!subscriptionType || subscriptionType === 'free') {
+      return <Navigate to="/payment" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <HomePlaceholder />;
 };
 
 export const AppContent: React.FC = () => {
