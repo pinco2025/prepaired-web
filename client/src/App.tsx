@@ -17,6 +17,7 @@ import TestPage from './components/TestPage';
 import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
 import TestReview from './components/TestReview';
+import AppLayout from "./components/AppLayout";
 
 const RootRoute: React.FC = () => {
   const { user, loading } = useAuth();
@@ -42,6 +43,7 @@ export const AppContent: React.FC = () => {
       {showHeader && <Sidebar />}
       <main className="flex-1 w-full relative">
         <Routes>
+          <Route element={<AppLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="/" element={<RootRoute />} />
@@ -117,6 +119,7 @@ export const AppContent: React.FC = () => {
               <TestReview />
             </RequireAuth>
           } />
+          </Route>
         </Routes>
       </main>
     </div>
