@@ -1,15 +1,29 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { User } from '@supabase/supabase-js';
+
+// Define subscription tiers
+export const PAID_SUBSCRIPTION = 'ipft-01-2026';
 
 type AuthContextValue = {
   user: User | null;
   subscriptionType: string | null;
-  loading: boolean;
+  loading: boolean; // True while initial auth check is happening
+  isAuthenticated: boolean; // True if user is logged in
+  isPaidUser: boolean; // True only if subscription is IPFT-01-2026
   examType: string | null;
+  refreshSubscription: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue>({ user: null, subscriptionType: null, loading: true, examType: null });
+const AuthContext = createContext<AuthContextValue>({
+  user: null,
+  subscriptionType: null,
+  loading: true,
+  isAuthenticated: false,
+  isPaidUser: false,
+  examType: null,
+  refreshSubscription: async () => { },
+});
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -18,135 +32,147 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [examType, setExamType] = useState<string | null>(null);
-  // track which user's examType we've fetched to avoid repeated fetches on minor auth events
-  const lastExamFetchedFor = React.useRef<string | null>(null);
 
+  // Fetch subscription data from database
+  const fetchSubscription = useCallback(async (userId: string): Promise<string | null> => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching subscription:', error);
+        return null;
+      }
+
+      const tier = profile?.subscription_tier ?? null;
+      // Normalize to lowercase for consistent comparison
+      return typeof tier === 'string' ? tier.trim().toLowerCase() : null;
+    } catch (err) {
+      console.error('Error in fetchSubscription:', err);
+      return null;
+    }
+  }, []);
+
+  // Fetch exam type from database
+  const fetchExamType = useCallback(async (userId: string): Promise<string | null> => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('exam_type')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching exam type:', error);
+        return null;
+      }
+
+      const exam = profile?.exam_type ?? null;
+      return typeof exam === 'string' ? exam.trim() : null;
+    } catch (err) {
+      console.error('Error in fetchExamType:', err);
+      return null;
+    }
+  }, []);
+
+  // Full user data fetch
+  const fetchUserData = useCallback(async (currentUser: User) => {
+    const [subscription, exam] = await Promise.all([
+      fetchSubscription(currentUser.id),
+      fetchExamType(currentUser.id),
+    ]);
+
+    setSubscriptionType(subscription);
+    setExamType(exam);
+  }, [fetchSubscription, fetchExamType]);
+
+  // Manual refresh function for after payment
+  const refreshSubscription = useCallback(async () => {
+    if (user) {
+      const subscription = await fetchSubscription(user.id);
+      setSubscriptionType(subscription);
+    }
+  }, [user, fetchSubscription]);
+
+  // Initial auth check and subscription handler
   useEffect(() => {
     let mounted = true;
 
-    const fetchUser = async (showLoading: boolean = true) => {
-      if (showLoading) setLoading(true);
+    const initializeAuth = async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        const u = data?.user ?? null;
+        // Get current session
+        const { data: { session } } = await supabase.auth.getSession();
+
         if (!mounted) return;
-        // if the signed-in user hasn't changed, avoid re-running expensive profile reads
-        if (u && user && u.id === user.id) {
-          // update the user object but don't re-fetch profile/exam if already fetched
-          setUser(u);
-          if (showLoading && mounted) setLoading(false);
-          return;
-        }
-        setUser(u);
-        // First try to read `subscription_tier` from the `users` table (owned by Supabase auth schema)
-        // Table: users, column: subscription_tier
-        if (u) {
-          try {
-            const { data: profile, error: profileError } = await supabase
-              .from('users')
-              .select('subscription_tier')
-              .eq('id', u.id)
-              .single();
 
-            if (!mounted) return;
-
-            if (profileError) {
-              // fallback to metadata if table read fails
-              const meta: any = u.user_metadata ?? {};
-              const subs = meta.subscription || meta.subscription_type || meta.plan || meta.role || null;
-              setSubscriptionType(subs ?? null);
-            } else {
-              const subsFromTable = (profile as any)?.subscription_tier ?? null;
-              const meta = (u.user_metadata ?? {} ) as any;
-
-              // Prioritize table if it has a paid value, otherwise check metadata
-              // This handles cases where table update fails (RLS) but metadata update succeeds
-              let rawSub = subsFromTable;
-              if (!rawSub || rawSub === 'free') {
-                 // Check metadata for a better value
-                 const metaSub = meta.subscription_tier ?? meta.subscription ?? meta.subscription_type ?? meta.plan ?? meta.role;
-                 if (metaSub && metaSub !== 'free') {
-                    rawSub = metaSub;
-                 }
-              }
-              // If still null, fallback to whatever we found
-              if (!rawSub) {
-                 rawSub = meta.subscription_tier ?? meta.subscription ?? meta.subscription_type ?? meta.plan ?? meta.role ?? null;
-              }
-
-              // normalize to a trimmed, lower-case string when possible
-              const normalized = typeof rawSub === 'string' ? rawSub.trim().toLowerCase() : null;
-              setSubscriptionType(normalized);
-            }
-          } catch (tblErr) {
-            const meta: any = u.user_metadata ?? {};
-            const subs = meta.subscription || meta.subscription_type || meta.plan || meta.role || null;
-            setSubscriptionType(subs ?? null);
-          }
-          // now fetch exam_type once for this user (cache by user id)
-          try {
-            if (lastExamFetchedFor.current !== u.id) {
-              const { data: profileExam, error: examError } = await supabase
-                .from('users')
-                .select('exam_type')
-                .eq('id', u.id)
-                .single();
-
-              if (!mounted) return;
-
-              if (!examError && profileExam) {
-                const raw = (profileExam as any).exam_type ?? null;
-                const normalized = typeof raw === 'string' ? raw.trim() : raw;
-                setExamType(normalized);
-              } else {
-                // fallback to metadata or null
-                const meta: any = u.user_metadata ?? {};
-                const raw = meta.exam_type ?? null;
-                setExamType(typeof raw === 'string' ? raw.trim() : raw ?? null);
-              }
-
-              lastExamFetchedFor.current = u.id;
-            }
-          } catch (examErr) {
-            if (mounted) setExamType(null);
-          }
+        if (session?.user) {
+          setUser(session.user);
+          await fetchUserData(session.user);
         } else {
+          setUser(null);
           setSubscriptionType(null);
           setExamType(null);
-          lastExamFetchedFor.current = null;
         }
       } catch (err) {
-        setUser(null);
-        setSubscriptionType(null);
-        setExamType(null);
+        console.error('Error initializing auth:', err);
+        if (mounted) {
+          setUser(null);
+          setSubscriptionType(null);
+          setExamType(null);
+        }
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchUser();
+    initializeAuth();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      if (!session) {
-        setUser(null);
-        setSubscriptionType(null);
-        setExamType(null);
-        lastExamFetchedFor.current = null;
-        setLoading(false);
-      } else {
-        // refetch when auth changes but don't toggle global loading (prevents UI flash on tab switch)
-        fetchUser(false);
+    // Listen for auth state changes
+    const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+
+        console.log('Auth state changed:', event);
+
+        if (session?.user) {
+          setUser(session.user);
+          // Fetch subscription data whenever auth state changes
+          await fetchUserData(session.user);
+        } else {
+          setUser(null);
+          setSubscriptionType(null);
+          setExamType(null);
+        }
       }
-    });
+    );
 
     return () => {
       mounted = false;
-      listener?.subscription.unsubscribe();
+      authListener.unsubscribe();
     };
-  }, []);
+  }, [fetchUserData]);
+
+  // Computed values
+  const isAuthenticated = user !== null;
+  const isPaidUser = subscriptionType?.toLowerCase() === PAID_SUBSCRIPTION.toLowerCase();
+
+  const value: AuthContextValue = {
+    user,
+    subscriptionType,
+    loading,
+    isAuthenticated,
+    isPaidUser,
+    examType,
+    refreshSubscription,
+  };
 
   return (
-    <AuthContext.Provider value={{ user, subscriptionType, loading, examType }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

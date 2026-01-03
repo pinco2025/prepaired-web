@@ -1,14 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import RequireAuth from './components/RequireAuth';
+import PublicOnlyRoute from './components/PublicOnlyRoute';
 import ComingSoon from './components/ComingSoon';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
-import HomePlaceholder from './components/HomePlaceholder';
+import LandingPage from './components/LandingPage';
 import Subjects from './components/Subjects';
 import SubjectDetails from './components/SubjectDetails';
 import ChapterDetails from './components/ChapterDetails';
@@ -18,129 +19,125 @@ import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
 import TestReview from './components/TestReview';
 import AppLayout from "./components/AppLayout";
-import PaymentPage from './components/PaymentPage';
 
-const RootRoute: React.FC = () => {
-  const { user, loading, subscriptionType } = useAuth();
-  if (loading) return (
-      <div className="flex-grow flex items-center justify-center">
-         {/* Simple loading state */}
+/**
+ * HomeRoute - Handles the root "/" route
+ * 
+ * Access Rules:
+ * - Loading → Show spinner
+ * - Not authenticated → Show landing page
+ * - Authenticated + free tier → Show landing page
+ * - Authenticated + paid tier → Redirect to /dashboard
+ */
+const HomeRoute: React.FC = () => {
+  const { isAuthenticated, isPaidUser, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-  );
-  if (user) {
-    if (!subscriptionType || subscriptionType === 'free') {
-      return <HomePlaceholder />;
-    }
+    );
+  }
+
+  // Paid users get redirected to dashboard
+  if (isAuthenticated && isPaidUser) {
     return <Navigate to="/dashboard" replace />;
   }
-  return <HomePlaceholder />;
+
+  // Everyone else sees the landing page
+  return <LandingPage />;
 };
 
 export const AppContent: React.FC = () => {
-  const location = useLocation();
+  const { isPaidUser, isAuthenticated, loading } = useAuth();
 
-  const hideHeaderOnPaths = ['/', '/login', '/register', '/payment'];
-  const isTestPage = location.pathname.startsWith('/tests/');
-  const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage;
+  // Determine if we should show the sidebar
+  // Show sidebar only for authenticated paid users on protected routes
+  const showSidebar = !loading && isAuthenticated && isPaidUser;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
       {/* Background layer: color + grid image */}
       <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg -z-10"></div>
-      {showHeader && <Sidebar />}
+      {showSidebar && <Sidebar />}
       <main className="flex-1 w-full relative">
         <Routes>
           <Route element={<AppLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<SignUp />} />
-          <Route path="/" element={<RootRoute />} />
-          <Route
-            path="/payment"
-            element={
-              <RequireAuth>
-                <PaymentPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
+            {/* Public routes */}
+            <Route path="/" element={<HomeRoute />} />
+
+            {/* Auth routes - only for non-paid users */}
+            <Route path="/login" element={
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            } />
+            <Route path="/register" element={
+              <PublicOnlyRoute>
+                <SignUp />
+              </PublicOnlyRoute>
+            } />
+
+            {/* Protected routes - require IPFT-01-2026 subscription */}
+            <Route path="/dashboard" element={
               <RequireAuth>
                 <Dashboard />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/subjects/:subject/:grade/:chapter"
-            element={
+            } />
+            <Route path="/subjects/:subject/:grade/:chapter" element={
               <RequireAuth>
                 <ChapterDetails />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
+            } />
+            <Route path="/admin" element={
               <RequireAuth>
                 <AdminPlaceholder />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/subjects"
-            element={
+            } />
+            <Route path="/subjects" element={
               <RequireAuth>
                 <Subjects />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/subjects/:subject/:grade"
-            element={
+            } />
+            <Route path="/subjects/:subject/:grade" element={
               <RequireAuth>
                 <SubjectDetails />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/tests"
-            element={
+            } />
+            <Route path="/tests" element={
               <RequireAuth>
                 <Tests />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/tests/:testId"
-            element={
+            } />
+            <Route path="/tests/:testId" element={
               <RequireAuth>
                 <TestPage />
               </RequireAuth>
-            }
-          />
-          <Route
-            path="/coming-soon"
-            element={
+            } />
+            <Route path="/coming-soon" element={
               <RequireAuth>
                 <ComingSoon />
               </RequireAuth>
-            }
-          />
-          <Route path="/test-submitted" element={
-            <RequireAuth>
-              <TestSubmitted />
-            </RequireAuth>
-          } />
-          <Route path="/results/:submissionId" element={
-            <RequireAuth>
-              <TestResult />
-            </RequireAuth>
-          } />
-          <Route path="/review/:submissionId" element={
-            <RequireAuth>
-              <TestReview />
-            </RequireAuth>
-          } />
+            } />
+            <Route path="/test-submitted" element={
+              <RequireAuth>
+                <TestSubmitted />
+              </RequireAuth>
+            } />
+            <Route path="/results/:submissionId" element={
+              <RequireAuth>
+                <TestResult />
+              </RequireAuth>
+            } />
+            <Route path="/review/:submissionId" element={
+              <RequireAuth>
+                <TestReview />
+              </RequireAuth>
+            } />
+
+            {/* Catch all - redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
       </main>

@@ -1,8 +1,54 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useRazorpay } from '../hooks/useRazorpay';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
+    const { user, subscriptionType } = useAuth();
+    const { initiatePayment, loading: paymentLoading, error: paymentError } = useRazorpay();
+
+    // Check if user has paid subscription
+    const isPaidUser = subscriptionType?.toLowerCase() === 'ipft-01-2026';
+
+    // Scroll to pay section
+    const scrollToPaySection = () => {
+        const paySection = document.getElementById('pay-section');
+        if (paySection) {
+            paySection.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    // Handle "Click to Pay" button - scroll to pay section or redirect to login
+    const handleClickToPay = () => {
+        if (!user) {
+            navigate('/register');
+        } else {
+            scrollToPaySection();
+        }
+    };
+
+    // Handle "Claim Offer Now" button - initiate payment
+    const handleClaimOffer = async () => {
+        if (!user) {
+            navigate('/login', { state: { from: '/' } });
+            return;
+        }
+
+        if (isPaidUser) {
+            navigate('/dashboard');
+            return;
+        }
+
+        // Initiate payment for free tier users
+        await initiatePayment({
+            userId: user.id,
+            planType: 'IPFT-01-2026',
+            amount: 49900, // ₹499 in paise
+            userEmail: user.email,
+            userName: user.user_metadata?.full_name || '',
+        });
+    };
 
     return (
         <div className="bg-background text-text-main h-screen flex flex-col pt-28 overflow-y-auto overflow-x-hidden no-scrollbar scroll-momentum">
@@ -21,7 +67,7 @@ const LandingPage: React.FC = () => {
                         </span>
                         <p className="text-slate-600 font-medium whitespace-nowrap"><span className="text-primary font-bold">Limited Time Offer:</span> Get 20% off Premium!</p>
                     </div>
-                    <button onClick={() => navigate('/register')} className="bg-gradient-to-r from-primary to-accent hover:to-primary text-white text-xs font-bold py-2.5 px-6 rounded-full shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/30 hover:-translate-y-0.5 flex items-center gap-2 shrink-0 uppercase tracking-wide">
+                    <button onClick={handleClickToPay} className="bg-gradient-to-r from-primary to-accent hover:to-primary text-white text-xs font-bold py-2.5 px-6 rounded-full shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/30 hover:-translate-y-0.5 flex items-center gap-2 shrink-0 uppercase tracking-wide">
                         Click to Pay
                         <span className="material-symbols-outlined text-sm">credit_card</span>
                     </button>
@@ -187,7 +233,7 @@ const LandingPage: React.FC = () => {
                         </div>
 
                         <div className="mt-16 w-full max-w-5xl mx-auto px-4">
-                            <div className="relative overflow-hidden rounded-3xl bg-white border-2 border-blue-500/20 shadow-[0_30px_80px_-20px_rgba(0,102,255,0.2)] group hover:shadow-[0_40px_90px_-20px_rgba(0,102,255,0.3)] transition-all duration-500">
+                            <div id="pay-section" className="relative overflow-hidden rounded-3xl bg-white border-2 border-blue-500/20 shadow-[0_30px_80px_-20px_rgba(0,102,255,0.2)] group hover:shadow-[0_40px_90px_-20px_rgba(0,102,255,0.3)] transition-all duration-500">
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-bl-[150px] -z-0 opacity-40"></div>
                                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/10 rounded-tr-[100px] -z-0"></div>
                                 <div className="absolute right-20 top-20 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse-slow"></div>
@@ -227,10 +273,17 @@ const LandingPage: React.FC = () => {
                                                 Detailed Performance Analytics
                                             </li>
                                         </ul>
-                                        <button className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary-dark hover:to-primary text-white font-bold text-lg py-4 px-10 rounded-xl transition-all duration-300 shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1 flex items-center justify-center gap-3 group/btn">
-                                            Claim Offer Now
-                                            <span className="material-symbols-outlined transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                                        <button
+                                            onClick={handleClaimOffer}
+                                            disabled={paymentLoading}
+                                            className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary-dark hover:to-primary text-white font-bold text-lg py-4 px-10 rounded-xl transition-all duration-300 shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1 flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {paymentLoading ? 'Processing...' : 'Claim Offer Now'}
+                                            {!paymentLoading && <span className="material-symbols-outlined transition-transform group-hover/btn:translate-x-1">arrow_forward</span>}
                                         </button>
+                                        {paymentError && (
+                                            <p className="text-red-500 text-sm mt-2">{paymentError}</p>
+                                        )}
                                     </div>
                                     <div className="w-full md:w-[40%] relative min-h-[350px] md:min-h-[500px] flex items-center justify-center p-8 overflow-visible">
                                         <div className="relative w-64 aspect-[3/4] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 z-20 flex flex-col items-center justify-center p-6 text-center transition-transform duration-500 hover:scale-105 rotate-[-3deg] group-hover:rotate-0">

@@ -1,33 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  // If user is already authenticated, prevent access to login page
-  useEffect(() => {
-    let mounted = true;
-    const check = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        const session = data?.session ?? null;
-        if (session && mounted) {
-          // already logged in -> redirect to home/dashboard
-          navigate('/', { replace: true });
-        }
-      } catch (err) {
-        // ignore errors here; allow login UI to show
-      }
-    };
-    check();
-    return () => {
-      mounted = false;
-    };
-  }, [navigate]);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -39,8 +17,8 @@ const Login: React.FC = () => {
         password,
       });
       if (error) throw error;
-      const from = (location.state as any)?.from || '/';
-      navigate(from);
+      // Always navigate to root - RootRoute will handle redirect based on subscription
+      navigate('/');
     } catch (error: any) {
       alert(error.error_description || error.message);
     }
@@ -48,8 +26,8 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const from = (location.state as any)?.from || '/';
-      const redirectTo = from.startsWith('/') ? window.location.origin + from : from;
+      // Always redirect to root after OAuth - HomeRoute will handle subscription-based routing
+      const redirectTo = window.location.origin + '/';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo },
