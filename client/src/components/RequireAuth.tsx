@@ -1,49 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
 
 type Props = {
   children: React.ReactElement;
 };
 
 const RequireAuth: React.FC<Props> = ({ children }) => {
+  const { user, loading, subscriptionType } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    // Wait for loading to finish
+    if (loading) return;
 
-    const check = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        const session = data?.session ?? null;
-        if (!session) {
-          navigate('/login', { replace: true, state: { from: location.pathname } });
-        }
-      } catch (err) {
-        // on error, redirect to login
-        navigate('/login', { replace: true });
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
+    if (!user) {
+      // Redirect to login if not authenticated
+      navigate('/login', { replace: true, state: { from: location.pathname } });
+      return;
+    }
 
-    check();
+    // Check subscription status
+    // Default to 'free' if null.
+    // Normalized to lowercase in AuthContext.
+    const isFree = !subscriptionType || subscriptionType === 'free';
+    const isPaymentPage = location.pathname === '/payment';
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      if (!session) {
-        navigate('/login', { replace: true, state: { from: location.pathname } });
-      }
-    });
+    if (isFree && !isPaymentPage) {
+        // If user is free and trying to access restricted pages (wrapped by RequireAuth), redirect to payment
+        navigate('/payment', { replace: true });
+    } else if (!isFree && isPaymentPage) {
+        // If user is paid and trying to access payment page, redirect to dashboard
+        navigate('/dashboard', { replace: true });
+    }
 
-    return () => {
-      mounted = false;
-      listener?.subscription.unsubscribe();
-    };
-  }, [navigate, location]);
+  }, [user, loading, subscriptionType, navigate, location]);
 
-  if (loading) return null;
+  if (loading) {
+      // You might want to render a loading spinner here
+      return (
+          <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+      );
+  }
+
+  // If we decided to redirect, render null to avoid flashing content
+  if (!user) return null;
+
+  const isFree = !subscriptionType || subscriptionType === 'free';
+  const isPaymentPage = location.pathname === '/payment';
+
+  if (isFree && !isPaymentPage) return null;
+  if (!isFree && isPaymentPage) return null;
 
   return children;
 };
