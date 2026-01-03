@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRazorpay } from '../hooks/useRazorpay';
@@ -7,9 +7,34 @@ const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const { user, subscriptionType } = useAuth();
     const { initiatePayment, loading: paymentLoading, error: paymentError } = useRazorpay();
+    const [darkMode, setDarkMode] = useState(false);
 
     // Check if user has paid subscription
     const isPaidUser = subscriptionType?.toLowerCase() === 'ipft-01-2026';
+
+    // Initialize dark mode from localStorage
+    useEffect(() => {
+        const isDark = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(isDark);
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, []);
+
+    // Toggle dark mode
+    const toggleDarkMode = () => {
+        const isDark = !darkMode;
+        setDarkMode(isDark);
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('darkMode', 'false');
+        }
+    };
 
     // Auto-scroll to pay section when logged-in free tier user visits the page
     useEffect(() => {
@@ -66,6 +91,17 @@ const LandingPage: React.FC = () => {
 
     return (
         <div className="bg-background text-text-main h-screen flex flex-col pt-28 overflow-y-auto overflow-x-hidden no-scrollbar scroll-momentum">
+            {/* Floating Dark Mode Toggle - Left of navbar */}
+            <button
+                onClick={toggleDarkMode}
+                className="fixed top-5 left-4 z-50 p-3 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-blue-100 dark:border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all hover:scale-110"
+                title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+                <span className="material-symbols-outlined text-xl">
+                    {darkMode ? 'light_mode' : 'dark_mode'}
+                </span>
+            </button>
+
             <header className="fixed top-4 left-0 right-0 z-50 px-4 flex justify-center w-full pointer-events-none">
                 <div className="pointer-events-auto w-full max-w-4xl bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full py-2.5 pl-5 pr-2.5 flex items-center justify-between gap-4 transition-transform hover:scale-[1.005] duration-300">
                     <div className="flex items-center gap-3 shrink-0">

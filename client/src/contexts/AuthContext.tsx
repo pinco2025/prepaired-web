@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
@@ -32,6 +32,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [examType, setExamType] = useState<string | null>(null);
+
+  // Track if initial load is done
+  const initialLoadDone = useRef(false);
 
   // Fetch subscription data from database
   const fetchSubscription = useCallback(async (userId: string): Promise<string | null> => {
@@ -78,17 +81,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Full user data fetch
-  const fetchUserData = useCallback(async (currentUser: User) => {
-    const [subscription, exam] = await Promise.all([
-      fetchSubscription(currentUser.id),
-      fetchExamType(currentUser.id),
-    ]);
-
-    setSubscriptionType(subscription);
-    setExamType(exam);
-  }, [fetchSubscription, fetchExamType]);
-
   // Manual refresh function for after payment
   const refreshSubscription = useCallback(async () => {
     if (user) {
@@ -97,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, fetchSubscription]);
 
-  // Initial auth check and subscription handler
+  // Initial auth check
   useEffect(() => {
     let mounted = true;
 
@@ -110,7 +102,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (session?.user) {
           setUser(session.user);
-          await fetchUserData(session.user);
+
+          // Fetch subscription and exam type in parallel
+          const [subscription, exam] = await Promise.all([
+            fetchSubscription(session.user.id),
+            fetchExamType(session.user.id),
+          ]);
+
+          if (mounted) {
+            setSubscriptionType(subscription);
+            setExamType(exam);
+          }
         } else {
           setUser(null);
           setSubscriptionType(null);
@@ -126,6 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } finally {
         if (mounted) {
           setLoading(false);
+          initialLoadDone.current = true;
         }
       }
     };
@@ -137,12 +140,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, session) => {
         if (!mounted) return;
 
+        // Skip if initial load hasn't completed yet - initializeAuth handles it
+        if (!initialLoadDone.current) return;
+
         console.log('Auth state changed:', event);
 
         if (session?.user) {
           setUser(session.user);
-          // Fetch subscription data whenever auth state changes
-          await fetchUserData(session.user);
+
+          // Fetch subscription data
+          const [subscription, exam] = await Promise.all([
+            fetchSubscription(session.user.id),
+            fetchExamType(session.user.id),
+          ]);
+
+          if (mounted) {
+            setSubscriptionType(subscription);
+            setExamType(exam);
+          }
         } else {
           setUser(null);
           setSubscriptionType(null);
@@ -155,7 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       mounted = false;
       authListener.unsubscribe();
     };
-  }, [fetchUserData]);
+  }, [fetchSubscription, fetchExamType]); // These are stable due to useCallback with empty deps
 
   // Computed values
   const isAuthenticated = user !== null;
