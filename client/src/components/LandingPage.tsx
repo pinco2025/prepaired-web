@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRazorpay } from '../hooks/useRazorpay';
@@ -10,6 +10,20 @@ const LandingPage: React.FC = () => {
 
     // Check if user has paid subscription
     const isPaidUser = subscriptionType?.toLowerCase() === 'ipft-01-2026';
+
+    // Auto-scroll to pay section when logged-in free tier user visits the page
+    useEffect(() => {
+        if (user && !isPaidUser) {
+            // Small delay to ensure page is rendered
+            const timer = setTimeout(() => {
+                const paySection = document.getElementById('pay-section');
+                if (paySection) {
+                    paySection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [user, isPaidUser]);
 
     // Scroll to pay section
     const scrollToPaySection = () => {
@@ -55,10 +69,14 @@ const LandingPage: React.FC = () => {
             <header className="fixed top-4 left-0 right-0 z-50 px-4 flex justify-center w-full pointer-events-none">
                 <div className="pointer-events-auto w-full max-w-4xl bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full py-2.5 pl-5 pr-2.5 flex items-center justify-between gap-4 transition-transform hover:scale-[1.005] duration-300">
                     <div className="flex items-center gap-3 shrink-0">
-                        <div className="size-8 flex items-center justify-center bg-primary text-white rounded-full shadow-md shadow-blue-500/20">
-                            <span className="material-symbols-outlined text-lg">psychology</span>
-                        </div>
-                        <span className="font-display font-bold text-lg tracking-tight text-slate-800 hidden sm:block">prepAIred</span>
+                        <img
+                            alt="prepAIred logo"
+                            className="h-8 w-8 object-contain"
+                            src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000"
+                        />
+                        <span className="font-display font-bold text-lg tracking-tight text-slate-800 hidden sm:block">
+                            prep<span className="text-primary">AI</span>red
+                        </span>
                     </div>
                     <div className="hidden md:flex items-center gap-2 text-sm">
                         <span className="flex h-2 w-2 relative">
