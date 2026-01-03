@@ -287,3 +287,11 @@ export interface TestCategory {
   tests: Test[];
 }
 
+export interface UserAnalytics {
+  user_id: string;
+  phy_avg: number;
+  chem_avg: number;
+  math_avg: number;
+  accuracy: number;
+  attempt_no: number;
+}

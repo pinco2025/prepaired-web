@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
-const AccuracyCard: React.FC = () => {
-    const finalAccuracy = 75;
+interface AccuracyCardProps {
+    accuracy?: number;
+}
+
+const AccuracyCard: React.FC<AccuracyCardProps> = ({ accuracy: propAccuracy = 0 }) => {
+    const finalAccuracy = propAccuracy;
     const [accuracy, setAccuracy] = useState(0);
     const radius = 60; // Adjusted for better fit
     const circumference = 2 * Math.PI * radius;
@@ -12,7 +16,7 @@ const AccuracyCard: React.FC = () => {
             setAccuracy(finalAccuracy);
         }, 300); // Delay start of animation
         return () => clearTimeout(timer);
-    }, []);
+    }, [finalAccuracy]);
 
     return (
         <div className="col-span-1 md:col-span-6 lg:col-span-4 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col h-full min-h-0">

@@ -5,18 +5,47 @@ import WeakAreasCard from './WeakAreasCard';
 import AccuracyCard from './AccuracyCard';
 import AverageScoreCard from './AverageScoreCard';
 import DashboardSkeleton from './DashboardSkeleton';
+import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
+import { UserAnalytics } from '../data';
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
 
   useEffect(() => {
-    // Simulate data fetching
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500); // 1.5 seconds delay
+    const fetchAnalytics = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    return () => clearTimeout(timer);
-  }, []);
+      try {
+        const { data, error } = await supabase
+          .from('user_analytics')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!error && data) {
+          setAnalytics(data);
+        }
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [user]);
+
+  // Calculate derived values
+  const phyScore = analytics && analytics.attempt_no ? Math.round(analytics.phy_avg / analytics.attempt_no) : 0;
+  const chemScore = analytics && analytics.attempt_no ? Math.round(analytics.chem_avg / analytics.attempt_no) : 0;
+  const mathScore = analytics && analytics.attempt_no ? Math.round(analytics.math_avg / analytics.attempt_no) : 0;
+  const accuracy = analytics && analytics.attempt_no ? Math.round(analytics.accuracy / analytics.attempt_no) : 0;
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -26,13 +55,13 @@ const Dashboard: React.FC = () => {
     <div className="p-4 md:p-6 h-full md:h-screen animate-fade-in-up overflow-y-auto md:overflow-hidden flex flex-col">
       <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
         <div className="mb-4 shrink-0">
-          <h1 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">Welcome back, Alex!</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Student'}!</h1>
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Here's your prepAIred learning summary.</p>
         </div>
         <div className="flex-1 grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4 pb-4 md:min-h-0">
             {/* Row 1 */}
             <div className="col-span-1 md:col-span-12 lg:col-span-7 h-[380px] md:h-full md:min-h-0">
-                 <SubjectsCard />
+                 <SubjectsCard averages={{ physics: phyScore, chemistry: chemScore, maths: mathScore }} />
             </div>
             <div className="col-span-1 md:col-span-12 lg:col-span-5 h-[380px] md:h-full md:min-h-0">
                 <PercentileCard />
@@ -43,7 +72,7 @@ const Dashboard: React.FC = () => {
                 <WeakAreasCard />
             </div>
             <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
-                <AccuracyCard />
+                <AccuracyCard accuracy={accuracy} />
             </div>
             <div className="col-span-1 md:col-span-12 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
                 <AverageScoreCard />

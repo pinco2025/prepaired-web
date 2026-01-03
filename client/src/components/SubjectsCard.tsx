@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SubjectBubble from './SubjectBubble';
 
-const subjectsData = [
-  { name: 'Physics', topic: 'Electrostatics', percentage: 78, color: 'blue' },
-  { name: 'Chemistry', topic: 'Chemical Bonding', percentage: 64, color: 'green' },
-  { name: 'Maths', topic: 'Calculus', percentage: 42, color: 'orange' },
-];
-
 const colorMap: { [key: string]: { [key: string]: string; bg: string; border: string; shadow: string; liquid1: string; liquid2: string } } = {
   blue: {
     bg: 'bg-blue-50 dark:bg-blue-900/10',
@@ -31,9 +25,22 @@ const colorMap: { [key: string]: { [key: string]: string; bg: string; border: st
   },
 };
 
-const SubjectsCard: React.FC = () => {
+interface SubjectsCardProps {
+  averages?: {
+    physics: number;
+    chemistry: number;
+    maths: number;
+  };
+}
+
+const SubjectsCard: React.FC<SubjectsCardProps> = ({ averages }) => {
     // We don't need local state for animation here anymore as SubjectBubble handles it with useCountUp
-    // But we still render the list
+
+  const subjectsData = [
+    { name: 'Physics', topic: 'Score', percentage: averages?.physics || 0, color: 'blue' },
+    { name: 'Chemistry', topic: 'Score', percentage: averages?.chemistry || 0, color: 'green' },
+    { name: 'Maths', topic: 'Score', percentage: averages?.maths || 0, color: 'orange' },
+  ];
 
   return (
     <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col justify-between h-full min-h-0">
