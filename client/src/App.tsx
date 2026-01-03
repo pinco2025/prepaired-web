@@ -18,6 +18,7 @@ import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
 import TestReview from './components/TestReview';
 import AppLayout from "./components/AppLayout";
+import PaymentPage from './components/PaymentPage';
 
 const RootRoute: React.FC = () => {
   const { user, loading } = useAuth();
@@ -32,7 +33,7 @@ const RootRoute: React.FC = () => {
 export const AppContent: React.FC = () => {
   const location = useLocation();
 
-  const hideHeaderOnPaths = ['/', '/login', '/register'];
+  const hideHeaderOnPaths = ['/', '/login', '/register', '/payment'];
   const isTestPage = location.pathname.startsWith('/tests/');
   const showHeader = !hideHeaderOnPaths.includes(location.pathname) && !isTestPage;
 
@@ -47,6 +48,14 @@ export const AppContent: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="/" element={<RootRoute />} />
+          <Route
+            path="/payment"
+            element={
+              <RequireAuth>
+                <PaymentPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/dashboard"
             element={
