@@ -70,8 +70,9 @@ const PaymentPage: React.FC = () => {
             if (metaError && tableError) {
                 alert('Payment successful, but failed to update subscription status. Please contact support.');
             } else {
-                // Reload to reflect changes in AuthContext
-                window.location.reload();
+                // Do not reload. AuthContext listens to onAuthStateChange (triggered by updateUser)
+                // and will update the state. The useEffect above will then redirect to /dashboard.
+                // We add a small manual delay or check just in case, but usually unnecessary.
             }
           }
         } catch (err) {
