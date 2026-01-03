@@ -81,7 +81,7 @@ export const useRazorpay = (): UseRazorpayReturn => {
             try {
                 const orderData = await response.json();
                 console.log('Order data:', orderData);
-                orderId = orderData.order_id;
+                orderId = orderData.orderId; // Backend returns camelCase 'orderId'
             } catch {
                 // API might not exist yet - continue without order_id for testing
                 console.warn('Could not get order_id, proceeding in test mode');
