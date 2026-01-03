@@ -34,7 +34,7 @@ const PaymentPage: React.FC = () => {
 
     // Razorpay options
     const options = {
-      key: "rzp_test_PLACEHOLDER", // REPLACE THIS with your actual Razorpay Test Key ID
+      key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_RzH77YIQvKB8er", // Use env var or fallback to the provided key
       amount: "50000", // 500.00 INR
       currency: "INR",
       name: "prepAIred",
