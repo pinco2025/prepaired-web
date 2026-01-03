@@ -29,7 +29,7 @@ const RootRoute: React.FC = () => {
   );
   if (user) {
     if (!subscriptionType || subscriptionType === 'free') {
-      return <Navigate to="/payment" replace />;
+      return <HomePlaceholder />;
     }
     return <Navigate to="/dashboard" replace />;
   }
@@ -118,7 +118,14 @@ export const AppContent: React.FC = () => {
               </RequireAuth>
             }
           />
-          <Route path="/coming-soon" element={<ComingSoon />} />
+          <Route
+            path="/coming-soon"
+            element={
+              <RequireAuth>
+                <ComingSoon />
+              </RequireAuth>
+            }
+          />
           <Route path="/test-submitted" element={
             <RequireAuth>
               <TestSubmitted />
