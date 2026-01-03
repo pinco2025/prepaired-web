@@ -1,12 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRazorpay } from '../hooks/useRazorpay';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
-    const { user, subscriptionType } = useAuth();
-    const { initiatePayment, loading: paymentLoading, error: paymentError } = useRazorpay();
+    const { user, subscriptionType, refreshSubscription } = useAuth();
+
+    // Handle successful payment - navigate to dashboard
+    const handlePaymentSuccess = useCallback(() => {
+        navigate('/dashboard', { replace: true });
+    }, [navigate]);
+
+    const { initiatePayment, loading: paymentLoading, error: paymentError } = useRazorpay({
+        refreshSubscription,
+        onPaymentSuccess: handlePaymentSuccess,
+    });
     const [darkMode, setDarkMode] = useState(false);
 
     // Check if user has paid subscription

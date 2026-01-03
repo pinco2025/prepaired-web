@@ -15,6 +15,11 @@ interface PaymentParams {
     userName?: string;
 }
 
+interface UseRazorpayConfig {
+    refreshSubscription?: () => Promise<void>;
+    onPaymentSuccess?: () => void;
+}
+
 interface UseRazorpayReturn {
     initiatePayment: (params: PaymentParams) => Promise<boolean>;
     loading: boolean;
@@ -35,9 +40,36 @@ const loadRazorpayScript = (): Promise<boolean> => {
     });
 };
 
-export const useRazorpay = (): UseRazorpayReturn => {
+export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn => {
+    const { refreshSubscription, onPaymentSuccess } = config;
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Poll for subscription update to handle webhook delay
+    const pollForSubscriptionUpdate = useCallback(async (
+        userId: string,
+        expectedPlan: string,
+        maxRetries: number = 5,
+        delayMs: number = 1000
+    ): Promise<boolean> => {
+        for (let i = 0; i < maxRetries; i++) {
+            // Wait before checking (except first attempt)
+            if (i > 0) {
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+
+            const { data } = await supabase
+                .from('users')
+                .select('subscription_tier')
+                .eq('id', userId)
+                .single();
+
+            if (data?.subscription_tier?.toLowerCase() === expectedPlan.toLowerCase()) {
+                return true;
+            }
+        }
+        return false;
+    }, []);
 
     const initiatePayment = useCallback(async (params: PaymentParams): Promise<boolean> => {
         const { userId, planType, amount, userEmail, userName } = params;
@@ -109,7 +141,7 @@ export const useRazorpay = (): UseRazorpayReturn => {
                                 console.error('Error updating metadata:', metaError);
                             }
 
-                            // 2. Update users table
+                            // 2. Update users table directly (in case webhook is delayed)
                             const { error: tableError } = await supabase
                                 .from('users')
                                 .update({ subscription_tier: planType })
@@ -119,17 +151,32 @@ export const useRazorpay = (): UseRazorpayReturn => {
                                 console.error('Error updating users table:', tableError);
                             }
 
-                            if (metaError && tableError) {
+                            // 3. Poll for subscription update to ensure webhook processed
+                            const subscriptionUpdated = await pollForSubscriptionUpdate(userId, planType);
+
+                            if (!subscriptionUpdated && metaError && tableError) {
                                 setError('Payment successful, but failed to update subscription. Please contact support.');
+                                setLoading(false);
                                 resolve(false);
-                            } else {
-                                // Success - reload page to update auth state
-                                window.location.reload();
-                                resolve(true);
+                                return;
                             }
+
+                            // 4. Refresh auth context to pick up new subscription
+                            if (refreshSubscription) {
+                                await refreshSubscription();
+                            }
+
+                            // 5. Call success callback (for navigation to dashboard)
+                            if (onPaymentSuccess) {
+                                onPaymentSuccess();
+                            }
+
+                            setLoading(false);
+                            resolve(true);
                         } catch (err) {
                             console.error('Error updating subscription:', err);
                             setError('An error occurred while updating your subscription.');
+                            setLoading(false);
                             resolve(false);
                         }
                     },
@@ -162,7 +209,7 @@ export const useRazorpay = (): UseRazorpayReturn => {
             setLoading(false);
             return false;
         }
-    }, []);
+    }, [pollForSubscriptionUpdate, refreshSubscription, onPaymentSuccess]);
 
     return { initiatePayment, loading, error };
 };
