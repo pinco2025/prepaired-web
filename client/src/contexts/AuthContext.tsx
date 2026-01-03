@@ -58,7 +58,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else {
               const subsFromTable = (profile as any)?.subscription_tier ?? null;
               const meta = (u.user_metadata ?? {} ) as any;
-              const rawSub = (subsFromTable ?? meta.subscription ?? meta.subscription_type ?? meta.plan ?? meta.role) ?? null;
+
+              // Prioritize table if it has a paid value, otherwise check metadata
+              // This handles cases where table update fails (RLS) but metadata update succeeds
+              let rawSub = subsFromTable;
+              if (!rawSub || rawSub === 'free') {
+                 // Check metadata for a better value
+                 const metaSub = meta.subscription_tier ?? meta.subscription ?? meta.subscription_type ?? meta.plan ?? meta.role;
+                 if (metaSub && metaSub !== 'free') {
+                    rawSub = metaSub;
+                 }
+              }
+              // If still null, fallback to whatever we found
+              if (!rawSub) {
+                 rawSub = meta.subscription_tier ?? meta.subscription ?? meta.subscription_type ?? meta.plan ?? meta.role ?? null;
+              }
+
               // normalize to a trimmed, lower-case string when possible
               const normalized = typeof rawSub === 'string' ? rawSub.trim().toLowerCase() : null;
               setSubscriptionType(normalized);

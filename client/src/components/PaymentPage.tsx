@@ -50,14 +50,25 @@ const PaymentPage: React.FC = () => {
             // on a secure backend (e.g., Supabase Edge Functions or a Node.js server) using a service role key.
             // This prevents users from manually calling this update function to bypass payment.
 
-            const { error } = await supabase
+            // 1. Try to update user metadata (this usually works for the user themselves)
+            const { error: metaError } = await supabase.auth.updateUser({
+              data: { subscription_tier: 'IPFT-01-2026' }
+            });
+
+            if (metaError) console.error('Error updating metadata:', metaError);
+
+            // 2. Try to update the 'users' table
+            const { error: tableError } = await supabase
               .from('users')
               .update({ subscription_tier: 'IPFT-01-2026' })
               .eq('id', user.id);
 
-            if (error) {
-                console.error('Error updating subscription:', error);
-                alert('Payment successful, but failed to update subscription. Please contact support.');
+            if (tableError) {
+                console.error('Error updating users table:', tableError);
+            }
+
+            if (metaError && tableError) {
+                alert('Payment successful, but failed to update subscription status. Please contact support.');
             } else {
                 // Reload to reflect changes in AuthContext
                 window.location.reload();
