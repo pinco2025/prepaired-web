@@ -268,6 +268,7 @@ export interface Question {
 
 export interface Test {
   id: string;
+  testID?: number;
   title: string;
   description: string;
   duration: number;

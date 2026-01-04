@@ -6,7 +6,7 @@ import { Test } from '../data';
 import { useAuth } from '../contexts/AuthContext';
 
 interface TestWithStatus extends Test {
-  status: 'completed' | 'unlocked' | 'locked';
+    status: 'completed' | 'unlocked' | 'locked';
 }
 
 const Tests: React.FC = () => {
@@ -25,7 +25,7 @@ const Tests: React.FC = () => {
                 const { data: testsData, error: testsError } = await supabase
                     .from('tests')
                     .select('*')
-                    .order('id', { ascending: true });
+                    .order('testID', { ascending: true });
 
                 if (testsError) throw testsError;
 
@@ -33,7 +33,7 @@ const Tests: React.FC = () => {
                 const { data: submissionsData, error: submissionsError } = await supabase
                     .from('student_tests')
                     .select('test_id')
-                    .eq('student_id', user.id)
+                    .eq('user_id', user.id)
                     .not('submitted_at', 'is', null);
 
                 if (submissionsError) throw submissionsError;
@@ -42,7 +42,7 @@ const Tests: React.FC = () => {
 
                 let firstUnlockedFound = false;
                 const testsWithStatus: TestWithStatus[] = (testsData || []).map(test => {
-                    const isCompleted = completedTestIds.has(test.id);
+                    const isCompleted = completedTestIds.has(test.testID);
                     let status: 'completed' | 'unlocked' | 'locked' = 'locked';
 
                     if (isCompleted) {
@@ -71,7 +71,7 @@ const Tests: React.FC = () => {
             // For now, just stop loading and show empty.
             setIsLoading(false);
         }
-    }, [user]);
+    }, [user?.id]);
 
     if (isLoading) {
         return (
@@ -158,12 +158,12 @@ const Tests: React.FC = () => {
                         <div className="relative z-10 grid grid-cols-1 md:block gap-12 md:gap-0">
                             {tests.map((test, index) => {
                                 const position = testPositions[index % testPositions.length];
-                                const testNumber = test.id.split('-').pop();
+                                const testNumber = test.testID;
 
                                 if (test.status === 'completed') {
                                     return (
-                                        <div key={test.id} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
-                                            <Link to={`/results/${test.id}`} className="group relative flex flex-col items-center w-48">
+                                        <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+                                            <Link to={`/results/${test.testID}`} className="group relative flex flex-col items-center w-48">
                                                 <div className="relative">
                                                     <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-green-500 shadow-glow-green flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 relative">
                                                         <span className="text-2xl font-bold text-green-500">{testNumber}</span>
@@ -181,8 +181,8 @@ const Tests: React.FC = () => {
 
                                 if (test.status === 'unlocked') {
                                     return (
-                                        <div key={test.id} className="flex justify-center md:absolute mb-8 md:mb-0 z-20" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
-                                            <Link to={`/tests/${test.id}`} className="group relative flex flex-col items-center w-56">
+                                        <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0 z-20" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+                                            <Link to={`/tests/${test.testID}`} className="group relative flex flex-col items-center w-56">
                                                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-primary/30 rounded-full blur-xl animate-pulse"></div>
                                                 <div className="relative mb-4">
                                                     <div className="w-24 h-24 rounded-full bg-primary text-white shadow-glow-primary flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 ring-4 ring-primary/20 relative">
@@ -202,7 +202,7 @@ const Tests: React.FC = () => {
                                 }
 
                                 return (
-                                    <div key={test.id} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+                                    <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
                                         <div className="group relative flex flex-col items-center w-48 opacity-60 hover:opacity-100 transition-opacity cursor-not-allowed">
                                             <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-border-light dark:border-border-dark flex items-center justify-center z-10 relative">
                                                 <span className="text-2xl font-bold text-text-secondary-light dark:text-text-secondary-dark">{testNumber}</span>
