@@ -320,7 +320,7 @@ const LandingPage: React.FC = () => {
                                                 <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wide mb-1">Your Price</p>
                                                 <div className="flex items-baseline gap-2">
                                                     <span className="text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">₹499</span>
-                                                    <span className="text-xs font-bold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/40 px-2 py-1 rounded-full border border-green-200 dark:border-green-800 mb-2">80% OFF</span>
+                                                    <span className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded-full border border-red-200 dark:border-red-800 mb-2">80% OFF</span>
                                                 </div>
                                             </div>
                                         </div>
