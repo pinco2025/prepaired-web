@@ -17,7 +17,7 @@ const Tests: React.FC = () => {
 
     useEffect(() => {
         const fetchTestsAndSubmissions = async () => {
-            if (!user) return;
+            if (!user?.id) return;
 
             setIsLoading(true);
             try {
@@ -64,12 +64,12 @@ const Tests: React.FC = () => {
             }
         };
 
-        if (user) {
+        if (user?.id) {
             fetchTestsAndSubmissions();
         } else {
             setIsLoading(false);
         }
-    }, [user]);
+    }, [user?.id]);
 
     if (isLoading) {
         return (
@@ -138,7 +138,7 @@ const Tests: React.FC = () => {
                         <h1 className="text-4xl md:text-5xl font-bold text-text-light dark:text-text-dark tracking-tight mb-4">Select Your Test</h1>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark text-lg max-w-2xl mx-auto">Navigate through the mastery path. Unlock new challenges by completing levels.</p>
                     </div>
-                    <div className="relative w-full max-w-5xl mx-auto py-10 min-h-[900px]">
+                    <div className="relative w-full max-w-5xl mx-auto py-10" style={{ minHeight: `${Math.max(tests.length > 0 ? testPositions[Math.min(tests.length - 1, testPositions.length - 1)].top + 200 : 400, 400)}px` }}>
                         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-0 hidden md:block" style={{ strokeWidth: 3, fill: 'none' }}>
                             <defs>
                                 <linearGradient id="pathGradient" x1="0%" x2="100%" y1="0%" y2="100%">
@@ -147,11 +147,42 @@ const Tests: React.FC = () => {
                                     <stop offset="100%" style={{ stopColor: '#9ca3af', stopOpacity: 0.3 }} />
                                 </linearGradient>
                             </defs>
-                            <path
-                                className="stroke-border-light dark:stroke-border-dark path-line"
-                                d="M 120 80 C 250 80, 300 200, 420 200 C 540 200, 590 80, 710 80 C 830 80, 880 200, 880 320 C 880 440, 830 560, 710 560 C 590 560, 540 440, 420 440 C 300 440, 250 560, 120 560 C 50 560, 50 680, 120 780 C 200 880, 350 880, 420 800 C 490 720, 500 700, 650 780"
-                                style={{ stroke: 'url(#pathGradient)', strokeLinecap: 'round' }}
-                            />
+                            {/* Dynamic path based on number of tests */}
+                            {tests.length >= 1 && (
+                                <path
+                                    className="stroke-border-light dark:stroke-border-dark path-line"
+                                    d={(() => {
+                                        // Generate path segments based on actual test count
+                                        const nodeCenter = 40; // Offset to center of node
+                                        const segments: string[] = [];
+
+                                        for (let i = 0; i < Math.min(tests.length, testPositions.length); i++) {
+                                            const pos = testPositions[i];
+                                            const x = pos.left + 70 + nodeCenter;
+                                            const y = pos.top + 40 + nodeCenter;
+
+                                            if (i === 0) {
+                                                segments.push(`M ${x} ${y}`);
+                                            } else {
+                                                const prevPos = testPositions[i - 1];
+                                                const prevX = prevPos.left + 70 + nodeCenter;
+                                                const prevY = prevPos.top + 40 + nodeCenter;
+
+                                                // Calculate control points for smooth curves
+                                                const midX = (prevX + x) / 2;
+                                                const midY = (prevY + y) / 2;
+
+                                                // Use quadratic bezier for smoother curves
+                                                segments.push(`Q ${prevX + (x - prevX) * 0.5} ${prevY}, ${midX} ${midY}`);
+                                                segments.push(`T ${x} ${y}`);
+                                            }
+                                        }
+
+                                        return segments.join(' ');
+                                    })()}
+                                    style={{ stroke: 'url(#pathGradient)', strokeLinecap: 'round' }}
+                                />
+                            )}
                         </svg>
                         <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-border-light dark:bg-border-dark -translate-x-1/2 md:hidden z-0"></div>
 
