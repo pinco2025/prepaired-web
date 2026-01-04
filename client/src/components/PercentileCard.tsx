@@ -1,316 +1,208 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
-import { useCountUp } from "react-countup";
+import React, { useRef, useEffect, useState } from 'react';
+import ResizeObserver from 'resize-observer-polyfill';
+import useCountUp from '../hooks/useCountUp';
 
-// --- Types ---
-interface ChartData {
-  label: string;
-  date: string;
-  value: number;
+export interface ChartData {
+    label: string;
+    date: string;
+    value: number;
 }
 
-interface Point {
-  x: number;
-  y: number;
-  data: ChartData;
+interface PercentileCardProps {
+    percentile?: number;
+    historyData?: ChartData[];
 }
 
-// --- Constants ---
-const PRIMARY_COLOR = "#0066ff";
+const PercentileCard: React.FC<PercentileCardProps> = ({ percentile = 0, historyData = [] }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const animatedPercentile = useCountUp(percentile);
 
-// --- Mock Data ---
-const MOCK_HISTORY: ChartData[] = [
-  { label: "Test 1", date: "2023-10-01", value: 76.2 },
-  { label: "Test 2", date: "2023-10-05", value: 75.1 },
-  { label: "Test 3", date: "2023-10-12", value: 77.0 },
-  { label: "Test 4", date: "2023-10-20", value: 80.4 },
-  { label: "Test 5", date: "2023-10-28", value: 83.0 },
-  { label: "Test 6", date: "2023-11-05", value: 87.2 },
-  { label: "Test 7", date: "2023-11-12", value: 90.1 },
-  { label: "Test 8", date: "2023-11-20", value: 92.4 },
-  { label: "Test 9", date: "2023-11-28", value: 94.8 },
-  { label: "Test 10", date: "2023-12-05", value: 96.9 },
-  { label: "Current", date: "2023-12-15", value: 98.5 }
-];
+    useEffect(() => {
+        if (!containerRef.current) return;
 
-// --- Hooks ---
-function useElementSize<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setSize({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (!entries || entries.length === 0) return;
+            const { width, height } = entries[0].contentRect;
+            setDimensions({ width, height });
         });
-      }
-    });
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
 
-  return { ref, width: size.width, height: size.height };
-}
+        resizeObserver.observe(containerRef.current);
+        return () => resizeObserver.disconnect();
+    }, []);
 
-// --- Math Helpers ---
+    const { width, height } = dimensions;
+    const padding = 20;
 
-/**
- * Generates a smooth SVG path from points using a simplified smoothing algorithm.
- */
-function buildSmoothPath(points: Point[]) {
-  if (points.length < 2) return "";
+    // Autoscaling Logic
+    const dataValues = historyData.map(d => d.value);
+    const dataMin = dataValues.length > 0 ? Math.min(...dataValues) : 0;
+    const dataMax = dataValues.length > 0 ? Math.max(...dataValues) : 100;
 
-  let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+    // Calculate dynamic range
+    let minDomain = dataMin - 5;
+    let maxDomain = dataMax + 5;
 
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i - 1] || points[i];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[i + 2] || p2;
+    // Clamp to 0-100
+    minDomain = Math.max(0, minDomain);
+    maxDomain = Math.min(100, maxDomain);
 
-    // Tension factor
-    const t = 0.2;
+    // Ensure minimum spread for visual appeal
+    if (maxDomain - minDomain < 20) {
+        const center = (minDomain + maxDomain) / 2;
+        minDomain = Math.max(0, center - 10);
+        maxDomain = Math.min(100, center + 10);
 
-    const cp1x = p1.x + (p2.x - p0.x) * t;
-    const cp1y = p1.y + (p2.y - p0.y) * t;
+        // Re-clamp if center adjustment pushed it out
+        if (minDomain === 0) maxDomain = Math.min(100, 20);
+        if (maxDomain === 100) minDomain = Math.max(0, 80);
+    }
 
-    const cp2x = p2.x - (p3.x - p1.x) * t;
-    const cp2y = p2.y - (p3.y - p1.y) * t;
+    const minVal = minDomain;
+    const maxVal = maxDomain;
 
-    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
-  }
+    // Calculate points
+    const points = historyData.map((d, i) => {
+        let x;
+        if (historyData.length <= 1) {
+            x = width / 2; // Center if only 1 point
+        } else {
+            x = padding + (i * (width - 2 * padding)) / (historyData.length - 1);
+        }
 
-  return d;
-}
+        // Protect against divide by zero if maxVal === minVal
+        const range = maxVal - minVal || 1;
+        const y = height - padding - ((d.value - minVal) / range) * (height - 2 * padding);
 
-
-const PercentileCard: React.FC = () => {
-  const percentileId = "percentile-counter";
-  const { ref, width, height } = useElementSize<HTMLDivElement>();
-  const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
-
-  // Padding inside the SVG to prevent clipping of circles/stroke
-  const PADDING = { TOP: 20, BOTTOM: 30, LEFT: 10, RIGHT: 40 };
-
-  // --- Animation ---
-  const { start } = useCountUp({
-    ref: percentileId,
-    end: MOCK_HISTORY[MOCK_HISTORY.length - 1].value,
-    duration: 2,
-    decimals: 1,
-    startOnMount: false
-  });
-
-  useEffect(() => {
-    const t = setTimeout(start, 500);
-    return () => clearTimeout(t);
-  }, [start]);
-
-  // --- Data Processing ---
-  const { points, gridLines, areaPath, linePath } = useMemo(() => {
-    if (!width || !height) return { points: [], gridLines: [], areaPath: "", linePath: "" };
-
-    const chartW = width - PADDING.LEFT - PADDING.RIGHT;
-    const chartH = height - PADDING.TOP - PADDING.BOTTOM;
-
-    const values = MOCK_HISTORY.map((d) => d.value);
-    const minVal = Math.min(...values);
-    const maxVal = Math.max(...values);
-
-    // Domain scaling
-    const buffer = (maxVal - minVal) * 0.5 || 5;
-    const domainMin = Math.floor(Math.max(0, minVal - buffer));
-    const domainMax = Math.ceil(Math.min(100, maxVal + buffer * 0.5));
-    const domainRange = domainMax - domainMin || 1;
-
-    // Grid Lines (3 lines)
-    const gridValues = [domainMin, domainMin + domainRange * 0.5, domainMax];
-    const gridLines = gridValues.map(val => ({
-        value: val,
-        y: PADDING.TOP + chartH - ((val - domainMin) / domainRange) * chartH
-    }));
-
-    // Calculate Points
-    const calculatedPoints: Point[] = MOCK_HISTORY.map((d, i) => {
-        const x = PADDING.LEFT + (i / (MOCK_HISTORY.length - 1)) * chartW;
-        const y = PADDING.TOP + chartH - ((d.value - domainMin) / domainRange) * chartH;
-        return { x, y, data: d };
+        return { x, y, value: d.value, label: d.label, date: d.date };
     });
 
-    const path = buildSmoothPath(calculatedPoints);
-    const area = `${path} L ${PADDING.LEFT + chartW} ${PADDING.TOP + chartH} L ${PADDING.LEFT} ${PADDING.TOP + chartH} Z`;
+    // Helper to build a smooth path (Catmull-Rom like or Cubic Bezier)
+    // For simplicity and "smoothness", we can use a basic cubic bezier strategy.
+    // control point = previous point + (current - previous) * tension
+    const buildSmoothPath = (points: {x: number, y: number}[]) => {
+        if (points.length === 0) return '';
+        if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
 
-    return { points: calculatedPoints, gridLines, linePath: path, areaPath: area };
-  }, [width, height]);
+        let d = `M ${points[0].x} ${points[0].y}`;
 
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[Math.max(0, i - 1)];
+            const p1 = points[i];
+            const p2 = points[i + 1];
+            const p3 = points[Math.min(points.length - 1, i + 2)];
 
-  return (
-    <div className="col-span-1 md:col-span-12 lg:col-span-5 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col relative overflow-hidden h-full">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            // Calculate control points using a simplified tension model (0.2 is tension)
+            const cp1x = p1.x + (p2.x - p0.x) * 0.15;
+            const cp1y = p1.y + (p2.y - p0.y) * 0.15;
+            const cp2x = p2.x - (p3.x - p1.x) * 0.15;
+            const cp2y = p2.y - (p3.y - p1.y) * 0.15;
 
-      {/* Header */}
-      <div className="flex justify-between items-start mb-2 relative z-10 shrink-0">
-        <div>
-          <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">
-            PrepAIred %ile
-          </h2>
-          <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-            Global Ranking
-          </p>
-        </div>
-        <div className="inline-flex items-center gap-1.5 bg-success-light/10 text-success-dark px-2.5 py-1 rounded-full border border-success-light/20">
-          <span className="material-icons-outlined text-sm">trending_up</span>
-          <span className="text-xs font-bold">Top 1.5%</span>
-        </div>
-      </div>
+            d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+        }
+        return d;
+    };
 
-      {/* Big Value */}
-      <div className="flex items-baseline gap-2 mb-4 relative z-10 shrink-0">
-        <span
-          id={percentileId}
-          className="text-4xl md:text-5xl font-bold text-primary tracking-tight"
-        />
-        <span className="text-base text-text-secondary-light font-medium">%ile</span>
-      </div>
+    // Create path string for the line
+    const pathD = buildSmoothPath(points);
 
-      {/* Chart Container */}
-      <div className="flex-1 w-full min-h-[140px] relative" ref={ref}>
-        {width > 0 && height > 0 && (
-            <>
-                <svg width={width} height={height} className="overflow-visible">
-                    <defs>
-                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={PRIMARY_COLOR} stopOpacity="0.2" />
-                            <stop offset="100%" stopColor={PRIMARY_COLOR} stopOpacity="0.0" />
-                        </linearGradient>
-                    </defs>
+    // Create path for the area fill
+    const areaPathD = points.length > 0
+        ? `${pathD} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`
+        : '';
 
-                    {/* Grid Lines */}
-                    {gridLines.map((line, i) => (
-                        <g key={`grid-${i}`}>
-                            <line
-                                x1={PADDING.LEFT}
-                                y1={line.y}
-                                x2={width - PADDING.RIGHT}
-                                y2={line.y}
-                                stroke="currentColor"
-                                strokeOpacity="0.06"
-                                strokeDasharray="4 4"
-                                className="text-text-secondary-light dark:text-text-secondary-dark"
-                            />
-                            {/* Y-Axis Label */}
-                            <text
-                                x={width - PADDING.RIGHT + 8}
-                                y={line.y}
-                                dy="0.3em"
-                                fontSize="10"
-                                fill="currentColor"
-                                opacity="0.5"
-                                className="text-text-secondary-light dark:text-text-secondary-dark font-mono"
-                            >
-                                {Math.round(line.value)}
-                            </text>
-                        </g>
-                    ))}
-
-                    {/* Area Fill */}
-                    <path d={areaPath} fill="url(#chartGradient)" />
-
-                    {/* Main Line */}
-                    <path
-                        d={linePath}
-                        fill="none"
-                        stroke={PRIMARY_COLOR}
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="animate-draw-line"
-                    />
-
-                    {/* Interactive Points */}
-                    {points.map((p, i) => {
-                         const isLast = i === points.length - 1;
-                         const isHovered = hoveredPoint === p;
-                         // Only show points on hover or if it's the last one
-                         const isVisible = isLast || isHovered;
-
-                         return (
-                            <g
-                                key={i}
-                                onMouseEnter={() => setHoveredPoint(p)}
-                                onMouseLeave={() => setHoveredPoint(null)}
-                                className="cursor-pointer"
-                            >
-                                {/* Invisible Hit Target (Larger) */}
-                                <circle cx={p.x} cy={p.y} r="15" fill="transparent" />
-
-                                {/* Visible Dot */}
-                                <circle
-                                    cx={p.x}
-                                    cy={p.y}
-                                    r={isHovered ? 5 : 4}
-                                    fill={isLast || isHovered ? PRIMARY_COLOR : "var(--background)"}
-                                    stroke="white"
-                                    strokeWidth="2"
-                                    className={`transition-all duration-200 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-                                />
-                                {isLast && !isHovered && (
-                                     <circle
-                                        cx={p.x}
-                                        cy={p.y}
-                                        r="4"
-                                        fill={PRIMARY_COLOR}
-                                        stroke="white"
-                                        strokeWidth="2"
-                                     />
-                                )}
-                            </g>
-                         );
-                    })}
-                </svg>
-
-                {/* Tooltip (HTML overlay for easier styling/z-index) */}
-                {hoveredPoint && (
-                    <div
-                        className="absolute z-20 pointer-events-none transition-all duration-100 ease-out"
-                        style={{
-                            left: hoveredPoint.x,
-                            top: hoveredPoint.y,
-                            transform: `translate(-50%, -130%)`
-                        }}
-                    >
-                        <div className="bg-surface-dark text-white text-xs py-1.5 px-3 rounded-lg shadow-xl flex flex-col items-center min-w-[60px] border border-white/10">
-                            <span className="font-bold text-sm">{hoveredPoint.data.value}%</span>
-                            <span className="text-[10px] text-gray-400">{hoveredPoint.data.label}</span>
-                        </div>
-                        {/* Little triangle arrow */}
-                        <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-surface-dark absolute left-1/2 -bottom-[5px] -translate-x-1/2"></div>
+    return (
+        <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl shadow-sm border border-border-light dark:border-border-dark flex flex-col h-full">
+            <div className="flex justify-between items-start mb-4">
+                <div>
+                    <h3 className="text-text-secondary-light dark:text-text-secondary-dark font-medium text-sm">Percentile</h3>
+                    <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-4xl font-bold text-text-light dark:text-text-dark">{animatedPercentile}</span>
+                        <span className="text-success-light dark:text-success-dark text-sm font-medium">Top {Math.max(1, 100 - percentile)}%</span>
                     </div>
-                )}
-            </>
-        )}
-      </div>
+                </div>
+            </div>
 
-      <p className="text-xs text-center text-text-secondary-light dark:text-text-secondary-dark mt-2 shrink-0">
-        Your performance is trending upward
-      </p>
+            <div className="flex-1 min-h-0 relative" ref={containerRef}>
+               {width > 0 && height > 0 && historyData.length > 0 ? (
+                   <svg width={width} height={height} className="overflow-visible">
+                        {/* Gradients */}
+                       <defs>
+                           <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                               <stop offset="0%" stopColor="#818CF8" />
+                               <stop offset="100%" stopColor="#C084FC" />
+                           </linearGradient>
+                           <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                               <stop offset="0%" stopColor="#818CF8" stopOpacity="0.2" />
+                               <stop offset="100%" stopColor="#818CF8" stopOpacity="0" />
+                           </linearGradient>
+                           <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                               <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                               <feMerge>
+                                   <feMergeNode in="coloredBlur" />
+                                   <feMergeNode in="SourceGraphic" />
+                               </feMerge>
+                           </filter>
+                       </defs>
 
-      <style>{`
-        .animate-draw-line {
-          stroke-dasharray: 1000;
-          stroke-dashoffset: 1000;
-          animation: drawLine 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-        @keyframes drawLine {
-          to { stroke-dashoffset: 0; }
-        }
-      `}</style>
-    </div>
-  );
+                       {/* Area Fill */}
+                       <path
+                           d={areaPathD}
+                           fill="url(#areaGradient)"
+                           className="animate-fade-in-up"
+                       />
+
+                       {/* Line */}
+                       <path
+                           d={pathD}
+                           fill="none"
+                           stroke="url(#lineGradient)"
+                           strokeWidth="3"
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                           filter="url(#glow)"
+                           className="animate-draw-line"
+                           style={{
+                               strokeDasharray: 1000,
+                               strokeDashoffset: 1000,
+                               animation: 'dash 1.5s ease-out forwards'
+                           }}
+                       />
+
+                       {/* Points */}
+                       {points.map((p, i) => (
+                           <g key={i} className="group">
+                               <circle
+                                   cx={p.x}
+                                   cy={p.y}
+                                   r="4"
+                                   className="fill-background-light dark:fill-background-dark stroke-primary-light dark:stroke-primary-dark stroke-2 transition-all duration-300 group-hover:r-6"
+                               />
+                               {/* Tooltip */}
+                               <foreignObject x={p.x - 50} y={p.y - 60} width="100" height="50" className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                    <div className="flex flex-col items-center justify-center p-2 bg-gray-900 text-white text-xs rounded shadow-lg transform translate-y-2">
+                                        <span className="font-bold">{p.value}%</span>
+                                        <span className="text-gray-300">{p.date}</span>
+                                    </div>
+                               </foreignObject>
+                           </g>
+                       ))}
+                   </svg>
+               ) : (
+                   <div className="flex items-center justify-center h-full text-text-secondary-light dark:text-text-secondary-dark text-sm">
+                       No history data available
+                   </div>
+               )}
+            </div>
+            <style>{`
+                @keyframes dash {
+                    to {
+                        stroke-dashoffset: 0;
+                    }
+                }
+            `}</style>
+        </div>
+    );
 };
 
 export default PercentileCard;
