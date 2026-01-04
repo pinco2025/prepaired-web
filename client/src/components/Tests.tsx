@@ -67,11 +67,9 @@ const Tests: React.FC = () => {
         if (user) {
             fetchTestsAndSubmissions();
         } else {
-            // Handle case where user is not logged in, maybe show all as locked.
-            // For now, just stop loading and show empty.
             setIsLoading(false);
         }
-    }, [user?.id]);
+    }, [user]);
 
     if (isLoading) {
         return (
@@ -118,6 +116,7 @@ const Tests: React.FC = () => {
             </main>
         );
     }
+
     const testPositions = [
         { top: 0, left: 50 },
         { top: 120, left: 350 },
@@ -130,6 +129,7 @@ const Tests: React.FC = () => {
         { top: 740, left: 350 },
         { top: 700, left: 640 },
     ];
+
     return (
         <main className="flex-grow">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -158,7 +158,7 @@ const Tests: React.FC = () => {
                         <div className="relative z-10 grid grid-cols-1 md:block gap-12 md:gap-0">
                             {tests.map((test, index) => {
                                 const position = testPositions[index % testPositions.length];
-                                const testNumber = test.testID;
+                                const testNumber = index + 1;
 
                                 if (test.status === 'completed') {
                                     return (
@@ -201,6 +201,27 @@ const Tests: React.FC = () => {
                                     );
                                 }
 
+                                // Locked tests
+                                if (test.type === 'Boss') { // Boss Level
+                                    return (
+                                        <div key={test.testID} className="flex justify-center md:absolute" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+                                            <div className="group relative flex flex-col items-center w-48 cursor-not-allowed">
+                                                <div className="absolute -inset-1 bg-red-500/10 rounded-full blur-md animate-pulse"></div>
+                                                <div className="w-24 h-24 rounded-full bg-surface-light dark:bg-surface-dark border-4 border-dashed border-red-500 flex items-center justify-center z-10 relative shadow-glow-red">
+                                                    <span className="text-3xl font-bold text-red-500">{testNumber}</span>
+                                                    <span className="material-symbols-outlined absolute -top-3 text-white bg-red-500 rounded-full p-1 text-base shadow-sm">local_fire_department</span>
+                                                    <span className="material-symbols-outlined absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-500/20 text-4xl">lock</span>
+                                                </div>
+                                                <div className="mt-3 text-center w-full">
+                                                    <h3 className="font-bold text-red-500 text-sm leading-tight mb-1">{test.title}</h3>
+                                                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 border border-red-100 dark:border-red-900/50">Boss Level</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                // Regular Locked Test
                                 return (
                                     <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
                                         <div className="group relative flex flex-col items-center w-48 opacity-60 hover:opacity-100 transition-opacity cursor-not-allowed">

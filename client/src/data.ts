@@ -277,6 +277,7 @@ export interface Test {
   instructions: string[];
   url: string;
   exam?: 'Normal' | 'JEE' | 'NEET';
+  type?: 'Boss' | 'Normal';
   questions?: Question[];
   maximum_marks?: number;
   sections?: { name: string }[];
