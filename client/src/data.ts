@@ -294,4 +294,6 @@ export interface UserAnalytics {
   math_avg: number;
   accuracy: number;
   attempt_no: number;
+  percentile?: number;
+  history_url?: string;
 }

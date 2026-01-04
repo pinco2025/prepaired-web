@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SubjectsCard from './SubjectsCard';
-import PercentileCard from './PercentileCard';
+import PercentileCard, { ChartData } from './PercentileCard';
 import WeakAreasCard from './WeakAreasCard';
 import AccuracyCard from './AccuracyCard';
 import AverageScoreCard from './AverageScoreCard';
@@ -13,6 +13,7 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
+  const [historyData, setHistoryData] = useState<ChartData[]>([]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -41,6 +42,29 @@ const Dashboard: React.FC = () => {
     fetchAnalytics();
   }, [user]);
 
+  useEffect(() => {
+    if (analytics?.history_url) {
+      fetch(analytics.history_url)
+        .then((res) => res.json())
+        .then((data) => {
+          const formattedData = Array.isArray(data)
+            ? data.map((item: any, index: number) => ({
+                label: `Test ${index + 1}`,
+                date: item.created_at
+                  ? new Date(item.created_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : '',
+                value: item.percentile || 0,
+              }))
+            : [];
+          setHistoryData(formattedData);
+        })
+        .catch((err) => console.error('Error fetching history:', err));
+    }
+  }, [analytics?.history_url]);
+
   // Calculate derived values
   const phyScore = analytics && analytics.attempt_no ? Math.round(analytics.phy_avg / analytics.attempt_no) : 0;
   const chemScore = analytics && analytics.attempt_no ? Math.round(analytics.chem_avg / analytics.attempt_no) : 0;
@@ -64,7 +88,7 @@ const Dashboard: React.FC = () => {
                  <SubjectsCard averages={{ physics: phyScore, chemistry: chemScore, maths: mathScore }} />
             </div>
             <div className="col-span-1 md:col-span-12 lg:col-span-5 h-[380px] md:h-full md:min-h-0">
-                <PercentileCard />
+                <PercentileCard percentile={analytics?.percentile} historyData={historyData} />
             </div>
 
             {/* Row 2 */}
