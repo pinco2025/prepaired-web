@@ -47,18 +47,20 @@ const Dashboard: React.FC = () => {
       fetch(analytics.history_url)
         .then((res) => res.json())
         .then((data) => {
-          const formattedData = Array.isArray(data)
-            ? data.map((item: any, index: number) => ({
+          const sortedData = Array.isArray(data)
+            ? data.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+            : [];
+
+          const formattedData = sortedData.map((item: any, index: number) => ({
                 label: `Test ${index + 1}`,
-                date: item.created_at
-                  ? new Date(item.created_at).toLocaleDateString('en-US', {
+                date: item.timestamp
+                  ? new Date(item.timestamp).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })
                   : '',
                 value: item.percentile || 0,
-              }))
-            : [];
+              }));
           setHistoryData(formattedData);
         })
         .catch((err) => console.error('Error fetching history:', err));
