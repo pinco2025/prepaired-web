@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
@@ -51,10 +51,19 @@ const HomeRoute: React.FC = () => {
 
 export const AppContent: React.FC = () => {
   const { isPaidUser, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  // Check if user is on a test-taking route (hide sidebar during test)
+  // Matches /tests/:testId but not /tests (the list page)
+  const isTestRoute = /^\/tests\/[^/]+$/.test(location.pathname);
+
+  // Also hide sidebar on the test-submitted page
+  const isTestSubmittedRoute = location.pathname === '/test-submitted';
 
   // Determine if we should show the sidebar
   // Show sidebar only for authenticated paid users on protected routes
-  const showSidebar = !loading && isAuthenticated && isPaidUser;
+  // Hide sidebar when user is taking a test or on submission page
+  const showSidebar = !loading && isAuthenticated && isPaidUser && !isTestRoute && !isTestSubmittedRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">

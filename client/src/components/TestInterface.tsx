@@ -152,7 +152,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       console.log('Submission already in progress, skipping...');
       return;
     }
-    
+
     isSubmittingRef.current = true;
     setIsSubmitting(true);
     console.log('Starting submission...');
@@ -184,34 +184,34 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       let finalSubmissionId = currentStudentTestId;
 
       if (currentStudentTestId) {
-          console.log('Updating existing record:', currentStudentTestId);
-          const { data: updateResult, error: updateError } = await supabase
-              .from('student_tests')
-              .update(submissionData)
-              .eq('id', currentStudentTestId)
-              .select();
-          
-          console.log('Update result:', updateResult);
-          error = updateError;
+        console.log('Updating existing record:', currentStudentTestId);
+        const { data: updateResult, error: updateError } = await supabase
+          .from('student_tests')
+          .update(submissionData)
+          .eq('id', currentStudentTestId)
+          .select();
+
+        console.log('Update result:', updateResult);
+        error = updateError;
       } else {
-          // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
-          console.log('No student test ID, creating new entry (fallback)');
-          const { data: insertData, error: insertError } = await supabase.from('student_tests').insert([{
-              test_id: currentTestData.testId,
-              user_id: user.id,
-              answers: currentAnswers,
-              started_at: new Date().toISOString(),
-              submitted_at: new Date().toISOString()
-          }])
+        // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
+        console.log('No student test ID, creating new entry (fallback)');
+        const { data: insertData, error: insertError } = await supabase.from('student_tests').insert([{
+          test_id: currentTestData.testId,
+          user_id: user.id,
+          answers: currentAnswers,
+          started_at: new Date().toISOString(),
+          submitted_at: new Date().toISOString()
+        }])
           .select('id')
           .single();
 
-          if (insertData) {
-            finalSubmissionId = insertData.id;
-            // Update state so subsequent retries use this ID (prevent duplicate inserts)
-            setStudentTestId(insertData.id);
-          }
-          error = insertError;
+        if (insertData) {
+          finalSubmissionId = insertData.id;
+          // Update state so subsequent retries use this ID (prevent duplicate inserts)
+          setStudentTestId(insertData.id);
+        }
+        error = insertError;
       }
 
       if (error || !finalSubmissionId) {
@@ -268,11 +268,11 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
     const initializeTest = async () => {
       if (!test || !test.url) return;
-      
+
       // Mark as initializing immediately
       initializationRef.current = true;
       console.log('Initializing test...');
-      
+
       const data = await fetchTestData(test.url);
 
       const adaptedTestData: LocalTest = {
@@ -346,14 +346,14 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
           setStudentTestId((existingTest as any).id);
           // Load answers from DB if available
           if ((existingTest as any).answers) {
-               setAnswers((existingTest as any).answers);
+            setAnswers((existingTest as any).answers);
           }
         } else {
           console.log('Creating new student test entry...');
           const { data: newStudentTest, error: insertError } = await supabase
             .from('student_tests')
-            .insert({ 
-              test_id: data.testId, 
+            .insert({
+              test_id: data.testId,
               user_id: user.id,
               started_at: new Date().toISOString()
             })
@@ -440,7 +440,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
   useEffect(() => {
     if (!testData || !studentTestId) return;
-    
+
     // Save to LocalStorage
     try {
       localStorage.setItem(`test-answers-${testData.testId}`, JSON.stringify(answers));
@@ -455,7 +455,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         .update({ answers: answers })
         .eq('id', studentTestId)
         .then(({ error }) => {
-            if (error) console.error('Error auto-saving answers to DB:', error);
+          if (error) console.error('Error auto-saving answers to DB:', error);
         });
     }, 500);
 
@@ -482,24 +482,24 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
     // Check if already selected (toggle behavior)
     if (answers[currentQuestion.uuid] === optionId) {
-        // Unmark
-        setAnswers((prev) => {
-            const newAnswers = { ...prev };
-            delete newAnswers[currentQuestion.uuid];
-            return newAnswers;
-        });
-        setSelectedOption(null);
+      // Unmark
+      setAnswers((prev) => {
+        const newAnswers = { ...prev };
+        delete newAnswers[currentQuestion.uuid];
+        return newAnswers;
+      });
+      setSelectedOption(null);
 
-        const newQuestionStatuses = [...questionStatuses];
-        newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
-        setQuestionStatuses(newQuestionStatuses);
+      const newQuestionStatuses = [...questionStatuses];
+      newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
+      setQuestionStatuses(newQuestionStatuses);
     } else {
-        // Mark
-        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
-        setSelectedOption(optionId);
-        const newQuestionStatuses = [...questionStatuses];
-        newQuestionStatuses[currentQuestionIndex] = 'answered';
-        setQuestionStatuses(newQuestionStatuses);
+      // Mark
+      setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: optionId }));
+      setSelectedOption(optionId);
+      const newQuestionStatuses = [...questionStatuses];
+      newQuestionStatuses[currentQuestionIndex] = 'answered';
+      setQuestionStatuses(newQuestionStatuses);
     }
   };
 
@@ -512,7 +512,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
       const isValidNumber = !isNaN(parseFloat(value)) && isFinite(Number(value));
       if (isValidNumber || value === '') {
-          setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: value }));
+        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: value }));
       }
 
       const newQuestionStatuses = [...questionStatuses];
@@ -601,7 +601,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const isNumericalQuestion = () => {
     // Primary check: No options
     if (currentQuestion && (!currentQuestion.options || currentQuestion.options.length === 0)) {
-        return true;
+      return true;
     }
 
     // Fallback: Legacy JEE index check
@@ -636,7 +636,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
     const isValidNumber = !isNaN(parseFloat(newValue)) && isFinite(Number(newValue));
     if (isValidNumber || newValue === '') {
-        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: newValue }));
+      setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: newValue }));
     }
 
     const newQuestionStatuses = [...questionStatuses];
@@ -876,6 +876,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
               <button
                 onClick={() => {
                   setIsModalOpen(false);
+                  // Reset the submission ref to ensure a fresh attempt
+                  isSubmittingRef.current = false;
                   handleSubmit();
                 }}
                 className="flex-1 rounded-lg border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-opacity shadow-lg shadow-primary/20"
