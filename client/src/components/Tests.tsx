@@ -5,24 +5,40 @@ import { TestCategory } from '../data';
 
 const Tests: React.FC = () => {
   const [testsData, setTestsData] = useState<TestCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTests = async () => {
-      const { data, error } = await supabase.from('tests').select('*');
-      if (error) {
-        console.error('Error fetching tests:', error);
-      } else {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const { data, error: fetchError } = await supabase.from('tests').select('*');
+
+        if (fetchError) {
+          console.error('Error fetching tests:', fetchError);
+          setError('Failed to load tests. Please try again.');
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          setTestsData([]);
+          return;
+        }
+
         // Group tests by category
         const categories: { [key: string]: TestCategory } = {};
         data.forEach((test: any) => {
-          if (!categories[test.category]) {
-            categories[test.category] = {
-              title: test.category,
+          const categoryName = test.category || 'Uncategorized';
+          if (!categories[categoryName]) {
+            categories[categoryName] = {
+              title: categoryName,
               icon: 'checklist', // Default icon
               tests: [],
             };
           }
-          categories[test.category].tests.push({
+          categories[categoryName].tests.push({
             id: test.testID,
             title: test.title,
             description: test.description,
@@ -34,11 +50,65 @@ const Tests: React.FC = () => {
           });
         });
         setTestsData(Object.values(categories));
+      } catch (err) {
+        console.error('Unexpected error fetching tests:', err);
+        setError('An unexpected error occurred. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTests();
   }, []);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark">Loading tests...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <span className="material-icons-outlined text-red-500 text-5xl mb-4">error_outline</span>
+            <p className="text-red-500 text-lg font-medium mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Empty state
+  if (testsData.length === 0) {
+    return (
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark text-5xl mb-4">quiz</span>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark text-lg">No tests available at the moment.</p>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm mt-2">Check back later for new tests.</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-grow">
