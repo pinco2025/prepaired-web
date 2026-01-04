@@ -167,34 +167,74 @@ const LandingPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="relative mt-8 max-w-5xl mx-auto">
-                        <div className="w-full aspect-video bg-white dark:bg-slate-800 rounded-2xl border border-blue-100 dark:border-slate-700 shadow-[0_20px_50px_-12px_rgba(0,102,255,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden relative group cursor-pointer mb-16">
-                            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-800 dark:to-slate-900/50"></div>
-                            <div className="absolute inset-0 bg-grid-pattern opacity-[0.6] mix-blend-multiply dark:mix-blend-overlay"></div>
-                            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200/20 dark:bg-blue-500/10 rounded-full blur-[60px]"></div>
-                            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-indigo-200/20 dark:bg-indigo-500/10 rounded-full blur-[60px]"></div>
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                                <div className="relative flex items-center justify-center size-24 bg-white dark:bg-slate-800 rounded-full shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-all duration-300 border border-blue-50 dark:border-slate-700">
-                                    <div className="absolute inset-0 rounded-full border border-blue-100 dark:border-slate-600 animate-[ping_2s_ease-in-out_infinite] opacity-20"></div>
-                                    <span className="material-symbols-outlined text-4xl text-primary ml-1">play_arrow</span>
-                                </div>
-                            </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-6 z-10 bg-gradient-to-t from-white/90 via-white/50 to-transparent dark:from-slate-900/90 dark:via-slate-900/50 pt-12">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <div className="w-[35%] h-full bg-primary rounded-full"></div>
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-display">01:45 / 03:20</span>
-                                </div>
-                            </div>
-                            <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-start">
-                                <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur px-4 py-2 rounded-lg border border-blue-50 dark:border-slate-700 shadow-sm">
-                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Platform Walkthrough</span>
-                                </div>
+                    <div className="relative mt-8 mb-24 w-full">
+                        <div className="absolute inset-y-0 left-0 w-12 md:w-32 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-20 pointer-events-none"></div>
+                        <div className="absolute inset-y-0 right-0 w-12 md:w-32 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-20 pointer-events-none"></div>
+                        <div className="overflow-hidden flex items-center">
+                            <div className="flex animate-scroll hover:[animation-play-state:paused] gap-6 py-8 w-max">
+                                {[...Array(2)].map((_, i) => (
+                                    <React.Fragment key={i}>
+                                        <div className="w-[320px] bg-gradient-to-br from-[#38b6ff] to-[#0066ff] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-500/20 border border-white/10">
+                                            <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                                            <div className="absolute bottom-0 right-0 p-6 opacity-[0.08] pointer-events-none transform translate-x-1/4 translate-y-1/4">
+                                                <span className="material-symbols-outlined text-[140px] leading-none text-white">network_node</span>
+                                            </div>
+                                            <div className="size-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white mb-6 border border-white/20 shadow-inner">
+                                                <span className="material-symbols-outlined text-2xl">psychology_alt</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-2xl text-white mb-2">Adaptive AI</h3>
+                                            <p className="text-white/90 font-medium text-sm leading-relaxed">Smart Difficulty Scaling.<br/>It learns your pace.</p>
+                                        </div>
+                                        <div className="w-[320px] bg-[#18356b] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-900/20 border border-white/5">
+                                            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+                                            <div className="size-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-200 mb-6 border border-blue-400/20">
+                                                <span className="material-symbols-outlined text-2xl">analytics</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-2xl text-white mb-2 relative z-10">Deep Analytics</h3>
+                                            <p className="text-slate-300 font-medium text-sm leading-relaxed relative z-10">Micro-concept Insights.<br/>Know exactly where to focus.</p>
+                                        </div>
+                                        <div className="w-[320px] bg-[#f9f9f9] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-gray-200/50 border border-slate-200">
+                                            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent to-primary"></div>
+                                            <div className="absolute -right-8 top-10 w-32 h-32 bg-blue-100/50 rounded-full blur-3xl"></div>
+                                            <div className="size-12 rounded-xl bg-white flex items-center justify-center text-accent mb-6 border border-slate-100 shadow-sm">
+                                                <span className="material-symbols-outlined text-2xl">smart_toy</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-2xl text-slate-800 mb-2 relative z-10">24/7 AI Tutor</h3>
+                                            <p className="text-slate-500 font-bold text-sm leading-relaxed relative z-10">Instant Explanations.<br/>Never get stuck again.</p>
+                                        </div>
+                                        <div className="w-[320px] bg-[#3291ca] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-400/20 border border-white/10">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                                            <div className="absolute -left-4 -bottom-4 w-24 h-24 border-4 border-white/10 rounded-full"></div>
+                                            <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center text-white mb-6 border border-white/20 backdrop-blur-sm">
+                                                <span className="material-symbols-outlined text-2xl">menu_book</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-2xl text-white mb-2 relative z-10">NCERT Linked</h3>
+                                            <p className="text-blue-50 font-medium text-sm leading-relaxed relative z-10">Direct Page Mapping.<br/>Streamline your revision.</p>
+                                        </div>
+                                        <div className="w-[320px] bg-gradient-to-bl from-[#18356b] to-[#2563eb] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-800/20 border border-white/10">
+                                            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent"></div>
+                                            <div className="size-12 rounded-xl bg-white/10 flex items-center justify-center text-white mb-6 border border-white/10">
+                                                <span className="material-symbols-outlined text-2xl">desktop_windows</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-2xl text-white mb-2 relative z-10">Exam Mode</h3>
+                                            <p className="text-blue-100 font-medium text-sm leading-relaxed relative z-10">NTA Interface Clone.<br/>Master the pressure.</p>
+                                        </div>
+                                        <div className="w-[320px] bg-[#dee1e7] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-300/40 border border-slate-300">
+                                            <div className="absolute right-0 top-0 p-6 opacity-[0.05]">
+                                                <span className="material-symbols-outlined text-8xl text-slate-900">emoji_events</span>
+                                            </div>
+                                            <div className="size-12 rounded-xl bg-white flex items-center justify-center text-slate-700 mb-6 border border-slate-200 shadow-sm">
+                                                <span className="material-symbols-outlined text-2xl">leaderboard</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-2xl text-slate-800 mb-2 relative z-10">Live Rank</h3>
+                                            <p className="text-slate-600 font-bold text-sm leading-relaxed relative z-10">National Competition.<br/>Know where you stand.</p>
+                                        </div>
+                                    </React.Fragment>
+                                ))}
                             </div>
                         </div>
-
-                        <div className="grid lg:grid-cols-2 gap-8 items-start relative">
+                    </div>
+                    <div className="grid lg:grid-cols-2 gap-8 items-start relative max-w-5xl mx-auto">
                             <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-8 flex flex-col h-full transition-colors duration-300">
                                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-slate-700">
                                     <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Original Question</h3>
@@ -399,7 +439,6 @@ const LandingPage: React.FC = () => {
                         </div>
 
                     </div>
-                </div>
             </main>
         </div>
     );
