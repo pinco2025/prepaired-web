@@ -124,18 +124,17 @@ h1, h2, h3, h4, h5, h6 {
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 
-.grid-bg {
-  background-size: 40px 40px;
+.grid-bg-light {
   background-image:
-    linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
-  mask-image: none
+    linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+  background-size: 3rem 3rem;
 }
-
-.dark .grid-bg {
+.grid-bg-dark {
   background-image:
-    linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+    linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+  background-size: 3rem 3rem;
 }
 
 .liquid-shape {
@@ -169,4 +168,42 @@ h1, h2, h3, h4, h5, h6 {
   100% {
     transform: translateX(100%);
   }
+}
+
+.glow-input {
+  transition: all 0.3s ease;
+}
+.glow-input:hover {
+  box-shadow: 0 0 10px rgba(56, 182, 255, 0.2);
+  border-color: rgba(56, 182, 255, 0.5);
+}
+.glow-input:focus {
+  box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
+  transform: translateY(-1px);
+}
+.glow-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glow-button:hover {
+  box-shadow: 0 0 20px rgba(0, 102, 255, 0.6);
+  transform: translateY(-2px);
+}
+.glow-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 10px rgba(0, 102, 255, 0.4);
+}
+.google-btn-hover {
+  transition: all 0.2s ease;
+}
+.google-btn-hover:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+.dark .google-btn-hover:hover {
+  background-color: #27272a;
+  border-color: #4b5563;
+}
+.link-hover {
+    transition: color 0.2s ease;
 }

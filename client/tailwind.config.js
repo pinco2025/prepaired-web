@@ -8,8 +8,8 @@ module.exports = {
     extend: {
       colors: {
         primary: "#0066ff",
-        "accent": "#35b2ff",
-        "background-light": "#f3f4f6",
+        "primary-light": "#38b6ff",
+        "background-light": "#f9f9f9",
         "background-dark": "#121212",
         "surface-light": "#ffffff",
         "surface-dark": "#1e1e1e",
@@ -25,8 +25,7 @@ module.exports = {
         "error-dark": "#f87171",
       },
       fontFamily: {
-        display: ["Inter", "Inter"],
-        serif: ["Space Grotesk"]
+        display: ["Poppins", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",
@@ -35,9 +34,8 @@ module.exports = {
         '2xl': "1.5rem",
       },
       boxShadow: {
-          'card-light': '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
-          'card-dark': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-          'glow': '0 0 15px rgba(0, 102, 255, 0.2)',
+        'card-light': '0 10px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)',
+        'card-dark': '0 10px 25px -5px rgb(0 0 0 / 0.2), 0 8px 10px -6px rgb(0 0 0 / 0.2)',
       },
       animation: {
         'scroll': 'scroll 40s linear infinite',
