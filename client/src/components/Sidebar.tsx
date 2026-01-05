@@ -12,6 +12,7 @@ const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     const isDark = localStorage.getItem('darkMode') === 'true';
@@ -104,9 +105,27 @@ const Sidebar: React.FC = () => {
     };
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isSigningOut) return; // Prevent double-click
+
+    setIsSigningOut(true);
+    setIsUserMenuOpen(false);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+      }
+      // Force navigation and reload to ensure clean state
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Sign out failed:', error);
+      // Fallback: force reload
+      window.location.href = '/';
+    }
   };
 
   const menuItems = [
@@ -205,9 +224,17 @@ const Sidebar: React.FC = () => {
                     <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
                     <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
                   </div>
-                  <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors">
-                    <span className="material-icons-outlined text-lg">logout</span>
-                    <span>Sign Out</span>
+                  <button
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 active:bg-red-500/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none ${isSigningOut ? 'opacity-60 pointer-events-none' : ''}`}
+                  >
+                    {isSigningOut ? (
+                      <span className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      <span className="material-icons-outlined text-lg">logout</span>
+                    )}
+                    <span>{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
                   </button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 .path-line {
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
+    stroke-dasharray: 10000;
+    stroke-dashoffset: 10000;
     animation: dash 5s linear forwards;
 }
 

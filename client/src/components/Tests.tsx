@@ -170,31 +170,46 @@ const Tests: React.FC = () => {
                                     d={(() => {
                                         // Generate path segments based on actual test count
                                         const nodeCenter = 40; // Offset to center of node
-                                        const segments: string[] = [];
+                                        const numTests = Math.min(tests.length, testPositions.length);
 
-                                        for (let i = 0; i < Math.min(tests.length, testPositions.length); i++) {
+                                        if (numTests === 0) return '';
+
+                                        // Calculate all node centers first
+                                        const points = [];
+                                        for (let i = 0; i < numTests; i++) {
                                             const pos = testPositions[i];
-                                            const x = pos.left + 70 + nodeCenter;
-                                            const y = pos.top + 40 + nodeCenter;
-
-                                            if (i === 0) {
-                                                segments.push(`M ${x} ${y}`);
-                                            } else {
-                                                const prevPos = testPositions[i - 1];
-                                                const prevX = prevPos.left + 70 + nodeCenter;
-                                                const prevY = prevPos.top + 40 + nodeCenter;
-
-                                                // Calculate control points for smooth curves
-                                                const midX = (prevX + x) / 2;
-                                                const midY = (prevY + y) / 2;
-
-                                                // Use quadratic bezier for smoother curves
-                                                segments.push(`Q ${prevX + (x - prevX) * 0.5} ${prevY}, ${midX} ${midY}`);
-                                                segments.push(`T ${x} ${y}`);
-                                            }
+                                            points.push({
+                                                x: pos.left + 70 + nodeCenter,
+                                                y: pos.top + 40 + nodeCenter
+                                            });
                                         }
 
-                                        return segments.join(' ');
+                                        if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+
+                                        // Start path at first point
+                                        let path = `M ${points[0].x} ${points[0].y}`;
+
+                                        // Use smooth S-curves with proper tangent calculations
+                                        for (let i = 1; i < points.length; i++) {
+                                            const prev = points[i - 1];
+                                            const curr = points[i];
+
+                                            // Calculate direction-aware control points for smooth flowing curves
+                                            const dx = curr.x - prev.x;
+                                            const dy = curr.y - prev.y;
+
+                                            // Control point 1: extends from previous point in flow direction
+                                            const cp1x = prev.x + dx * 0.5;
+                                            const cp1y = prev.y;
+
+                                            // Control point 2: approaches current point smoothly
+                                            const cp2x = curr.x - dx * 0.5;
+                                            const cp2y = curr.y;
+
+                                            path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+                                        }
+
+                                        return path;
                                     })()}
                                     style={{ stroke: 'url(#pathGradient)', strokeLinecap: 'round' }}
                                 />
@@ -292,7 +307,7 @@ const Tests: React.FC = () => {
                                 // Regular Locked Test
                                 return (
                                     <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
-                                        <div className="group relative flex flex-col items-center w-48 opacity-60 hover:opacity-100 transition-opacity cursor-not-allowed">
+                                        <div className="group relative flex flex-col items-center w-48 cursor-not-allowed">
                                             <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-border-light dark:border-border-dark flex items-center justify-center z-10 relative">
                                                 <span className="text-2xl font-bold text-text-secondary-light dark:text-text-secondary-dark">{testNumber}</span>
                                                 <div className="absolute inset-0 bg-black/5 dark:bg-white/5 rounded-full"></div>

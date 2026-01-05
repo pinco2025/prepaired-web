@@ -1,7 +1,19 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRazorpay } from '../hooks/useRazorpay';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+// Dynamic equations for the cycling effect - Inspired PrepAIred Questions (IPQs)
+// Based on the PYQ: s = t³ - 6t² + 3t + 4, find velocity when a = 0
+const dynamicEquations = [
+    { eq: 's = 2t^3 - 9t^2 + 12t', ask: 'total distance when velocity becomes zero' },
+    { eq: 's = t^3 - 4t^2 + 3t + 5', ask: 'average velocity in [0, t] where a = 0' },
+    { eq: 's = 3t^3 - 12t^2 + 9t', ask: 'time when particle returns to origin' },
+    { eq: 's = t^3 - 5t^2 + 6t + 2', ask: 'displacement when speed is maximum' },
+    { eq: 's = 2t^3 - 8t^2 + 6t', ask: 'velocity when acceleration changes sign' },
+];
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
@@ -17,6 +29,39 @@ const LandingPage: React.FC = () => {
         onPaymentSuccess: handlePaymentSuccess,
     });
     const [darkMode, setDarkMode] = useState(false);
+
+    // State for cycling equations
+    const [equationIndex, setEquationIndex] = useState(0);
+    const [isVisible, setIsVisible] = useState(false);
+    const comparisonRef = useRef<HTMLDivElement>(null);
+
+    // Cycle through equations
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setEquationIndex((prev) => (prev + 1) % dynamicEquations.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Intersection observer for scroll animation
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setIsVisible(true);
+                    }
+                });
+            },
+            { threshold: 0.2 }
+        );
+
+        if (comparisonRef.current) {
+            observer.observe(comparisonRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     // Check if user has paid subscription
     const isPaidUser = subscriptionType?.toLowerCase() === 'ipft-01-2026';
@@ -235,130 +280,223 @@ const LandingPage: React.FC = () => {
                         </div>
                     </div>
                     {/* --- Question Comparison Section --- */}
-                    <div className="grid lg:grid-cols-2 gap-4 lg:gap-8 items-stretch relative max-w-6xl mx-auto px-2 lg:px-0">
-                        <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 z-40 flex-col items-center justify-center pointer-events-none">
-                            <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,102,255,0.3)] flex items-center justify-center relative z-10 pointer-events-auto border border-blue-50 dark:border-slate-700">
-                                <span className="font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-primary to-accent text-2xl italic tracking-tighter pr-0.5">VS</span>
-                            </div>
+                    <div ref={comparisonRef} className="max-w-6xl mx-auto px-4 mb-8">
+                        {/* Section Header */}
+                        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                            <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-4">
+                                See the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent animate-gradient-shift">Difference</span>
+                            </h2>
+                            <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl mx-auto">
+                                Why solve PYQs, when you can have <span className="font-semibold text-slate-700 dark:text-slate-200">a better version - IPQs</span>
+                            </p>
                         </div>
 
-                        {/* --- Old Way --- */}
-                        <div className="relative bg-white dark:bg-slate-800/50 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full overflow-visible group scale-[0.98] opacity-80 lg:opacity-100 origin-right">
-                            <div className="absolute -top-4 -left-3 z-20">
-                                <div className="bg-slate-600 dark:bg-slate-700 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg rotate-[-3deg] flex items-center gap-1.5 border-2 border-white dark:border-slate-600">
-                                    <span className="material-symbols-outlined text-sm">history</span>
-                                    Old Way
-                                </div>
+                        {/* Comparison Cards Container */}
+                        <div className="relative">
+                            {/* Floating Decorative Elements */}
+                            <div className="absolute -top-8 -left-8 w-16 h-16 text-primary/10 dark:text-primary/5 animate-float-particle pointer-events-none hidden lg:block" style={{ animationDelay: '0s' }}>
+                                <span className="material-symbols-outlined text-6xl">function</span>
                             </div>
-                            <div className="p-6 md:p-8 flex flex-col h-full rounded-3xl bg-slate-50/50 dark:bg-slate-800/30">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-slate-400 text-xl">description</span>
-                                        <div>
-                                            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Previous Year Question</h4>
-                                            <div className="bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded w-fit mt-1">JEE Main 2023</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mb-4">
-                                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-[10px] font-bold uppercase mb-4">
-                                        <span className="material-symbols-outlined text-sm">foundation</span> Basic Value
-                                    </div>
-                                    <div className="relative p-5 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                        <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-loose font-serif">
-                                            Q. A particle moves along a straight line such that
-                                            <span className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-300 dark:border-slate-600 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-200 mx-0.5" title="Static Data">s = t³ - 6t² + 3t + 4</span>
-                                            meters. The velocity when the
-                                            <span className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded mx-0.5">acceleration is zero</span>
-                                            is:
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex flex-wrap gap-3 mb-6">
-                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wide opacity-80 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
-                                        <span className="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Original Formulation
-                                    </div>
-                                    <div className="flex items-center gap-1.5 text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wide bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">
-                                        <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span> Standard Condition
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase mb-1">Exam Pattern</span>
-                                        <span className="text-xs text-slate-500 dark:text-slate-400">Familiarity with format &amp; language.</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Basic Check</span>
-                                        <span className="text-xs text-slate-500 dark:text-slate-400">Direct application.</span>
-                                    </div>
-                                </div>
-                                <div className="mt-auto bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded-lg p-3 flex gap-3 items-start">
-                                    <span className="material-symbols-outlined text-red-400 text-lg mt-0.5">warning</span>
-                                    <div>
-                                        <span className="text-xs font-bold text-red-700 dark:text-red-300 block mb-0.5">Limited Learning</span>
-                                        <p className="text-[11px] text-red-600/80 dark:text-red-400/80 leading-tight">Same static values every time. Encourages rote memorization rather than logic.</p>
-                                    </div>
-                                </div>
+                            <div className="absolute -bottom-8 -right-8 w-16 h-16 text-accent/10 dark:text-accent/5 animate-float-particle pointer-events-none hidden lg:block" style={{ animationDelay: '2s' }}>
+                                <span className="material-symbols-outlined text-6xl">calculate</span>
                             </div>
-                        </div>
+                            <div className="absolute top-1/4 -right-12 w-12 h-12 text-green-500/10 animate-float-particle pointer-events-none hidden lg:block" style={{ animationDelay: '1s' }}>
+                                <span className="material-symbols-outlined text-5xl">neurology</span>
+                            </div>
 
-                        {/* --- AI Enhanced Way --- */}
-                        <div className="relative bg-white dark:bg-slate-800 rounded-3xl border border-blue-100 dark:border-slate-700 shadow-[0_25px_60px_-10px_rgba(56,182,255,0.4)] dark:shadow-[0_25px_60px_-10px_rgba(0,102,255,0.2)] flex flex-col h-full overflow-visible group z-10 transition-all duration-500 hover:border-blue-300 dark:hover:border-blue-600 scale-100 lg:scale-[1.03] animate-float hover:shadow-[0_40px_80px_-15px_rgba(56,182,255,0.5)]">
-                            <div className="absolute -top-4 -right-2 z-20">
-                                <div className="bg-gradient-to-r from-primary to-accent text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg shadow-blue-500/30 flex items-center gap-1.5 ring-4 ring-white dark:ring-slate-800 animate-pulse-slow">
-                                    <span className="material-symbols-outlined text-sm">auto_awesome</span>
-                                    AI-Enhanced
+                            {/* Central VS Badge - visible on desktop */}
+                            <div className={`hidden lg:flex absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 z-40 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary via-accent to-primary animate-gradient-shift shadow-2xl shadow-blue-500/50 flex items-center justify-center ring-4 ring-white dark:ring-slate-900 hover:scale-110 transition-transform cursor-default group">
+                                    <div className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-20"></div>
+                                    <span className="font-display font-black text-white text-3xl group-hover:scale-110 transition-transform">VS</span>
                                 </div>
                             </div>
-                            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-50/50 dark:from-blue-900/20 via-transparent to-transparent -z-10 rounded-3xl"></div>
-                            <div className="p-6 md:p-8 flex flex-col h-full">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2 bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/30 dark:to-green-900/30 text-primary rounded-xl ring-1 ring-blue-100 dark:ring-blue-800 shadow-sm">
-                                        <span className="material-symbols-outlined text-xl text-primary">psychology_alt</span>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Inspired PrepAIred Question</h4>
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Adaptive • Analytical • Dynamic</p>
-                                    </div>
+
+                            {/* Mobile VS Badge */}
+                            <div className="lg:hidden flex justify-center py-6">
+                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary via-accent to-primary animate-gradient-shift shadow-xl shadow-blue-500/40 flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
+                                    <span className="font-display font-bold text-white text-xl">VS</span>
                                 </div>
-                                <div className="relative p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700 mb-6 group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-colors shadow-sm group-hover:shadow-md">
-                                    <div className="absolute top-3 right-3">
-                                        <span className="flex h-2 w-2">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-slate-700 dark:text-slate-200 font-medium leading-loose font-serif">
-                                        Q. For a particle defined by
-                                        <span className="bg-white dark:bg-slate-800 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-md font-mono text-xs font-bold shadow-sm mx-0.5 decoration-clone box-decoration-clone">x = 2t³ - 9t² + 12t</span>,
-                                        determine the
-                                        <span className="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/60 dark:border-blue-700/60 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold mx-0.5 border-dashed">average velocity</span>
-                                        in the interval [0, T] where acceleration vanishes.
-                                    </p>
-                                </div>
-                                <div className="space-y-4 mb-6">
-                                    <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-green-50/50 dark:hover:bg-green-900/20 transition-colors">
-                                        <div className="mt-0.5 text-green-500 bg-green-100 dark:bg-green-900/30 rounded-full p-1"><span className="material-symbols-outlined text-sm">cyclone</span></div>
-                                        <div>
-                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Dynamic Variables</span>
-                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">Values change every attempt to kill rote memorization.</p>
+                            </div>
+
+                            <div className="grid lg:grid-cols-2 gap-6 lg:gap-20 items-stretch">
+                                {/* --- Traditional Approach Card --- */}
+                                <div className={`relative group transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
+                                    {/* Diagonal "Outdated" Stripe */}
+                                    <div className="absolute -top-2 -left-2 -right-2 -bottom-2 overflow-hidden rounded-3xl pointer-events-none z-10">
+                                        <div className="absolute top-8 -left-12 w-40 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-bold uppercase tracking-widest py-1.5 text-center transform -rotate-45 shadow-lg">
+                                            Outdated
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors">
-                                        <div className="mt-0.5 text-primary bg-blue-100 dark:bg-blue-900/30 rounded-full p-1"><span className="material-symbols-outlined text-sm">account_tree</span></div>
-                                        <div>
-                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Multi-Concept Linking</span>
-                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">Requires connecting velocity, acceleration, and limits.</p>
+
+                                    <div className="bg-gradient-to-br from-slate-50 to-red-50/30 dark:from-slate-800 dark:to-red-950/20 rounded-3xl p-8 border-2 border-red-200/60 dark:border-red-900/40 shadow-lg h-full relative overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
+                                        {/* Faded overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent dark:from-slate-900/30 pointer-events-none rounded-3xl"></div>
+
+                                        {/* Card Header */}
+                                        <div className="relative flex items-center gap-4 mb-6">
+                                            <div className="w-12 h-12 rounded-xl bg-red-100/80 dark:bg-red-900/30 flex items-center justify-center border border-red-200/50 dark:border-red-800/30">
+                                                <span className="material-symbols-outlined text-2xl text-red-400/80">history_edu</span>
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="font-display font-bold text-xl text-slate-600 dark:text-slate-300">Traditional</h3>
+                                                    <span className="px-2 py-0.5 text-[10px] font-semibold bg-red-100 dark:bg-red-900/40 text-red-500 dark:text-red-400 rounded uppercase">PYQ</span>
+                                                </div>
+                                                <p className="text-sm text-slate-400 dark:text-slate-500">Static question banks</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Question Display */}
+                                        <div className="relative mb-6 p-4 bg-white/60 dark:bg-slate-900/40 rounded-xl border border-red-100 dark:border-red-900/30">
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <span className="px-2.5 py-1 text-xs font-semibold bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full border border-orange-200/50 dark:border-orange-800/30">JEE Main 2023</span>
+                                                <span className="flex items-center gap-1 text-[10px] text-red-400 font-medium">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                                    Never Changes
+                                                </span>
+                                            </div>
+                                            <div className="text-slate-600 dark:text-slate-400 leading-relaxed text-[15px] space-y-2">
+                                                <p>A particle moves such that:</p>
+                                                <div
+                                                    className="flex items-center justify-center py-2 px-3 bg-slate-100 dark:bg-slate-800 rounded-lg"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: katex.renderToString('s = t^3 - 6t^2 + 3t + 4', {
+                                                            throwOnError: false,
+                                                            displayMode: false
+                                                        })
+                                                    }}
+                                                />
+                                                <p>Find velocity when acceleration is zero.</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Drawbacks - More prominent */}
+                                        <div className="relative space-y-2 p-4 bg-red-50/80 dark:bg-red-950/30 rounded-xl border border-red-200/50 dark:border-red-900/30">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="material-symbols-outlined text-red-500 text-lg">warning</span>
+                                                <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Limitations</span>
+                                            </div>
+                                            {['Same numbers every time', 'Encourages memorization', 'Limited concept testing'].map((text, i) => (
+                                                <div key={i} className="flex items-center gap-2 text-red-600/80 dark:text-red-400/80">
+                                                    <span className="material-symbols-outlined text-base">block</span>
+                                                    <span className="text-sm font-medium">{text}</span>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 dark:text-green-400">
-                                        <span className="material-symbols-outlined text-lg">check_circle</span>
-                                        <span>Better Concept Retention</span>
-                                    </div>
-                                    <div className="px-2 py-1 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 text-[10px] font-bold uppercase rounded-md border border-green-200 dark:border-green-700 shadow-sm animate-pulse-slow">
-                                        +45% Efficacy
+
+                                {/* --- AI-Enhanced Card --- */}
+                                <div className={`relative group transition-all duration-700 delay-150 pt-4 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+                                    {/* Animated Glow Effect */}
+                                    <div className="absolute -inset-2 top-2 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl opacity-40 blur-2xl group-hover:opacity-60 transition-opacity duration-500 animate-gradient-shift"></div>
+
+                                    <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 border-2 border-primary/40 dark:border-primary/30 shadow-2xl shadow-blue-500/30 comparison-card-hover overflow-visible">
+                                        {/* Background Pattern */}
+                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-50/80 dark:from-blue-900/20 via-transparent to-transparent pointer-events-none rounded-3xl"></div>
+
+                                        {/* Corner Accent */}
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-accent/10 rounded-bl-[80px] rounded-tr-3xl pointer-events-none"></div>
+
+                                        {/* Verified Badge */}
+                                        <div className="absolute -top-4 right-6 z-20">
+                                            <div className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-lg shadow-emerald-500/40 flex items-center gap-2 hover:scale-105 transition-transform whitespace-nowrap">
+                                                <span className="material-symbols-outlined text-sm">verified</span>
+                                                Verified by IITians
+                                            </div>
+                                        </div>
+
+                                        {/* Card Header */}
+                                        <div className="relative flex items-center gap-4 mb-8 mt-2">
+                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 dark:from-primary/30 dark:to-accent/30 flex items-center justify-center ring-2 ring-primary/30 group-hover:scale-110 group-hover:ring-primary/50 transition-all">
+                                                <span className="material-symbols-outlined text-3xl text-primary">psychology</span>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white">prepAIred</h3>
+                                                <p className="text-sm text-primary dark:text-primary-light font-medium">Adaptive learning engine</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Question Display - Dynamic! */}
+                                        <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900/80 dark:to-slate-900/40 rounded-2xl p-6 mb-8 border border-blue-200 dark:border-slate-600 overflow-hidden">
+                                            {/* Regeneration Progress Bar */}
+                                            <div className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-primary to-accent animate-gradient-shift" style={{ width: '100%', animation: 'progress 3s linear infinite' }}></div>
+                                            <style>{`
+                                                @keyframes progress {
+                                                    0% { width: 0%; opacity: 0.5; }
+                                                    90% { width: 100%; opacity: 1; }
+                                                    100% { width: 100%; opacity: 0; }
+                                                }
+                                            `}</style>
+
+                                            {/* Live indicator */}
+                                            <div className="absolute top-4 right-4 flex items-center gap-2">
+                                                <span className="relative flex h-3 w-3">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                                </span>
+                                                <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">Live</span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <span className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary to-accent text-white rounded-full shadow-sm">Generated Now</span>
+                                                <span className="text-[10px] text-slate-400 dark:text-slate-500">• Refreshes every attempt</span>
+                                            </div>
+                                            <div className="text-slate-700 dark:text-slate-300 leading-relaxed space-y-3">
+                                                <p>For a particle with position function:</p>
+                                                <div
+                                                    key={equationIndex}
+                                                    className="flex items-center justify-center py-3 px-4 bg-white dark:bg-slate-800 rounded-xl border border-primary/30 shadow-sm animate-value-glow"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: katex.renderToString(dynamicEquations[equationIndex].eq, {
+                                                            throwOnError: false,
+                                                            displayMode: false
+                                                        })
+                                                    }}
+                                                />
+                                                <p>
+                                                    Find the{' '}
+                                                    <span
+                                                        key={`ask-${equationIndex}`}
+                                                        className="font-semibold text-accent"
+                                                    >
+                                                        {dynamicEquations[equationIndex].ask}
+                                                    </span>
+                                                    <span className="animate-typewriter-cursor text-primary ml-0.5">|</span>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Advantages */}
+                                        <div className="relative space-y-3">
+                                            {['Fresh values every attempt', 'Tests true understanding', 'Multi-concept integration'].map((text, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex items-center gap-3 text-slate-700 dark:text-slate-300 group/item hover:translate-x-1 transition-transform"
+                                                    style={{ animationDelay: `${i * 100}ms` }}
+                                                >
+                                                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center checkmark-bounce shadow-sm">
+                                                        <span className="material-symbols-outlined text-green-500 text-lg">check</span>
+                                                    </div>
+                                                    <span className="text-sm font-medium">{text}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Bottom Stats */}
+                                        <div className="relative mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                                            <div className="flex items-center gap-2 group/stat hover:scale-105 transition-transform cursor-default">
+                                                <span className="material-symbols-outlined text-primary text-2xl">trending_up</span>
+                                                <div className="flex flex-col">
+                                                    <span className="text-lg font-bold text-slate-800 dark:text-white">45%</span>
+                                                    <span className="text-xs text-slate-400">better retention</span>
+                                                </div>
+                                            </div>
+                                            <div className="px-4 py-2.5 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/40 dark:to-emerald-900/40 text-green-700 dark:text-green-300 text-sm font-bold rounded-xl border border-green-200 dark:border-green-700 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-default">
+                                                ✓ Proven Results
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
