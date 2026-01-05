@@ -41,7 +41,7 @@ const ComingSoon: React.FC = () => {
         </div>
 
         {/* Title with gradient */}
-        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-500 bg-clip-text text-transparent animate-gradient-x mb-4">
+        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-500 bg-clip-text text-transparent animate-gradient-x mb-4 pb-2 leading-normal">
           Coming Soon
         </h1>
 
