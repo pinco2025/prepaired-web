@@ -28,52 +28,52 @@ const Sidebar: React.FC = () => {
 
     // Helper to actually perform the toggle
     const toggle = () => {
-        setDarkMode(isDark);
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('darkMode', 'true');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('darkMode', 'false');
-        }
+      setDarkMode(isDark);
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('darkMode', 'true');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('darkMode', 'false');
+      }
     };
 
     // @ts-ignore - View Transition API
     if (document.startViewTransition) {
-        const x = e.clientX;
-        const y = e.clientY;
-        const endRadius = Math.hypot(
-            Math.max(x, window.innerWidth - x),
-            Math.max(y, window.innerHeight - y)
+      const x = e.clientX;
+      const y = e.clientY;
+      const endRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+      );
+
+      // @ts-ignore
+      const transition = document.startViewTransition(() => {
+        toggle();
+      });
+
+      transition.ready.then(() => {
+        const clipPath = [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${endRadius}px at ${x}px ${y}px)`,
+        ];
+
+        document.documentElement.animate(
+          {
+            clipPath: isDark ? clipPath : [...clipPath].reverse(),
+          },
+          {
+            duration: 500,
+            easing: "ease-out",
+            pseudoElement: isDark
+              ? "::view-transition-new(root)"
+              : "::view-transition-old(root)",
+          }
         );
-
-        // @ts-ignore
-        const transition = document.startViewTransition(() => {
-            toggle();
-        });
-
-        transition.ready.then(() => {
-            const clipPath = [
-                `circle(0px at ${x}px ${y}px)`,
-                `circle(${endRadius}px at ${x}px ${y}px)`,
-            ];
-
-            document.documentElement.animate(
-                {
-                    clipPath: isDark ? clipPath : [...clipPath].reverse(),
-                },
-                {
-                    duration: 500,
-                    easing: "ease-out",
-                    pseudoElement: isDark
-                        ? "::view-transition-new(root)"
-                        : "::view-transition-old(root)",
-                }
-            );
-        });
+      });
 
     } else {
-        toggle();
+      toggle();
     }
   };
 
@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
   };
 
   const toggleMobileMenu = () => {
-      setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   }
 
   useEffect(() => {
@@ -124,70 +124,70 @@ const Sidebar: React.FC = () => {
       {/* Header / Logo */}
       <div className={`h-20 flex items-center ${isCollapsed && !mobile ? 'justify-center px-0' : 'px-6 justify-between'} transition-all duration-300 overflow-hidden shrink-0`}>
         <div className={`flex items-center gap-3 min-w-max ${isCollapsed && !mobile ? 'hidden' : 'flex'}`}>
-            <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
-            <span className={`text-xl font-bold text-text-light dark:text-text-dark transition-all duration-300`}>
-                prep<span className="text-primary">AI</span>red
-            </span>
+          <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
+          <span className={`text-xl font-bold text-text-light dark:text-text-dark transition-all duration-300`}>
+            prep<span className="text-primary">AI</span>red
+          </span>
         </div>
 
         {!mobile && (
-            <button
-                onClick={toggleSidebar}
-                className={`p-2 rounded-xl hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors ${isCollapsed ? 'w-full flex justify-center' : ''}`}
-                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            >
-                <span className="material-symbols-outlined">
-                    {isCollapsed ? 'menu' : 'menu_open'}
-                </span>
-            </button>
+          <button
+            onClick={toggleSidebar}
+            className={`p-2 rounded-xl hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors ${isCollapsed ? 'w-full flex justify-center' : ''}`}
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <span className="material-symbols-outlined">
+              {isCollapsed ? 'menu' : 'menu_open'}
+            </span>
+          </button>
         )}
       </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto sidebar-scroll py-2 flex flex-col justify-between overflow-x-hidden">
         <div className="space-y-1 px-3">
-            {menuItems.map((item) => (
-                <NavLink
-                    key={item.label}
-                    to={item.to}
-                    onClick={() => mobile && setIsMobileMenuOpen(false)}
-                    className={({ isActive }) => {
-                        const isActuallyActive = isActive && item.to !== '/coming-soon';
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.to}
+              onClick={() => mobile && setIsMobileMenuOpen(false)}
+              className={({ isActive }) => {
+                const isActuallyActive = isActive && item.to !== '/coming-soon';
 
-                        return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors whitespace-nowrap overflow-hidden
+                return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors whitespace-nowrap overflow-hidden
                         ${isActuallyActive
-                            ? 'bg-primary/10 text-primary'
-                            : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
-                        }
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
+                  }
                         ${isCollapsed && !mobile ? 'justify-center' : ''}`
-                    }}
-                    title={isCollapsed && !mobile ? item.label : undefined}
-                >
-                    <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
-                        {item.icon}
-                    </span>
-                    <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
-                        {item.label}
-                    </span>
-                </NavLink>
-            ))}
+              }}
+              title={isCollapsed && !mobile ? item.label : undefined}
+            >
+              <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
+                {item.icon}
+              </span>
+              <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
+                {item.label}
+              </span>
+            </NavLink>
+          ))}
         </div>
 
         {/* Bottom Actions */}
         <div className="mt-4 px-3 space-y-4 mb-6">
-            {/* Dark Mode Toggle */}
-             <button
-                onClick={toggleDarkMode}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 transition-colors whitespace-nowrap overflow-hidden ${isCollapsed && !mobile ? 'justify-center' : ''}`}
-                title="Toggle Dark Mode"
-            >
-                <span className="material-symbols-outlined shrink-0">
-                    {darkMode ? 'light_mode' : 'dark_mode'}
-                </span>
-                <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
-                    {darkMode ? 'Light Mode' : 'Dark Mode'}
-                </span>
-            </button>
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 transition-colors whitespace-nowrap overflow-hidden ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+            title="Toggle Dark Mode"
+          >
+            <span className="material-symbols-outlined shrink-0">
+              {darkMode ? 'light_mode' : 'dark_mode'}
+            </span>
+            <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
+              {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </span>
+          </button>
 
 
           {/* User Menu */}
@@ -198,17 +198,17 @@ const Sidebar: React.FC = () => {
                 ${isCollapsed && !mobile
                     ? 'left-full bottom-0 ml-4 w-48'
                     : 'bottom-full left-0 w-full mb-2'
-                }`}
+                  }`}
               >
                 <div className="py-2">
-                    <div className="px-4 py-2 border-b border-border-light dark:border-border-dark mb-1">
-                        <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
-                        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
-                    </div>
-                    <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors">
+                  <div className="px-4 py-2 border-b border-border-light dark:border-border-dark mb-1">
+                    <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
+                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
+                  </div>
+                  <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors">
                     <span className="material-icons-outlined text-lg">logout</span>
                     <span>Sign Out</span>
-                    </button>
+                  </button>
                 </div>
               </div>
             )}
@@ -223,7 +223,7 @@ const Sidebar: React.FC = () => {
               <img
                 alt="User profile"
                 className="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-white/10 shrink-0"
-                src={user?.user_metadata?.avatar_url || 'https://lh3.googleusercontent.com/a/ACg8ocJ_Y_0_-8_j_Vf_w_X_Y_V_c_E_L_w_T_k_S_g_w=s96-c'}
+                src={user?.user_metadata?.avatar_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23e0e7ff'/%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' fill='%236366f1'/%3E%3C/svg%3E"}
               />
               <div className={`flex-1 min-w-0 text-left transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'block'}`} style={{ display: isCollapsed && !mobile ? 'none' : 'block' }}>
                 <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
@@ -246,10 +246,10 @@ const Sidebar: React.FC = () => {
       {/* Mobile Top Bar */}
       <div className="md:hidden bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark p-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-           <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
-           <span className="text-xl font-bold text-text-light dark:text-text-dark">
-                prep<span className="text-primary">AI</span>red
-           </span>
+          <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
+          <span className="text-xl font-bold text-text-light dark:text-text-dark">
+            prep<span className="text-primary">AI</span>red
+          </span>
         </div>
         <button onClick={toggleMobileMenu} className="text-text-light dark:text-text-dark focus:outline-none">
           <span className="material-icons-outlined text-3xl">menu</span>
@@ -269,21 +269,21 @@ const Sidebar: React.FC = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
           <div className="absolute inset-y-0 left-0 w-64 bg-surface-light dark:bg-surface-dark shadow-xl transform transition-transform duration-300 ease-in-out">
-             <div className="h-full relative">
-                 <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="absolute top-4 right-4 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark z-50"
-                >
-                  <span className="material-icons-outlined">close</span>
-                </button>
-                <SidebarContent mobile={true} />
-             </div>
+            <div className="h-full relative">
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-4 right-4 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark z-50"
+              >
+                <span className="material-icons-outlined">close</span>
+              </button>
+              <SidebarContent mobile={true} />
+            </div>
           </div>
         </div>
       )}
 
-       {/* Global styles for view transition */}
-       <style>{`
+      {/* Global styles for view transition */}
+      <style>{`
         ::view-transition-old(root),
         ::view-transition-new(root) {
           animation: none;

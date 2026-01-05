@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#0066ff",
+        "accent" : "#35b2ff",
         "primary-light": "#38b6ff",
         "background-light": "#f9f9f9",
         "background-dark": "#121212",
@@ -26,6 +27,7 @@ module.exports = {
       },
       fontFamily: {
         display: ["Poppins", "sans-serif"],
+        serif: ["Space Grotesk"]
       },
       borderRadius: {
         DEFAULT: "0.5rem",
