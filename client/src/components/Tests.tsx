@@ -189,24 +189,25 @@ const Tests: React.FC = () => {
                                         // Start path at first point
                                         let path = `M ${points[0].x} ${points[0].y}`;
 
-                                        // Use smooth S-curves with proper tangent calculations
-                                        for (let i = 1; i < points.length; i++) {
-                                            const prev = points[i - 1];
-                                            const curr = points[i];
+                                        // Use Catmull-Rom style smooth curves with tension
+                                        const tension = 0.3; // Lower = tighter curves, Higher = looser curves
 
-                                            // Calculate direction-aware control points for smooth flowing curves
-                                            const dx = curr.x - prev.x;
-                                            const dy = curr.y - prev.y;
+                                        for (let i = 0; i < points.length - 1; i++) {
+                                            const p0 = points[Math.max(0, i - 1)];
+                                            const p1 = points[i];
+                                            const p2 = points[i + 1];
+                                            const p3 = points[Math.min(points.length - 1, i + 2)];
 
-                                            // Control point 1: extends from previous point in flow direction
-                                            const cp1x = prev.x + dx * 0.5;
-                                            const cp1y = prev.y;
+                                            // Calculate tangent-based control points for smooth flowing curves
+                                            // Control point 1: based on tangent from p0 to p2
+                                            const cp1x = p1.x + (p2.x - p0.x) * tension;
+                                            const cp1y = p1.y + (p2.y - p0.y) * tension;
 
-                                            // Control point 2: approaches current point smoothly
-                                            const cp2x = curr.x - dx * 0.5;
-                                            const cp2y = curr.y;
+                                            // Control point 2: based on tangent from p1 to p3
+                                            const cp2x = p2.x - (p3.x - p1.x) * tension;
+                                            const cp2y = p2.y - (p3.y - p1.y) * tension;
 
-                                            path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+                                            path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
                                         }
 
                                         return path;

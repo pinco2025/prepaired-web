@@ -154,24 +154,34 @@ const PercentileCard: React.FC<PercentileCardProps> = ({ percentile = 0, history
                             className="animate-fade-in-up"
                         />
 
-                        {/* Line Segments - colored by trend */}
+                        {/* Line Segments - colored by trend, using smooth curves */}
                         {points.length > 1 && points.slice(1).map((p, i) => {
-                            const prev = points[i];
+                            const p0 = points[Math.max(0, i - 1)];
+                            const p1 = points[i];
+                            const p2 = points[i + 1];
+                            const p3 = points[Math.min(points.length - 1, i + 2)];
+
+                            // Calculate control points using the same tension as buildSmoothPath
+                            const cp1x = p1.x + (p2.x - p0.x) * 0.15;
+                            const cp1y = p1.y + (p2.y - p0.y) * 0.15;
+                            const cp2x = p2.x - (p3.x - p1.x) * 0.15;
+                            const cp2y = p2.y - (p3.y - p1.y) * 0.15;
+
+                            const segmentPath = `M ${p1.x} ${p1.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+
                             const segmentColor = p.trend === 'up'
                                 ? '#22c55e'  // green-500
                                 : p.trend === 'down'
                                     ? '#ef4444'  // red-500
                                     : '#818CF8'; // primary purple
                             return (
-                                <line
+                                <path
                                     key={i}
-                                    x1={prev.x}
-                                    y1={prev.y}
-                                    x2={p.x}
-                                    y2={p.y}
+                                    d={segmentPath}
                                     stroke={segmentColor}
                                     strokeWidth="3"
                                     strokeLinecap="round"
+                                    fill="none"
                                     filter="url(#glow)"
                                 />
                             );
