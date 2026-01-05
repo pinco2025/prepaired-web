@@ -16,6 +16,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [historyData, setHistoryData] = useState<ChartData[]>([]);
+  const [chapterData, setChapterData] = useState<Record<string, { attempted: number; unattempted: number; correct: number; incorrect: number; total_questions: number }> | null>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -110,6 +111,25 @@ const Dashboard: React.FC = () => {
     fetchHistoryData();
   }, [analytics?.history_url]);
 
+  // Fetch chapter data
+  useEffect(() => {
+    const fetchChapterData = async () => {
+      if (!analytics?.chapter_url) return;
+
+      try {
+        const response = await fetch(analytics.chapter_url);
+        const data = await response.json();
+        if (data?.chapters) {
+          setChapterData(data.chapters);
+        }
+      } catch (err) {
+        console.error('Error fetching chapter data:', err);
+      }
+    };
+
+    fetchChapterData();
+  }, [analytics?.chapter_url]);
+
   // Calculate derived values
   const phyScore = analytics && analytics.attempt_no ? Math.round(analytics.phy_avg / analytics.attempt_no) : 0;
   const chemScore = analytics && analytics.attempt_no ? Math.round(analytics.chem_avg / analytics.attempt_no) : 0;
@@ -139,7 +159,7 @@ const Dashboard: React.FC = () => {
 
           {/* Row 2 */}
           <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
-            <WeakAreasCard />
+            <WeakAreasCard chapterData={chapterData} />
           </div>
           <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
             <AccuracyCard accuracy={accuracy} />

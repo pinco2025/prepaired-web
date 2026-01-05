@@ -298,4 +298,5 @@ export interface UserAnalytics {
   attempt_no: number;
   percentile?: number;
   history_url?: string;
+  chapter_url?: string;
 }
