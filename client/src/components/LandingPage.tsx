@@ -234,108 +234,137 @@ const LandingPage: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid lg:grid-cols-2 gap-8 items-start relative max-w-5xl mx-auto">
-                        <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-8 flex flex-col h-full transition-colors duration-300">
-                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-slate-700">
-                                <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Original Question</h3>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">PYQ</span>
-                                    <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">JEE Main 2023</span>
-                                </div>
-                            </div>
-                            <div className="relative mb-6 text-base text-gray-600 dark:text-gray-300 font-body leading-relaxed">
-                                <p className="mb-4">
-                                    Q. A particle moves along a straight line such that its displacement at any time t is given by
-                                    <span className="border-b-2 border-gray-300 dark:border-gray-600 pb-0.5 mx-1">s = t³ - 6t² + 3t + 4</span> meters.
-                                    The velocity when the <span className="border-b-2 border-gray-300 dark:border-gray-600 pb-0.5">acceleration is zero</span> is:
-                                </p>
-                            </div>
-                            <div className="relative mb-6">
-                                <div className="border-2 border-dashed border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-900/10 rounded-lg p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
-                                    <span className="material-symbols-outlined text-red-300 dark:text-red-800/60 text-3xl">visibility_off</span>
-                                    <span className="text-xs font-bold uppercase tracking-wide text-red-400 dark:text-red-700/60">No Context / Hint</span>
-                                    <p className="text-[10px] text-red-300 dark:text-red-800/60">Traditional questions often lack guidance on approach.</p>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 mt-auto">
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 opacity-60">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-500 dark:text-gray-400">A</span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">3 m/s</span>
-                                </div>
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 opacity-60">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-500 dark:text-gray-400">B</span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">-12 m/s</span>
-                                </div>
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 opacity-60">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-500 dark:text-gray-400">C</span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">42 m/s</span>
-                                </div>
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 opacity-60">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-500 dark:text-gray-400">D</span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">-9 m/s</span>
-                                </div>
+                    {/* --- Question Comparison Section --- */}
+                    <div className="grid lg:grid-cols-2 gap-4 lg:gap-8 items-stretch relative max-w-6xl mx-auto px-2 lg:px-0">
+                        <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 z-40 flex-col items-center justify-center pointer-events-none">
+                            <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,102,255,0.3)] flex items-center justify-center relative z-10 pointer-events-auto border border-blue-50 dark:border-slate-700">
+                                <span className="font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-primary to-accent text-2xl italic tracking-tighter pr-0.5">VS</span>
                             </div>
                         </div>
-                        <div className="relative bg-white dark:bg-slate-800 rounded-2xl border-2 border-primary/20 dark:border-primary/40 shadow-xl shadow-blue-900/10 dark:shadow-blue-900/20 p-8 flex flex-col h-full ring-4 ring-blue-50/50 dark:ring-blue-900/20 transition-colors duration-300">
-                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-blue-50 dark:border-slate-700">
-                                <h3 className="text-sm font-bold text-primary dark:text-primary-light uppercase tracking-widest flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-base">auto_awesome</span>
-                                    prepAIred Enhanced
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-white bg-primary px-3 py-1 rounded-full shadow-sm">AI Enhanced</span>
+
+                        {/* --- Old Way --- */}
+                        <div className="relative bg-white dark:bg-slate-800/50 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full overflow-visible group scale-[0.98] opacity-80 lg:opacity-100 origin-right">
+                            <div className="absolute -top-4 -left-3 z-20">
+                                <div className="bg-slate-600 dark:bg-slate-700 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg rotate-[-3deg] flex items-center gap-1.5 border-2 border-white dark:border-slate-600">
+                                    <span className="material-symbols-outlined text-sm">history</span>
+                                    Old Way
                                 </div>
                             </div>
-                            <div className="relative mb-6 text-base text-gray-800 dark:text-gray-200 font-body leading-relaxed font-medium">
-                                <p className="mb-4">
-                                    Q. A particle moves along a straight line such that its displacement at any time t is given by
-                                    <span className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded px-1 text-blue-700 dark:text-blue-300 font-mono text-sm mx-1">s = t³ - 6t² + 3t + 4</span> meters.
-                                    The velocity when the <span className="decoration-green-500 decoration-2 underline underline-offset-4 bg-green-50 dark:bg-green-900/20 px-1 rounded text-gray-900 dark:text-gray-100">acceleration is zero</span> is:
-                                </p>
-                            </div>
-                            <div className="relative mb-6">
-                                <div className="border border-green-200 dark:border-green-800 bg-green-50/40 dark:bg-green-900/10 rounded-lg p-5 flex gap-4 items-start relative overflow-hidden">
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-400"></div>
-                                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg text-green-600 dark:text-green-400 shadow-sm border border-green-100 dark:border-green-900 shrink-0">
-                                        <span className="material-symbols-outlined text-xl">lightbulb</span>
+                            <div className="p-6 md:p-8 flex flex-col h-full rounded-3xl bg-slate-50/50 dark:bg-slate-800/30">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-slate-400 text-xl">description</span>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Previous Year Question</h4>
+                                            <div className="bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded w-fit mt-1">JEE Main 2023</div>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-[11px] text-green-700 dark:text-green-400 font-bold uppercase tracking-wide mb-1">Breakdown Hint</p>
-                                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                            1. Find acceleration <span className="font-mono text-xs bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 px-1 rounded mx-0.5">a(t) = d²s/dt²</span>.<br />
-                                            2. Solve <span className="font-mono text-xs bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 px-1 rounded mx-0.5">a(t) = 0</span> to find 't'.
+                                </div>
+                                <div className="mb-4">
+                                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-[10px] font-bold uppercase mb-4">
+                                        <span className="material-symbols-outlined text-sm">foundation</span> Basic Value
+                                    </div>
+                                    <div className="relative p-5 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-loose font-serif">
+                                            Q. A particle moves along a straight line such that
+                                            <span className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-300 dark:border-slate-600 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-200 mx-0.5" title="Static Data">s = t³ - 6t² + 3t + 4</span>
+                                            meters. The velocity when the
+                                            <span className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded mx-0.5">acceleration is zero</span>
+                                            is:
                                         </p>
                                     </div>
                                 </div>
+                                <div className="flex flex-wrap gap-3 mb-6">
+                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wide opacity-80 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
+                                        <span className="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Original Formulation
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wide bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">
+                                        <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span> Standard Condition
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase mb-1">Exam Pattern</span>
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">Familiarity with format &amp; language.</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Basic Check</span>
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">Direct application.</span>
+                                    </div>
+                                </div>
+                                <div className="mt-auto bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded-lg p-3 flex gap-3 items-start">
+                                    <span className="material-symbols-outlined text-red-400 text-lg mt-0.5">warning</span>
+                                    <div>
+                                        <span className="text-xs font-bold text-red-700 dark:text-red-300 block mb-0.5">Limited Learning</span>
+                                        <p className="text-[11px] text-red-600/80 dark:text-red-400/80 leading-tight">Same static values every time. Encourages rote memorization rather than logic.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 mt-auto">
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 opacity-40 grayscale">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-400 dark:text-gray-500">A</span>
-                                    <span className="text-sm text-gray-400 dark:text-gray-500">3 m/s</span>
+                        </div>
+
+                        {/* --- AI Enhanced Way --- */}
+                        <div className="relative bg-white dark:bg-slate-800 rounded-3xl border border-blue-100 dark:border-slate-700 shadow-[0_25px_60px_-10px_rgba(56,182,255,0.4)] dark:shadow-[0_25px_60px_-10px_rgba(0,102,255,0.2)] flex flex-col h-full overflow-visible group z-10 transition-all duration-500 hover:border-blue-300 dark:hover:border-blue-600 scale-100 lg:scale-[1.03] animate-float hover:shadow-[0_40px_80px_-15px_rgba(56,182,255,0.5)]">
+                            <div className="absolute -top-4 -right-2 z-20">
+                                <div className="bg-gradient-to-r from-primary to-accent text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg shadow-blue-500/30 flex items-center gap-1.5 ring-4 ring-white dark:ring-slate-800 animate-pulse-slow">
+                                    <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                                    AI-Enhanced
                                 </div>
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 opacity-40 grayscale">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-400 dark:text-gray-500">B</span>
-                                    <span className="text-sm text-gray-400 dark:text-gray-500">-12 m/s</span>
+                            </div>
+                            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-50/50 dark:from-blue-900/20 via-transparent to-transparent -z-10 rounded-3xl"></div>
+                            <div className="p-6 md:p-8 flex flex-col h-full">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/30 dark:to-green-900/30 text-primary rounded-xl ring-1 ring-blue-100 dark:ring-blue-800 shadow-sm">
+                                        <span className="material-symbols-outlined text-xl text-primary">psychology_alt</span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Inspired PrepAIred Question</h4>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Adaptive • Analytical • Dynamic</p>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 p-3 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 opacity-40 grayscale">
-                                    <span className="size-5 flex items-center justify-center text-[10px] font-bold border border-gray-300 dark:border-slate-600 rounded-full text-gray-400 dark:text-gray-500">C</span>
-                                    <span className="text-sm text-gray-400 dark:text-gray-500">42 m/s</span>
+                                <div className="relative p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700 mb-6 group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-colors shadow-sm group-hover:shadow-md">
+                                    <div className="absolute top-3 right-3">
+                                        <span className="flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-slate-700 dark:text-slate-200 font-medium leading-loose font-serif">
+                                        Q. For a particle defined by
+                                        <span className="bg-white dark:bg-slate-800 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-md font-mono text-xs font-bold shadow-sm mx-0.5 decoration-clone box-decoration-clone">x = 2t³ - 9t² + 12t</span>,
+                                        determine the
+                                        <span className="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/60 dark:border-blue-700/60 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold mx-0.5 border-dashed">average velocity</span>
+                                        in the interval [0, T] where acceleration vanishes.
+                                    </p>
                                 </div>
-                                <div className="col-span-1 relative">
-                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg opacity-30 blur-[2px]"></div>
-                                    <div className="relative flex items-center justify-between p-3 rounded border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
-                                        <div className="flex items-center gap-2">
-                                            <div className="size-5 rounded-full bg-green-500 flex items-center justify-center text-white shadow-sm">
-                                                <span className="material-symbols-outlined text-[14px] font-bold">check</span>
-                                            </div>
-                                            <span className="text-sm font-bold text-gray-900 dark:text-white">-9 m/s</span>
+                                <div className="space-y-4 mb-6">
+                                    <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-green-50/50 dark:hover:bg-green-900/20 transition-colors">
+                                        <div className="mt-0.5 text-green-500 bg-green-100 dark:bg-green-900/30 rounded-full p-1"><span className="material-symbols-outlined text-sm">cyclone</span></div>
+                                        <div>
+                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Dynamic Variables</span>
+                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">Values change every attempt to kill rote memorization.</p>
                                         </div>
-                                        <span className="text-[9px] font-bold text-green-700 dark:text-green-300 bg-white dark:bg-green-900/50 px-1.5 py-0.5 rounded border border-green-200 dark:border-green-800 uppercase tracking-tight">Correct</span>
+                                    </div>
+                                    <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors">
+                                        <div className="mt-0.5 text-primary bg-blue-100 dark:bg-blue-900/30 rounded-full p-1"><span className="material-symbols-outlined text-sm">account_tree</span></div>
+                                        <div>
+                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Multi-Concept Linking</span>
+                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">Requires connecting velocity, acceleration, and limits.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 dark:text-green-400">
+                                        <span className="material-symbols-outlined text-lg">check_circle</span>
+                                        <span>Better Concept Retention</span>
+                                    </div>
+                                    <div className="px-2 py-1 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 text-[10px] font-bold uppercase rounded-md border border-green-200 dark:border-green-700 shadow-sm animate-pulse-slow">
+                                        +45% Efficacy
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     <div className="mt-16 w-full max-w-5xl mx-auto px-4">
                         <div id="pay-section" className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-800 border-2 border-blue-500/20 dark:border-blue-500/30 shadow-[0_30px_80px_-20px_rgba(0,102,255,0.2)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)] group hover:shadow-[0_40px_90px_-20px_rgba(0,102,255,0.3)] transition-all duration-500">
