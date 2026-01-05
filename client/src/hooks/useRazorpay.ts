@@ -24,6 +24,10 @@ interface UseRazorpayReturn {
     initiatePayment: (params: PaymentParams) => Promise<boolean>;
     loading: boolean;
     error: string | null;
+    // New: Success overlay state
+    showSuccess: boolean;
+    successPlanType: string;
+    handleSuccessComplete: () => void;
 }
 
 const loadRazorpayScript = (): Promise<boolean> => {
@@ -44,6 +48,18 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
     const { refreshSubscription, onPaymentSuccess } = config;
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    // New: State for success overlay
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [successPlanType, setSuccessPlanType] = useState('');
+
+    // Handler to complete success flow (called when countdown ends)
+    const handleSuccessComplete = useCallback(() => {
+        setShowSuccess(false);
+        setSuccessPlanType('');
+        if (onPaymentSuccess) {
+            onPaymentSuccess();
+        }
+    }, [onPaymentSuccess]);
 
     // Poll for subscription update to handle webhook delay
     const pollForSubscriptionUpdate = useCallback(async (
@@ -122,7 +138,7 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
             // Open Razorpay checkout
             return new Promise((resolve) => {
                 const options = {
-                    key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_RzH77YIQvKB8er',
+                    key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_live_RzY00fyQy6Y9XD',
                     amount: amount.toString(),
                     currency: 'INR',
                     name: 'prepAIred',
@@ -166,10 +182,9 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
                                 await refreshSubscription();
                             }
 
-                            // 5. Call success callback (for navigation to dashboard)
-                            if (onPaymentSuccess) {
-                                onPaymentSuccess();
-                            }
+                            // 5. Show success overlay (will call onPaymentSuccess after countdown)
+                            setSuccessPlanType(planType);
+                            setShowSuccess(true);
 
                             setLoading(false);
                             resolve(true);
@@ -209,9 +224,9 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
             setLoading(false);
             return false;
         }
-    }, [pollForSubscriptionUpdate, refreshSubscription, onPaymentSuccess]);
+    }, [pollForSubscriptionUpdate, refreshSubscription]);
 
-    return { initiatePayment, loading, error };
+    return { initiatePayment, loading, error, showSuccess, successPlanType, handleSuccessComplete };
 };
 
 export default useRazorpay;
