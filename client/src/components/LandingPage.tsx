@@ -22,6 +22,7 @@ const LandingPage: React.FC = () => {
 
     // Handle successful payment - navigate to dashboard
     const handlePaymentSuccess = useCallback(() => {
+        setPaymentSuccess(true);
         navigate('/dashboard', { replace: true });
     }, [navigate]);
 
@@ -36,7 +37,8 @@ const LandingPage: React.FC = () => {
         refreshSubscription,
         onPaymentSuccess: handlePaymentSuccess,
     });
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(true);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
 
     // State for cycling equations
     const [equationIndex, setEquationIndex] = useState(0);
@@ -74,9 +76,11 @@ const LandingPage: React.FC = () => {
     // Check if user has paid subscription
     const isPaidUser = subscriptionType?.toLowerCase() === 'ipft-01-2026';
 
-    // Initialize dark mode from localStorage
+    // Initialize dark mode from localStorage (default to dark if not set)
     useEffect(() => {
-        const isDark = localStorage.getItem('darkMode') === 'true';
+        const storedPreference = localStorage.getItem('darkMode');
+        // Default to dark mode if no preference is stored
+        const isDark = storedPreference === null ? true : storedPreference === 'true';
         setDarkMode(isDark);
         if (isDark) {
             document.documentElement.classList.add('dark');
@@ -559,14 +563,24 @@ const LandingPage: React.FC = () => {
                                                 Detailed Performance Analytics
                                             </li>
                                         </ul>
-                                        <button
-                                            onClick={handleClaimOffer}
-                                            disabled={paymentLoading}
-                                            className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary-dark hover:to-primary text-white font-bold text-lg py-4 px-10 rounded-xl transition-all duration-300 shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1 flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {paymentLoading ? 'Processing...' : 'Claim Offer Now'}
-                                            {!paymentLoading && <span className="material-symbols-outlined transition-transform group-hover/btn:translate-x-1">arrow_forward</span>}
-                                        </button>
+                                        {(isPaidUser || paymentSuccess) ? (
+                                            <button
+                                                onClick={() => navigate('/dashboard')}
+                                                className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold text-lg py-4 px-10 rounded-xl transition-all duration-300 shadow-xl shadow-green-500/20 hover:shadow-green-500/40 hover:-translate-y-1 flex items-center justify-center gap-3 group/btn animate-bounce-in"
+                                            >
+                                                Go to Dashboard
+                                                <span className="material-symbols-outlined transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={handleClaimOffer}
+                                                disabled={paymentLoading}
+                                                className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary-dark hover:to-primary text-white font-bold text-lg py-4 px-10 rounded-xl transition-all duration-300 shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1 flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {paymentLoading ? 'Processing...' : 'Claim Offer Now'}
+                                                {!paymentLoading && <span className="material-symbols-outlined transition-transform group-hover/btn:translate-x-1">arrow_forward</span>}
+                                            </button>
+                                        )}
                                         {paymentError && (
                                             <p className="text-red-500 text-sm mt-2">{paymentError}</p>
                                         )}
