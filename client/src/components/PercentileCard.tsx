@@ -192,10 +192,10 @@ const PercentileCard: React.FC<PercentileCardProps> = ({ percentile = 0, history
                                         }`}
                                 />
                                 {/* Tooltip */}
-                                <foreignObject x={p.x - 50} y={p.y - 60} width="100" height="50" className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                    <div className="flex flex-col items-center justify-center p-2 bg-gray-900 text-white text-xs rounded shadow-lg transform translate-y-2">
-                                        <span className="font-bold">{p.value}%</span>
-                                        <span className="text-gray-300">{p.testId || p.label}</span>
+                                <foreignObject x={p.x - 40} y={p.y - 48} width="80" height="44" className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none overflow-visible" style={{ zIndex: 50 }}>
+                                    <div className="flex flex-col items-center justify-center px-2 py-1.5 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark backdrop-blur-sm">
+                                        <span className="text-[11px] font-semibold">{p.value}%ile</span>
+                                        <span className="text-[9px] text-text-secondary-light dark:text-text-secondary-dark">{p.testId || p.label}</span>
                                     </div>
                                 </foreignObject>
                             </g>
