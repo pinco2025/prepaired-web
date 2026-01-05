@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import SubjectsCard from './SubjectsCard';
 import PercentileCard, { ChartData } from './PercentileCard';
 import WeakAreasCard from './WeakAreasCard';
@@ -11,6 +12,7 @@ import { UserAnalytics } from '../data';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [historyData, setHistoryData] = useState<ChartData[]>([]);
@@ -40,7 +42,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchAnalytics();
-  }, [user]);
+  }, [user, location.key]); // location.key changes on navigation, triggering re-fetch
 
   useEffect(() => {
     const fetchHistoryData = async () => {
@@ -113,6 +115,7 @@ const Dashboard: React.FC = () => {
   const chemScore = analytics && analytics.attempt_no ? Math.round(analytics.chem_avg / analytics.attempt_no) : 0;
   const mathScore = analytics && analytics.attempt_no ? Math.round(analytics.math_avg / analytics.attempt_no) : 0;
   const accuracy = analytics && analytics.attempt_no ? Math.round(analytics.accuracy / analytics.attempt_no) : 0;
+  const percentile = analytics && analytics.attempt_no && analytics.percentile ? Math.round((analytics.percentile / analytics.attempt_no) * 10) / 10 : 0;
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -131,7 +134,7 @@ const Dashboard: React.FC = () => {
             <SubjectsCard averages={{ physics: phyScore, chemistry: chemScore, maths: mathScore }} />
           </div>
           <div className="col-span-1 md:col-span-12 lg:col-span-5 h-[380px] md:h-full md:min-h-0">
-            <PercentileCard percentile={analytics?.percentile} historyData={historyData} />
+            <PercentileCard percentile={percentile} historyData={historyData} />
           </div>
 
           {/* Row 2 */}

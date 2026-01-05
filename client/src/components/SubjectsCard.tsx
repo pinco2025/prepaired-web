@@ -34,31 +34,31 @@ interface SubjectsCardProps {
 }
 
 const SubjectsCard: React.FC<SubjectsCardProps> = ({ averages }) => {
-    // We don't need local state for animation here anymore as SubjectBubble handles it with useCountUp
+  // We don't need local state for animation here anymore as SubjectBubble handles it with useCountUp
 
   const subjectsData = [
-    { name: 'Physics', topic: 'Score', percentage: averages?.physics || 0, color: 'blue' },
-    { name: 'Chemistry', topic: 'Score', percentage: averages?.chemistry || 0, color: 'green' },
-    { name: 'Maths', topic: 'Score', percentage: averages?.maths || 0, color: 'orange' },
+    { name: 'Physics', topic: 'Avg Score', percentage: averages?.physics || 0, color: 'blue' },
+    { name: 'Chemistry', topic: 'Avg Score', percentage: averages?.chemistry || 0, color: 'green' },
+    { name: 'Maths', topic: 'Avg Score', percentage: averages?.maths || 0, color: 'orange' },
   ];
 
   return (
     <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col justify-between h-full min-h-0">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">Subjects</h2>
+        <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">Subject Average Score</h2>
         <button className="text-sm font-medium text-primary hover:bg-primary/5 px-3 py-1 rounded-lg transition-colors">View Details</button>
       </div>
-      <div className="flex-1 flex items-center justify-around gap-4 px-2 overflow-hidden">
+      <div className="flex-1 flex items-center justify-center flex-wrap gap-8 md:gap-10 px-2 py-4 overflow-visible">
         {subjectsData.map((subject, index) => {
           const colors = colorMap[subject.color];
           return (
             <SubjectBubble
-                key={index}
-                name={subject.name}
-                topic={subject.topic}
-                percentage={subject.percentage}
-                colorClasses={colors}
-                sizeClass="w-20 h-20 lg:w-28 lg:h-28 xl:w-32 xl:h-32"
+              key={index}
+              name={subject.name}
+              topic={subject.topic}
+              percentage={subject.percentage}
+              colorClasses={colors}
+              sizeClass="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
             />
           );
         })}

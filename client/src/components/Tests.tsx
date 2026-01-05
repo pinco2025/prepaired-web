@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import './Tests.css';
 import { Test } from '../data';
@@ -7,10 +7,13 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface TestWithStatus extends Test {
     status: 'completed' | 'unlocked' | 'locked';
+    submissionId?: string;
+    hasResult?: boolean;
 }
 
 const Tests: React.FC = () => {
     const { user } = useAuth();
+    const location = useLocation();
     const [tests, setTests] = useState<TestWithStatus[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -29,20 +32,28 @@ const Tests: React.FC = () => {
 
                 if (testsError) throw testsError;
 
-                // Fetch user's submitted tests
+                // Fetch user's submitted tests with result info
                 const { data: submissionsData, error: submissionsError } = await supabase
                     .from('student_tests')
-                    .select('test_id')
+                    .select('id, test_id, result_url')
                     .eq('user_id', user.id)
                     .not('submitted_at', 'is', null);
 
                 if (submissionsError) throw submissionsError;
 
-                const completedTestIds = new Set(submissionsData.map(s => s.test_id));
+                // Create a map of test_id to submission info
+                const submissionsMap = new Map<string, { id: string; hasResult: boolean }>();
+                submissionsData.forEach(s => {
+                    submissionsMap.set(s.test_id, {
+                        id: s.id,
+                        hasResult: !!s.result_url
+                    });
+                });
 
                 let firstUnlockedFound = false;
                 const testsWithStatus: TestWithStatus[] = (testsData || []).map(test => {
-                    const isCompleted = completedTestIds.has(test.testID);
+                    const submissionInfo = submissionsMap.get(test.testID);
+                    const isCompleted = !!submissionInfo;
                     let status: 'completed' | 'unlocked' | 'locked' = 'locked';
 
                     if (isCompleted) {
@@ -52,7 +63,12 @@ const Tests: React.FC = () => {
                         firstUnlockedFound = true;
                     }
 
-                    return { ...test, status };
+                    return {
+                        ...test,
+                        status,
+                        submissionId: submissionInfo?.id,
+                        hasResult: submissionInfo?.hasResult
+                    };
                 });
 
                 setTests(testsWithStatus);
@@ -69,7 +85,7 @@ const Tests: React.FC = () => {
         } else {
             setIsLoading(false);
         }
-    }, [user?.id]);
+    }, [user?.id, location.key]); // location.key changes on navigation, triggering re-fetch
 
     if (isLoading) {
         return (
@@ -192,20 +208,41 @@ const Tests: React.FC = () => {
                                 const testNumber = index + 1;
 
                                 if (test.status === 'completed') {
+                                    // Result is ready - show clickable link
+                                    if (test.hasResult && test.submissionId) {
+                                        return (
+                                            <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+                                                <Link to={`/results/${test.submissionId}`} className="group relative flex flex-col items-center w-48">
+                                                    <div className="relative">
+                                                        <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-green-500 shadow-glow-green flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 relative">
+                                                            <span className="text-2xl font-bold text-green-500">{testNumber}</span>
+                                                            <span className="material-symbols-outlined absolute -top-2 -right-2 text-white bg-green-500 rounded-full p-0.5 text-sm shadow-sm">check</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-3 text-center w-full">
+                                                        <h3 className="font-bold text-text-light dark:text-text-dark text-sm leading-tight mb-1">{test.title}</h3>
+                                                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800">Completed</span>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        );
+                                    }
+
+                                    // Result not ready yet - show processing state (non-clickable)
                                     return (
                                         <div key={test.testID} className="flex justify-center md:absolute mb-8 md:mb-0" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
-                                            <Link to={`/results/${test.testID}`} className="group relative flex flex-col items-center w-48">
+                                            <div className="group relative flex flex-col items-center w-48">
                                                 <div className="relative">
-                                                    <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-green-500 shadow-glow-green flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 relative">
-                                                        <span className="text-2xl font-bold text-green-500">{testNumber}</span>
-                                                        <span className="material-symbols-outlined absolute -top-2 -right-2 text-white bg-green-500 rounded-full p-0.5 text-sm shadow-sm">check</span>
+                                                    <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-amber-500 flex items-center justify-center z-10 relative">
+                                                        <span className="text-2xl font-bold text-amber-500">{testNumber}</span>
+                                                        <span className="material-symbols-outlined absolute -top-2 -right-2 text-white bg-amber-500 rounded-full p-0.5 text-sm shadow-sm animate-spin">sync</span>
                                                     </div>
                                                 </div>
                                                 <div className="mt-3 text-center w-full">
                                                     <h3 className="font-bold text-text-light dark:text-text-dark text-sm leading-tight mb-1">{test.title}</h3>
-                                                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800">Completed</span>
+                                                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">Processing</span>
                                                 </div>
-                                            </Link>
+                                            </div>
                                         </div>
                                     );
                                 }
