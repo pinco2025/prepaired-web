@@ -17,6 +17,7 @@ const Dashboard: React.FC = () => {
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [historyData, setHistoryData] = useState<ChartData[]>([]);
   const [chapterData, setChapterData] = useState<Record<string, { attempted: number; unattempted: number; correct: number; incorrect: number; total_questions: number }> | null>(null);
+  const [recentScores, setRecentScores] = useState<{ score: number; label: string }[]>([]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -57,7 +58,16 @@ const Dashboard: React.FC = () => {
           ? data.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
           : [];
 
-        // Fetch test IDs for all attempt IDs
+        // Prepare data for AverageScoreCard (Last 5 tests)
+        // Ensure we take the last 5 entries, pad with empty/null if needed is handled in component, 
+        // but here we just pass the valid ones.
+        const scoresData = sortedData.map((item: any, index: number) => ({
+          score: Math.round((item.phy_score || 0) + (item.chem_score || 0) + (item.math_score || 0)),
+          label: `T${index + 1}`
+        }));
+        setRecentScores(scoresData); // We pass all, component can slice/filter
+
+        // Fetch test IDs for all attempt IDs (existing logic...)
         const attemptIds = sortedData.map((item: any) => item.test_attempt_id).filter(Boolean);
         let testIdMap: Record<string, string> = {};
 
@@ -76,7 +86,7 @@ const Dashboard: React.FC = () => {
         }
 
         const formattedData = sortedData.map((item: any, index: number) => {
-          // Calculate trend by comparing with previous percentile
+          // ... (existing percentile logic)
           let trend: 'up' | 'down' | 'neutral' = 'neutral';
           if (index > 0) {
             const prevPercentile = sortedData[index - 1]?.percentile || 0;
@@ -111,17 +121,25 @@ const Dashboard: React.FC = () => {
     fetchHistoryData();
   }, [analytics?.history_url]);
 
-  // Fetch chapter data
+  // Fetch chapter data for WeakAreasCard
   useEffect(() => {
     const fetchChapterData = async () => {
-      if (!analytics?.chapter_url) return;
+      console.log('[DEBUG] analytics?.chapter_url:', analytics?.chapter_url);
+      if (!analytics?.chapter_url) {
+        console.log('[DEBUG] No chapter_url found, skipping fetch');
+        return;
+      }
 
       try {
+        console.log('[DEBUG] Fetching chapter data from:', analytics.chapter_url);
         const response = await fetch(analytics.chapter_url);
+        console.log('[DEBUG] Chapter fetch response status:', response.status);
         const data = await response.json();
-        if (data?.chapters) {
-          setChapterData(data.chapters);
-        }
+        console.log('[DEBUG] Chapter data received:', data);
+        // Extract chapters from the nested structure (data.chapters) if present
+        const chapters = data.chapters || data;
+        console.log('[DEBUG] Extracted chapters:', chapters);
+        setChapterData(chapters);
       } catch (err) {
         console.error('Error fetching chapter data:', err);
       }
@@ -136,6 +154,8 @@ const Dashboard: React.FC = () => {
   const mathScore = analytics && analytics.attempt_no ? Math.round(analytics.math_avg / analytics.attempt_no) : 0;
   const accuracy = analytics && analytics.attempt_no ? Math.round(analytics.accuracy / analytics.attempt_no) : 0;
   const percentile = analytics && analytics.attempt_no && analytics.percentile ? Math.round((analytics.percentile / analytics.attempt_no) * 10) / 10 : 0;
+
+  const totalAverageScore = phyScore + chemScore + mathScore;
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -165,7 +185,7 @@ const Dashboard: React.FC = () => {
             <AccuracyCard accuracy={accuracy} />
           </div>
           <div className="col-span-1 md:col-span-12 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
-            <AverageScoreCard />
+            <AverageScoreCard averageScore={totalAverageScore} recentScores={recentScores} />
           </div>
         </div>
       </div>

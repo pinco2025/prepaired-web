@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#0066ff",
-        "accent" : "#35b2ff",
+        "accent": "#35b2ff",
         "primary-light": "#38b6ff",
         "background-light": "#f9f9f9",
         "background-dark": "#121212",
@@ -41,11 +41,21 @@ module.exports = {
       },
       animation: {
         'scroll': 'scroll 40s linear infinite',
+        'shimmer': 'shimmer 2s infinite',
+        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
       },
       keyframes: {
         scroll: {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         }
       }
     },

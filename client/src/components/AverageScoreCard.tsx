@@ -1,26 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import useCountUp from '../hooks/useCountUp';
 
-const testScoresData = [
-  { name: 'T1', score: 120, height: 40, isPrimary: false, isCurrent: false },
-  { name: 'T2', score: 165, height: 55, isPrimary: false, isCurrent: false },
-  { name: 'T3', score: 135, height: 45, isPrimary: true, isCurrent: false },
-  { name: 'T4', score: 210, height: 70, isPrimary: true, isCurrent: false },
-  { name: 'T5', score: 195, height: 65, isPrimary: true, isCurrent: true },
-];
+interface AverageScoreCardProps {
+  averageScore?: number;
+  recentScores?: { score: number; label: string }[];
+}
 
 const gridLines = [0, 25, 50, 75, 100];
 
-const AverageScoreCard: React.FC = () => {
-  const [scores, setScores] = useState(testScoresData.map(s => ({ ...s, currentHeight: 0 })));
-  const animatedScore = useCountUp(154, 2000);
+const AverageScoreCard: React.FC<AverageScoreCardProps> = ({ averageScore = 0, recentScores = [] }) => {
+  // Process scores to get last 5, padded if necessary
+  const processedScores = React.useMemo(() => {
+    // Take last 5 scores
+    const sliced = recentScores.slice(-5);
+
+    // Pad with empty slots if less than 5
+    const padded = [...sliced];
+    while (padded.length < 5) {
+      padded.unshift({ score: 0, label: '-' }); // Add to start so real data is on right
+    }
+
+    // Determine current (last) test
+    const lastIndex = padded.length - 1;
+
+    return padded.map((s, index) => ({
+      name: s.label,
+      score: s.score,
+      height: Math.min(100, (s.score / 300) * 100), // Calculate height percentage (max 300)
+      isPrimary: s.score > 0, // Only style as primary if it has a score
+      isCurrent: index === lastIndex && s.score > 0 // Highlight last one if it has data
+    }));
+  }, [recentScores]);
+
+  const [scores, setScores] = useState(processedScores.map(s => ({ ...s, currentHeight: 0 })));
+  const animatedScore = useCountUp(averageScore || 0, 2000);
 
   useEffect(() => {
+    // Update scores when processedScores changes (e.g. data loaded)
     const timer = setTimeout(() => {
-      setScores(testScoresData.map(s => ({ ...s, currentHeight: s.height })));
+      setScores(processedScores.map(s => ({ ...s, currentHeight: s.height })));
     }, 300);
     return () => clearTimeout(timer);
-  }, []);
+  }, [processedScores]);
 
   return (
     <div className="col-span-1 md:col-span-12 lg:col-span-4 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col h-full min-h-0">
@@ -91,22 +112,30 @@ const AverageScoreCard: React.FC = () => {
                       </div>
 
                       {/* Bar */}
-                      <div
-                        className={`w-full rounded-md relative transition-all duration-1000 ease-out transform group-hover:scale-110 origin-bottom
-                          ${test.isPrimary
-                            ? test.isCurrent
+                      {test.isPrimary ? (
+                        <div
+                          className={`w-full rounded-md relative transition-all duration-1000 ease-out transform group-hover:scale-110 origin-bottom
+                            ${test.isCurrent
                               ? 'bg-gradient-to-t from-primary to-accent shadow-lg shadow-primary/20'
                               : 'bg-gradient-to-t from-primary/70 to-accent/70'
-                            : 'bg-border-light dark:bg-border-dark'
-                          }
-                          ${test.isCurrent && 'ring-2 ring-primary/40 ring-offset-1 ring-offset-surface-light dark:ring-offset-surface-dark'}`}
-                        style={{ height: `${test.currentHeight}%`, minHeight: test.currentHeight > 0 ? '4px' : '0' }}
-                      >
-                        {/* Shine effect */}
-                        <div className="absolute inset-0 rounded-md overflow-hidden">
-                          <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent rounded-t-md"></div>
+                            }
+                            ${test.isCurrent && 'ring-2 ring-primary/40 ring-offset-1 ring-offset-surface-light dark:ring-offset-surface-dark'}`}
+                          style={{ height: `${test.currentHeight}%`, minHeight: '4px' }}
+                        >
+                          {/* Shine effect */}
+                          <div className="absolute inset-0 rounded-md overflow-hidden">
+                            <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent rounded-t-md"></div>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        /* Placeholder for unattempted test slot */
+                        <div
+                          className="w-full rounded-md border-2 border-dashed border-border-light dark:border-border-dark opacity-40 flex items-center justify-center"
+                          style={{ height: '8%', minHeight: '16px' }}
+                        >
+                          <span className="text-[8px] text-text-secondary-light dark:text-text-secondary-dark">—</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
