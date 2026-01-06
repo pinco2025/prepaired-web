@@ -1,3 +1,11 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://prepaired.in/sitemap.xml
+
+# Disallow admin/private routes
+Disallow: /dashboard
+Disallow: /tests/*
+Disallow: /profile

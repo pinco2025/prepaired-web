@@ -164,29 +164,29 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 h-full md:h-screen animate-fade-in-up overflow-y-auto md:overflow-hidden flex flex-col">
+    <div className="p-3 sm:p-4 md:p-6 h-full md:h-screen animate-fade-in-up overflow-y-auto md:overflow-hidden flex flex-col">
       <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
-        <div className="mb-4 shrink-0">
-          <h1 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Student'}!</h1>
-          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Here's your prepAIred learning summary.</p>
+        <div className="mb-3 sm:mb-4 shrink-0">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Student'}!</h1>
+          <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark mt-0.5 sm:mt-1">Here's your prepAIred learning summary.</p>
         </div>
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4 pb-4 md:min-h-0">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-3 sm:gap-4 pb-3 sm:pb-4 md:min-h-0">
           {/* Row 1 */}
-          <div className="col-span-1 md:col-span-12 lg:col-span-7 h-[380px] md:h-full md:min-h-0">
+          <div className="col-span-1 md:col-span-12 lg:col-span-7 h-[280px] sm:h-[320px] md:h-full md:min-h-0">
             <SubjectsCard averages={{ physics: phyScore, chemistry: chemScore, maths: mathScore }} />
           </div>
-          <div className="col-span-1 md:col-span-12 lg:col-span-5 h-[380px] md:h-full md:min-h-0">
+          <div className="col-span-1 md:col-span-12 lg:col-span-5 h-[280px] sm:h-[320px] md:h-full md:min-h-0">
             <PercentileCard percentile={percentile} historyData={historyData} />
           </div>
 
           {/* Row 2 */}
-          <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
+          <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[250px] sm:h-[280px] md:h-full md:min-h-0">
             <WeakAreasCard chapterData={chapterData} />
           </div>
-          <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
+          <div className="col-span-1 md:col-span-6 lg:col-span-4 h-[250px] sm:h-[280px] md:h-full md:min-h-0">
             <AccuracyCard accuracy={accuracy} />
           </div>
-          <div className="col-span-1 md:col-span-12 lg:col-span-4 h-[300px] md:h-full md:min-h-0">
+          <div className="col-span-1 md:col-span-12 lg:col-span-4 h-[250px] sm:h-[280px] md:h-full md:min-h-0">
             <AverageScoreCard averageScore={totalAverageScore} recentScores={recentScores} />
           </div>
         </div>

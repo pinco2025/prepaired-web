@@ -43,12 +43,12 @@ const SubjectsCard: React.FC<SubjectsCardProps> = ({ averages }) => {
   ];
 
   return (
-    <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col justify-between h-full min-h-0">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">Subject Average Score</h2>
-        <button className="text-sm font-medium text-primary hover:bg-primary/5 px-3 py-1 rounded-lg transition-colors">View Details</button>
+    <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-surface-light dark:bg-surface-dark rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col justify-between h-full min-h-0">
+      <div className="flex justify-between items-center mb-2 sm:mb-3 md:mb-4">
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-text-light dark:text-text-dark">Subject Average Score</h2>
+        <button className="text-xs sm:text-sm font-medium text-primary hover:bg-primary/5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg transition-colors">View Details</button>
       </div>
-      <div className="flex-1 flex items-center justify-center flex-wrap gap-8 md:gap-10 px-2 py-4 overflow-visible">
+      <div className="flex-1 flex items-center justify-center flex-wrap gap-4 sm:gap-6 md:gap-10 px-1 sm:px-2 py-2 sm:py-4 overflow-visible">
         {subjectsData.map((subject, index) => {
           const colors = colorMap[subject.color];
           return (
@@ -58,7 +58,7 @@ const SubjectsCard: React.FC<SubjectsCardProps> = ({ averages }) => {
               topic={subject.topic}
               percentage={subject.percentage}
               colorClasses={colors}
-              sizeClass="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
+              sizeClass="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32"
             />
           );
         })}

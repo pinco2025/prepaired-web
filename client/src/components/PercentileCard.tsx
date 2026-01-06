@@ -114,13 +114,13 @@ const PercentileCard: React.FC<PercentileCardProps> = ({ percentile = 0, history
         : '';
 
     return (
-        <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl shadow-sm border border-border-light dark:border-border-dark flex flex-col h-full">
-            <div className="flex justify-between items-start mb-4">
+        <div className="bg-surface-light dark:bg-surface-dark p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-border-light dark:border-border-dark flex flex-col h-full">
+            <div className="flex justify-between items-start mb-2 sm:mb-3 md:mb-4">
                 <div>
-                    <h3 className="text-text-secondary-light dark:text-text-secondary-dark font-medium text-sm">PrepAIred Percentile</h3>
-                    <div className="flex items-baseline gap-2 mt-1">
-                        <div className="flex items-baseline text-primary"><span className="text-5xl font-bold">{animatedPercentile}</span><span className="text-3xl font-bold">%ile</span></div>
-                        <span className="text-success-light dark:text-success-dark text-sm font-large">Top {Math.max(1, 100 - percentile)}%</span>
+                    <h3 className="text-text-secondary-light dark:text-text-secondary-dark font-medium text-xs sm:text-sm">PrepAIred Percentile</h3>
+                    <div className="flex items-baseline gap-1 sm:gap-2 mt-0.5 sm:mt-1">
+                        <div className="flex items-baseline text-primary"><span className="text-3xl sm:text-4xl md:text-5xl font-bold">{animatedPercentile}</span><span className="text-xl sm:text-2xl md:text-3xl font-bold">%ile</span></div>
+                        <span className="text-success-light dark:text-success-dark text-xs sm:text-sm font-medium">Top {Math.max(1, 100 - percentile)}%</span>
                     </div>
                 </div>
             </div>
