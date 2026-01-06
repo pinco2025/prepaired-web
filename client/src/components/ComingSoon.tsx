@@ -1,6 +1,8 @@
 import React from 'react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const ComingSoon: React.FC = () => {
+  usePageTitle('Coming Soon');
   return (
     <main className="flex-grow flex items-center justify-center h-full overflow-hidden relative">
       {/* Animated background elements */}

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Login: React.FC = () => {
+  usePageTitle('Login');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
   const [password, setPassword] = useState('');

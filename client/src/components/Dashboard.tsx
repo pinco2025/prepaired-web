@@ -9,8 +9,10 @@ import DashboardSkeleton from './DashboardSkeleton';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { UserAnalytics } from '../data';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Dashboard: React.FC = () => {
+  usePageTitle('Dashboard');
   const { user } = useAuth();
   const location = useLocation();
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // Define interfaces for the result data based on sample_result.json
 interface SectionScore {
@@ -57,6 +58,7 @@ const subjectIcons: Record<string, string> = {
 };
 
 const TestResult: React.FC = () => {
+  usePageTitle('Test Result');
   const { submissionId } = useParams<{ submissionId: string }>();
   const navigate = useNavigate();
   const [result, setResult] = useState<TestResultData | null>(null);
@@ -233,8 +235,8 @@ const TestResult: React.FC = () => {
                 <span className="text-lg font-bold text-text-light dark:text-text-dark">{total_stats.total_attempted}<span className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-normal">/{result.totalQuestions}</span></span>
               </div>
               <div className="w-full bg-border-light dark:bg-border-dark rounded-full h-2 overflow-hidden flex">
-                 <div className="bg-success-light dark:bg-success-dark h-full" style={{ width: `${(total_stats.total_correct / result.totalQuestions) * 100}%` }}></div>
-                 <div className="bg-error-light dark:bg-error-dark h-full" style={{ width: `${(total_stats.total_wrong / result.totalQuestions) * 100}%` }}></div>
+                <div className="bg-success-light dark:bg-success-dark h-full" style={{ width: `${(total_stats.total_correct / result.totalQuestions) * 100}%` }}></div>
+                <div className="bg-error-light dark:bg-error-dark h-full" style={{ width: `${(total_stats.total_wrong / result.totalQuestions) * 100}%` }}></div>
               </div>
             </div>
           </div>
@@ -278,7 +280,7 @@ const TestResult: React.FC = () => {
                       </div>
                     </div>
                     <div className="relative w-full h-2 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
-                      <div className={`absolute top-0 left-0 h-full rounded-full ${style.bar}`} style={{ width: `${Math.max(0, (data.score/sectionMaxScore)*100)}%` }}></div>
+                      <div className={`absolute top-0 left-0 h-full rounded-full ${style.bar}`} style={{ width: `${Math.max(0, (data.score / sectionMaxScore) * 100)}%` }}></div>
                     </div>
                   </div>
                 )

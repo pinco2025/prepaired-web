@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const TestSubmitted: React.FC = () => {
+  usePageTitle('Test Submitted');
   const location = useLocation();
   const navigate = useNavigate();
   const submissionId = location.state?.submissionId;
@@ -11,8 +13,8 @@ const TestSubmitted: React.FC = () => {
 
   const handleViewResult = async () => {
     if (!submissionId) {
-       navigate('/dashboard');
-       return;
+      navigate('/dashboard');
+      return;
     }
 
     setChecking(true);
@@ -85,7 +87,7 @@ const TestSubmitted: React.FC = () => {
               )}
             </button>
           ) : (
-             <Link
+            <Link
               to="/dashboard"
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
             >

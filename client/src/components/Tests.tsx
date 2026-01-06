@@ -4,6 +4,7 @@ import { supabase } from '../utils/supabaseClient';
 import './Tests.css';
 import { Test } from '../data';
 import { useAuth } from '../contexts/AuthContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface TestWithStatus extends Test {
     status: 'completed' | 'unlocked' | 'locked';
@@ -12,6 +13,7 @@ interface TestWithStatus extends Test {
 }
 
 const Tests: React.FC = () => {
+    usePageTitle('Tests');
     const { user } = useAuth();
     const location = useLocation();
     const [tests, setTests] = useState<TestWithStatus[]>([]);

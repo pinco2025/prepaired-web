@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { Test, Question } from '../data';
+import { usePageTitle } from '../hooks/usePageTitle';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
@@ -23,6 +24,7 @@ interface Solution {
 }
 
 const TestReview: React.FC = () => {
+    usePageTitle('Test Review');
     const { submissionId } = useParams<{ submissionId: string }>();
     const navigate = useNavigate();
 
@@ -39,64 +41,64 @@ const TestReview: React.FC = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-             if (!submissionId) {
-        setError('Submission ID is missing.');
-        setLoading(false);
-        return;
-      }
+            if (!submissionId) {
+                setError('Submission ID is missing.');
+                setLoading(false);
+                return;
+            }
 
-      try {
-        // 1. Fetch submission data to get result_url and test_id
-        const { data: submissionData, error: submissionError } = await supabase
-          .from('student_tests')
-          .select('result_url, test_id')
-          .eq('id', submissionId)
-          .single();
+            try {
+                // 1. Fetch submission data to get result_url and test_id
+                const { data: submissionData, error: submissionError } = await supabase
+                    .from('student_tests')
+                    .select('result_url, test_id')
+                    .eq('id', submissionId)
+                    .single();
 
-        if (submissionError) throw new Error(`Failed to fetch submission: ${submissionError.message}`);
-        if (!submissionData) throw new Error('Submission not found.');
+                if (submissionError) throw new Error(`Failed to fetch submission: ${submissionError.message}`);
+                if (!submissionData) throw new Error('Submission not found.');
 
-        const { result_url, test_id } = submissionData;
+                const { result_url, test_id } = submissionData;
 
-        // 2. Fetch test metadata to get the test url and solution_url
-        const { data: testMeta, error: testMetaError } = await supabase
-          .from('tests')
-          .select('url, solution_url')
-          .eq('testID', test_id)
-          .single();
+                // 2. Fetch test metadata to get the test url and solution_url
+                const { data: testMeta, error: testMetaError } = await supabase
+                    .from('tests')
+                    .select('url, solution_url')
+                    .eq('testID', test_id)
+                    .single();
 
-        if (testMetaError) throw new Error(`Failed to fetch test metadata: ${testMetaError.message}`);
-        if (!testMeta) throw new Error('Test metadata not found.');
+                if (testMetaError) throw new Error(`Failed to fetch test metadata: ${testMetaError.message}`);
+                if (!testMeta) throw new Error('Test metadata not found.');
 
-        const { url: testUrl, solution_url } = testMeta;
+                const { url: testUrl, solution_url } = testMeta;
 
-        // 3. Fetch all data concurrently
-        const [resultResponse, solutionResponse, testResponse] = await Promise.all([
-          fetch(result_url),
-          fetch(solution_url),
-          fetch(testUrl)
-        ]);
+                // 3. Fetch all data concurrently
+                const [resultResponse, solutionResponse, testResponse] = await Promise.all([
+                    fetch(result_url),
+                    fetch(solution_url),
+                    fetch(testUrl)
+                ]);
 
-        if (!resultResponse.ok) throw new Error(`Failed to fetch result data from ${result_url}`);
-        if (!solutionResponse.ok) throw new Error(`Failed to fetch solution data from ${solution_url}`);
-        if (!testResponse.ok) throw new Error(`Failed to fetch test content from ${testUrl}`);
+                if (!resultResponse.ok) throw new Error(`Failed to fetch result data from ${result_url}`);
+                if (!solutionResponse.ok) throw new Error(`Failed to fetch solution data from ${solution_url}`);
+                if (!testResponse.ok) throw new Error(`Failed to fetch test content from ${testUrl}`);
 
-        const resultJson = await resultResponse.json();
-        const solutionJson = await solutionResponse.json();
-        const testJson = await testResponse.json();
+                const resultJson = await resultResponse.json();
+                const solutionJson = await solutionResponse.json();
+                const testJson = await testResponse.json();
 
-        setUserAnswers(resultJson.attempt_comparison || []);
-        setSolutions(solutionJson.questions || []);
-        setTestData(testJson as Test);
-        setAllQuestions(testJson.questions || []);
+                setUserAnswers(resultJson.attempt_comparison || []);
+                setSolutions(solutionJson.questions || []);
+                setTestData(testJson as Test);
+                setAllQuestions(testJson.questions || []);
 
 
-      } catch (err: any) {
-        setError(err.message || 'An unknown error occurred.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+            } catch (err: any) {
+                setError(err.message || 'An unknown error occurred.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, [submissionId]);
@@ -315,7 +317,7 @@ const TestReview: React.FC = () => {
                                                 </div>
                                                 {currentSolution.solution_image_url && (
                                                     <div className="flex justify-center mt-4">
-                                                        <img src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg"/>
+                                                        <img src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg" />
                                                     </div>
                                                 )}
                                             </div>

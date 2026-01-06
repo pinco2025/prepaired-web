@@ -5,10 +5,12 @@ import { supabase } from '../utils/supabaseClient';
 import TestInstructions from './TestInstructions';
 import TestInterface from './TestInterface';
 import TestSubmitted from './TestSubmitted';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 type TestStatus = 'instructions' | 'inProgress' | 'submitted';
 
 const TestPage: React.FC = () => {
+  usePageTitle('Test');
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
   const [test, setTest] = useState<Test | null>(null);

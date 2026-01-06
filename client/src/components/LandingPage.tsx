@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRazorpay } from '../hooks/useRazorpay';
+import { usePageTitle } from '../hooks/usePageTitle';
 import PaymentSuccessOverlay from './PaymentSuccessOverlay';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -17,6 +18,7 @@ const dynamicEquations = [
 ];
 
 const LandingPage: React.FC = () => {
+    usePageTitle('AI-Powered JEE & NEET Prep');
     const navigate = useNavigate();
     const { user, subscriptionType, refreshSubscription } = useAuth();
 
@@ -45,6 +47,46 @@ const LandingPage: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     const comparisonRef = useRef<HTMLDivElement>(null);
 
+    // Header taglines for typewriter effect
+    const headerTaglines = [
+        'Crafted by IITians',
+        'AI-powered analytics',
+        'JEE Mains difficulty',
+        'Personalized insights',
+    ];
+    const [taglineIndex, setTaglineIndex] = useState(0);
+    const [displayedTagline, setDisplayedTagline] = useState('');
+    const [isTyping, setIsTyping] = useState(true);
+
+    // Typewriter effect for header tagline
+    useEffect(() => {
+        const currentTagline = headerTaglines[taglineIndex];
+        let timeout: NodeJS.Timeout;
+
+        if (isTyping) {
+            if (displayedTagline.length < currentTagline.length) {
+                timeout = setTimeout(() => {
+                    setDisplayedTagline(currentTagline.slice(0, displayedTagline.length + 1));
+                }, 80);
+            } else {
+                // Pause before erasing
+                timeout = setTimeout(() => setIsTyping(false), 2000);
+            }
+        } else {
+            if (displayedTagline.length > 0) {
+                timeout = setTimeout(() => {
+                    setDisplayedTagline(displayedTagline.slice(0, -1));
+                }, 40);
+            } else {
+                // Move to next tagline
+                setTaglineIndex((prev) => (prev + 1) % headerTaglines.length);
+                setIsTyping(true);
+            }
+        }
+
+        return () => clearTimeout(timeout);
+    }, [displayedTagline, isTyping, taglineIndex]);
+
     // Cycle through equations
     useEffect(() => {
         const interval = setInterval(() => {
@@ -52,6 +94,12 @@ const LandingPage: React.FC = () => {
         }, 3000);
         return () => clearInterval(interval);
     }, []);
+
+    // State for floating CTA button visibility
+    const [showFloatingCTA, setShowFloatingCTA] = useState(false);
+
+    // Section IDs for step-by-step navigation
+    const sectionIds = ['landing-scroll-container', 'question-section', 'pay-section'];
 
     // Intersection observer for scroll animation
     useEffect(() => {
@@ -72,6 +120,87 @@ const LandingPage: React.FC = () => {
 
         return () => observer.disconnect();
     }, []);
+
+    // Track scroll position to show/hide floating CTA (throttled for performance)
+    useEffect(() => {
+        const container = document.getElementById('landing-scroll-container');
+        if (!container) return;
+
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const paySection = document.getElementById('pay-section');
+                    const scrollTop = container.scrollTop;
+                    const viewportHeight = container.clientHeight;
+
+                    // Check if we're at/near the payment section
+                    let isNearPaySection = false;
+                    if (paySection) {
+                        const paySectionTop = paySection.offsetTop;
+                        // Hide CTA when the pay section is mostly in view (within 150px of top)
+                        isNearPaySection = scrollTop + viewportHeight * 0.5 >= paySectionTop;
+                    }
+
+                    // Show CTA only when scrolled past 200px AND not near payment section
+                    setShowFloatingCTA(scrollTop > 200 && !isNearPaySection);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        container.addEventListener('scroll', handleScroll, { passive: true });
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Scroll to next section
+    const scrollToNextSection = () => {
+        const container = document.getElementById('landing-scroll-container');
+        if (!container) return;
+
+        const currentScroll = container.scrollTop;
+        const containerHeight = container.clientHeight;
+
+        // Find the next section to scroll to
+        for (const sectionId of sectionIds) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const sectionTop = section.offsetTop - 120; // Account for header
+                if (sectionTop > currentScroll + 50) {
+                    container.scrollTo({ top: sectionTop, behavior: 'smooth' });
+                    return;
+                }
+            }
+        }
+
+        // If no next section, scroll to bottom
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    };
+
+    // Scroll to previous section
+    const scrollToPrevSection = () => {
+        const container = document.getElementById('landing-scroll-container');
+        if (!container) return;
+
+        const currentScroll = container.scrollTop;
+
+        // Find the previous section to scroll to (reverse order)
+        for (let i = sectionIds.length - 1; i >= 0; i--) {
+            const section = document.getElementById(sectionIds[i]);
+            if (section) {
+                const sectionTop = section.offsetTop - 120; // Account for header
+                if (sectionTop < currentScroll - 50) {
+                    container.scrollTo({ top: Math.max(0, sectionTop), behavior: 'smooth' });
+                    return;
+                }
+            }
+        }
+
+        // If no previous section, scroll to top
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     // Check if user has paid subscription
     const isPaidUser = subscriptionType?.toLowerCase() === 'ipft-01-2026';
@@ -163,41 +292,43 @@ const LandingPage: React.FC = () => {
                 planType={successPlanType}
                 onComplete={handleSuccessComplete}
             />
-            <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark h-screen flex flex-col pt-28 overflow-y-auto overflow-x-hidden no-scrollbar scroll-momentum transition-colors duration-300">
-                <header className="fixed top-4 left-0 right-0 z-50 px-4 flex justify-center w-full pointer-events-none">
-                    <div className="pointer-events-auto w-full max-w-4xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-blue-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-full py-2.5 pl-5 pr-2.5 flex items-center justify-between gap-4 transition-transform hover:scale-[1.005] duration-300">
-                        <div className="flex items-center gap-3 shrink-0">
+            <div id="landing-scroll-container" className="bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark text-text-light dark:text-text-dark h-screen flex flex-col pt-20 md:pt-28 overflow-y-auto overflow-x-hidden no-scrollbar scroll-momentum scroll-smooth transition-colors duration-300">
+                <header className="fixed top-2 md:top-4 left-0 right-0 z-50 px-2 md:px-4 flex justify-center w-full pointer-events-none">
+                    <div className="pointer-events-auto w-full max-w-4xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-blue-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-full py-2 md:py-2.5 pl-3 md:pl-5 pr-2 md:pr-2.5 flex items-center justify-between gap-2 md:gap-4 transition-transform hover:scale-[1.005] duration-300">
+                        <div className="flex items-center gap-2 md:gap-3 shrink-0">
                             <img
                                 alt="prepAIred logo"
-                                className="h-8 w-8 object-contain"
+                                className="h-7 w-7 md:h-8 md:w-8 object-contain"
                                 src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000"
                             />
                             <span className="font-display font-bold text-lg tracking-tight text-slate-800 dark:text-white hidden sm:block">
                                 prep<span className="text-primary">AI</span>red
                             </span>
                         </div>
-                        <div className="hidden md:flex items-center gap-2 text-sm ml-auto">
-                            <span className="flex h-2 w-2 relative">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        <div className="hidden md:flex items-center gap-2 text-sm mx-auto min-w-[200px] justify-center">
+                            <span className="flex h-2 w-2 relative shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
-                            <p className="text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap"><span className="text-primary font-bold">Limited Time Offer:</span> Get 20% off Premium!</p>
+                            <p className="text-slate-600 dark:text-slate-300 font-medium">
+                                {displayedTagline}<span className="animate-pulse text-primary">|</span>
+                            </p>
                         </div>
 
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={toggleDarkMode}
-                                className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="p-1.5 rounded-full text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-all duration-300 opacity-60 hover:opacity-100"
                                 title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                             >
-                                <span className="material-symbols-outlined text-xl">
+                                <span className="material-symbols-outlined text-lg">
                                     {darkMode ? 'light_mode' : 'dark_mode'}
                                 </span>
                             </button>
 
-                            <button onClick={handleClickToPay} className="bg-gradient-to-r from-primary to-accent hover:to-primary text-white text-xs font-bold py-2.5 px-6 rounded-full shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/30 hover:-translate-y-0.5 flex items-center gap-2 shrink-0 uppercase tracking-wide">
-                                Click to Pay
-                                <span className="material-symbols-outlined text-sm">credit_card</span>
+                            <button onClick={handleClickToPay} className="bg-gradient-to-r from-primary to-accent hover:to-primary text-white text-[10px] md:text-xs font-bold py-2 md:py-2.5 px-3 md:px-5 rounded-full shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/30 hover:-translate-y-0.5 flex items-center gap-1 md:gap-1.5 shrink-0 uppercase tracking-wide">
+                                Start Now
+                                <span className="material-symbols-outlined text-xs md:text-sm">arrow_forward</span>
                             </button>
                         </div>
                     </div>
@@ -206,92 +337,101 @@ const LandingPage: React.FC = () => {
                     <div className="absolute inset-0 bg-grid-pattern opacity-100 dark:opacity-30 pointer-events-none"></div>
                     <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-50 dark:bg-blue-900/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
                     <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
-                    <div className="container mx-auto px-4 py-16 max-w-7xl z-10">
-                        <div className="text-center mb-16 max-w-4xl mx-auto">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 text-primary text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
-                                <span className="material-symbols-outlined text-sm">auto_awesome</span>
-                                AI-Powered Learning
-                            </div>
-                            <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight mb-6 text-text-light dark:text-text-dark tracking-tight">
-                                Stop Guessing. <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Start Understanding.</span>
+                    <div className="container mx-auto px-4 py-8 md:py-16 max-w-7xl z-10">
+                        <div className="text-center mb-10 md:mb-16 max-w-4xl mx-auto">
+                            <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-bold leading-tight mb-4 md:mb-6 text-text-light dark:text-text-dark tracking-tight">
+                                Stop Panicking. <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Start Prep<span className="text-white">AI</span>ring.</span>
                             </h1>
-                            <p className="text-text-secondary-light dark:text-text-secondary-dark text-lg md:text-xl font-light leading-relaxed mb-10 max-w-2xl mx-auto">
-                                Experience the difference between traditional rote memorization and AI-powered adaptive learning designed specifically for JEE and NEET aspirants.
+                            <p className="text-text-secondary-light dark:text-text-secondary-dark text-base md:text-xl font-light leading-relaxed mb-6 md:mb-10 max-w-2xl mx-auto px-2">
+                                Experience the best way to prepare for your exams. Random test's will not tell you what you need to improve, but AI Analysis will.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <button className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-600/20 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-blue-600/30">
+                                <button
+                                    onClick={() => document.getElementById('question-section')?.scrollIntoView({ behavior: 'smooth' })}
+                                    className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-600/20 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-blue-600/30"
+                                >
                                     Try a Question Now
-                                    <span className="material-symbols-outlined">arrow_forward</span>
-                                </button>
-                                <button className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 text-text-light dark:text-text-dark hover:bg-gray-50 dark:hover:bg-slate-750 rounded-xl font-medium text-lg transition-all flex items-center justify-center gap-2 shadow-sm">
-                                    <span className="material-symbols-outlined text-gray-400">play_circle</span>
-                                    Watch Demo
+                                    <span className="material-symbols-outlined">arrow_downward</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div className="relative mt-8 mb-24 w-full">
-                            <div className="absolute inset-y-0 left-0 w-16 md:w-40 bg-gradient-to-r from-background-light via-background-light/80 dark:from-background-dark dark:via-background-dark/80 to-transparent z-20 pointer-events-none"></div>
-                            <div className="absolute inset-y-0 right-0 w-16 md:w-40 bg-gradient-to-l from-background-light via-background-light/80 dark:from-background-dark dark:via-background-dark/80 to-transparent z-20 pointer-events-none"></div>
+                        <div className="relative mt-4 md:mt-8 mb-16 md:mb-24 w-full">
+                            <div className="absolute inset-y-0 left-0 w-8 md:w-40 bg-gradient-to-r from-background-light via-background-light/80 dark:from-background-dark dark:via-background-dark/80 to-transparent z-20 pointer-events-none"></div>
+                            <div className="absolute inset-y-0 right-0 w-8 md:w-40 bg-gradient-to-l from-background-light via-background-light/80 dark:from-background-dark dark:via-background-dark/80 to-transparent z-20 pointer-events-none"></div>
                             <div className="overflow-hidden flex items-center">
-                                <div className="flex animate-scroll hover:[animation-play-state:paused] gap-6 py-8 w-max">
+                                <div className="flex animate-scroll hover:[animation-play-state:paused] gap-4 md:gap-6 py-4 md:py-8 w-max">
                                     {[...Array(2)].map((_, i) => (
                                         <React.Fragment key={i}>
-                                            <div className="w-[320px] bg-gradient-to-br from-[#38b6ff] to-[#0066ff] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-500/20 border border-white/10">
-                                                <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                                            {/* Dashboard Recommendations Card - Warm gradient for personalization */}
+                                            <div className="w-[260px] md:w-[320px] bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] rounded-2xl p-5 md:p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-indigo-500/25 border border-white/10">
+                                                <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/15 rounded-full blur-2xl"></div>
                                                 <div className="absolute bottom-0 right-0 p-6 opacity-[0.08] pointer-events-none transform translate-x-1/4 translate-y-1/4">
-                                                    <span className="material-symbols-outlined text-[140px] leading-none text-white">network_node</span>
+                                                    <span className="material-symbols-outlined text-[140px] leading-none text-white">dashboard_customize</span>
                                                 </div>
                                                 <div className="size-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white mb-6 border border-white/20 shadow-inner">
-                                                    <span className="material-symbols-outlined text-2xl">psychology_alt</span>
+                                                    <span className="material-symbols-outlined text-2xl">lightbulb</span>
                                                 </div>
-                                                <h3 className="font-display font-bold text-2xl text-white mb-2">Adaptive AI</h3>
-                                                <p className="text-white/90 font-medium text-sm leading-relaxed">Smart Difficulty Scaling.<br />It learns your pace.</p>
+                                                <h3 className="font-display font-bold text-xl md:text-2xl text-white mb-2">Dashboard Recommendations</h3>
+                                                <p className="text-white/90 font-medium text-sm leading-relaxed">Personalized study plans.<br />AI-curated weak area focus.</p>
                                             </div>
-                                            <div className="w-[320px] bg-[#18356b] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-900/20 border border-white/5">
-                                                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-                                                <div className="size-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-200 mb-6 border border-blue-400/20">
-                                                    <span className="material-symbols-outlined text-2xl">analytics</span>
+                                            {/* Cumulative Analytics Card - Data/tech feel */}
+                                            <div className="w-[260px] md:w-[320px] bg-[#0f172a] rounded-2xl p-5 md:p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-900/30 border border-cyan-500/20">
+                                                <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.05)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+                                                <div className="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                                                <div className="size-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6 border border-cyan-500/30">
+                                                    <span className="material-symbols-outlined text-2xl">insights</span>
                                                 </div>
-                                                <h3 className="font-display font-bold text-2xl text-white mb-2 relative z-10">Deep Analytics</h3>
-                                                <p className="text-slate-300 font-medium text-sm leading-relaxed relative z-10">Micro-concept Insights.<br />Know exactly where to focus.</p>
+                                                <h3 className="font-display font-bold text-xl md:text-2xl text-white mb-2 relative z-10">Cumulative Analytics</h3>
+                                                <p className="text-slate-400 font-medium text-sm leading-relaxed relative z-10">Track progress over time.<br />Chapter-wise performance stats.</p>
                                             </div>
-                                            <div className="w-[320px] bg-[#f9f9f9] dark:bg-slate-800 rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-gray-200/50 dark:shadow-slate-900/30 border border-slate-200 dark:border-slate-700">
-                                                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent to-primary"></div>
-                                                <div className="absolute -right-8 top-10 w-32 h-32 bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-3xl"></div>
-                                                <div className="size-12 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center text-accent mb-6 border border-slate-100 dark:border-slate-600 shadow-sm">
-                                                    <span className="material-symbols-outlined text-2xl">smart_toy</span>
+                                            {/* Same Relevance, Different Feel Card - Fresh/creative feel */}
+                                            <div className="w-[260px] md:w-[320px] bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-5 md:p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-emerald-200/40 dark:shadow-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40">
+                                                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+                                                <div className="absolute -right-8 top-10 w-32 h-32 bg-emerald-200/50 dark:bg-emerald-800/20 rounded-full blur-3xl"></div>
+                                                <div className="size-12 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 border border-emerald-200 dark:border-emerald-700 shadow-sm">
+                                                    <span className="material-symbols-outlined text-2xl">autorenew</span>
                                                 </div>
-                                                <h3 className="font-display font-bold text-2xl text-slate-800 dark:text-white mb-2 relative z-10">24/7 AI Tutor</h3>
-                                                <p className="text-slate-500 dark:text-slate-400 font-bold text-sm leading-relaxed relative z-10">Instant Explanations.<br />Never get stuck again.</p>
+                                                <h3 className="font-display font-bold text-xl md:text-2xl text-slate-800 dark:text-white mb-2 relative z-10">Same Relevance, Different Feel</h3>
+                                                <p className="text-slate-600 dark:text-slate-400 font-medium text-sm leading-relaxed relative z-10">Fresh question variants.<br />Same concepts, new challenges.</p>
                                             </div>
-                                            <div className="w-[320px] bg-[#3291ca] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-400/20 border border-white/10">
+                                            {/* IPQs Card - Inspired/creative feel */}
+                                            <div className="w-[260px] md:w-[320px] bg-gradient-to-br from-[#f97316] to-[#ea580c] rounded-2xl p-5 md:p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-orange-500/25 border border-white/10">
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                                                <div className="absolute -left-4 -bottom-4 w-24 h-24 border-4 border-white/10 rounded-full"></div>
-                                                <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center text-white mb-6 border border-white/20 backdrop-blur-sm">
-                                                    <span className="material-symbols-outlined text-2xl">menu_book</span>
+                                                <div className="absolute -left-4 -bottom-4 w-24 h-24 border-4 border-white/15 rounded-full"></div>
+                                                <div className="absolute right-4 top-4 opacity-[0.1]">
+                                                    <span className="material-symbols-outlined text-7xl text-white">auto_awesome</span>
                                                 </div>
-                                                <h3 className="font-display font-bold text-2xl text-white mb-2 relative z-10">NCERT Linked</h3>
-                                                <p className="text-blue-50 font-medium text-sm leading-relaxed relative z-10">Direct Page Mapping.<br />Streamline your revision.</p>
+                                                <div className="size-12 rounded-xl bg-white/20 flex items-center justify-center text-white mb-6 border border-white/20 backdrop-blur-sm">
+                                                    <span className="material-symbols-outlined text-2xl">bolt</span>
+                                                </div>
+                                                <h3 className="font-display font-bold text-xl md:text-2xl text-white mb-2 relative z-10">Inspired PrepAIred Questions</h3>
+                                                <p className="text-orange-100 font-medium text-sm leading-relaxed relative z-10">PYQ-inspired, AI-enhanced.<br />Never repeat the same question.</p>
                                             </div>
-                                            <div className="w-[320px] bg-gradient-to-bl from-[#18356b] to-[#2563eb] rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-blue-800/20 border border-white/10">
-                                                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent"></div>
-                                                <div className="size-12 rounded-xl bg-white/10 flex items-center justify-center text-white mb-6 border border-white/10">
+                                            {/* JEE-Like Interface Card - Professional/exam feel */}
+                                            <div className="w-[260px] md:w-[320px] bg-gradient-to-bl from-[#1e3a5f] to-[#0d1b2a] rounded-2xl p-5 md:p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-900/30 border border-blue-500/20">
+                                                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/15 via-transparent to-transparent"></div>
+                                                <div className="absolute bottom-4 right-4 opacity-[0.08]">
+                                                    <span className="material-symbols-outlined text-8xl text-white">computer</span>
+                                                </div>
+                                                <div className="size-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6 border border-blue-500/30">
                                                     <span className="material-symbols-outlined text-2xl">desktop_windows</span>
                                                 </div>
-                                                <h3 className="font-display font-bold text-2xl text-white mb-2 relative z-10">Exam Mode</h3>
-                                                <p className="text-blue-100 font-medium text-sm leading-relaxed relative z-10">NTA Interface Clone.<br />Master the pressure.</p>
+                                                <h3 className="font-display font-bold text-xl md:text-2xl text-white mb-2 relative z-10">JEE-Like Interface</h3>
+                                                <p className="text-slate-400 font-medium text-sm leading-relaxed relative z-10">Authentic NTA experience.<br />Practice under real conditions.</p>
                                             </div>
-                                            <div className="w-[320px] bg-[#dee1e7] dark:bg-slate-700 rounded-2xl p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-300/40 dark:shadow-slate-900/30 border border-slate-300 dark:border-slate-600">
-                                                <div className="absolute right-0 top-0 p-6 opacity-[0.05] dark:opacity-[0.08]">
-                                                    <span className="material-symbols-outlined text-8xl text-slate-900 dark:text-slate-300">emoji_events</span>
+                                            {/* Live Rank Card - Competitive/achievement feel */}
+                                            <div className="w-[260px] md:w-[320px] bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-5 md:p-7 flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-amber-500/25 border border-white/20">
+                                                <div className="absolute right-0 top-0 p-4 opacity-[0.15]">
+                                                    <span className="material-symbols-outlined text-8xl text-white">emoji_events</span>
                                                 </div>
-                                                <div className="size-12 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 mb-6 border border-slate-200 dark:border-slate-600 shadow-sm">
-                                                    <span className="material-symbols-outlined text-2xl">leaderboard</span>
+                                                <div className="absolute -left-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-2xl"></div>
+                                                <div className="size-12 rounded-xl bg-white/25 flex items-center justify-center text-white mb-6 border border-white/30 shadow-inner backdrop-blur-sm">
+                                                    <span className="material-symbols-outlined text-2xl">trending_up</span>
                                                 </div>
-                                                <h3 className="font-display font-bold text-2xl text-slate-800 dark:text-white mb-2 relative z-10">Live Rank</h3>
-                                                <p className="text-slate-600 dark:text-slate-300 font-bold text-sm leading-relaxed relative z-10">National Competition.<br />Know where you stand.</p>
+                                                <h3 className="font-display font-bold text-xl md:text-2xl text-white mb-2 relative z-10">Live Percentile</h3>
+                                                <p className="text-white/90 font-medium text-sm leading-relaxed relative z-10">Percentile predictions.<br />Compete with peers nationwide.</p>
                                             </div>
                                         </React.Fragment>
                                     ))}
@@ -299,13 +439,13 @@ const LandingPage: React.FC = () => {
                             </div>
                         </div>
                         {/* --- Question Comparison Section --- */}
-                        <div ref={comparisonRef} className="max-w-6xl mx-auto px-4 mb-8">
+                        <div id="question-section" ref={comparisonRef} className="max-w-6xl mx-auto px-2 md:px-4 mb-8 scroll-mt-24">
                             {/* Section Header */}
                             <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                                <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-4">
+                                <h2 className="text-2xl md:text-5xl font-display font-bold text-slate-900 dark:text-white mb-4">
                                     See the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent animate-gradient-shift">Difference</span>
                                 </h2>
-                                <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl mx-auto">
+                                <p className="text-slate-500 dark:text-slate-400 text-sm md:text-lg max-w-2xl mx-auto">
                                     Why solve PYQs, when you can have <span className="font-semibold text-slate-700 dark:text-slate-200">a better version - IPQs</span>
                                 </p>
                             </div>
@@ -331,14 +471,8 @@ const LandingPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* Mobile VS Badge */}
-                                <div className="lg:hidden flex justify-center py-6">
-                                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary via-accent to-primary animate-gradient-shift shadow-xl shadow-blue-500/40 flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
-                                        <span className="font-display font-bold text-white text-xl">VS</span>
-                                    </div>
-                                </div>
 
-                                <div className="grid lg:grid-cols-2 gap-6 lg:gap-20 items-stretch">
+                                <div className="grid lg:grid-cols-2 gap-4 lg:gap-20 items-stretch">
                                     {/* --- Traditional Approach Card --- */}
                                     <div className={`relative group transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
                                         {/* Diagonal "Outdated" Stripe */}
@@ -348,7 +482,7 @@ const LandingPage: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <div className="bg-gradient-to-br from-slate-50 to-red-50/30 dark:from-slate-800 dark:to-red-950/20 rounded-3xl p-8 border-2 border-red-200/60 dark:border-red-900/40 shadow-lg h-full relative overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
+                                        <div className="bg-gradient-to-br from-slate-50 to-red-50/30 dark:from-slate-800 dark:to-red-950/20 rounded-2xl md:rounded-3xl p-5 md:p-8 border-2 border-red-200/60 dark:border-red-900/40 shadow-lg h-full relative overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
                                             {/* Faded overlay */}
                                             <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent dark:from-slate-900/30 pointer-events-none rounded-3xl"></div>
 
@@ -406,12 +540,19 @@ const LandingPage: React.FC = () => {
                                         </div>
                                     </div>
 
+                                    {/* Mobile VS Badge - Between cards */}
+                                    <div className="lg:hidden flex justify-center py-2">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary via-accent to-primary animate-gradient-shift shadow-lg shadow-blue-500/40 flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
+                                            <span className="font-display font-bold text-white text-base">VS</span>
+                                        </div>
+                                    </div>
+
                                     {/* --- AI-Enhanced Card --- */}
                                     <div className={`relative group transition-all duration-700 delay-150 pt-4 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
                                         {/* Animated Glow Effect */}
                                         <div className="absolute -inset-2 top-2 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl opacity-40 blur-2xl group-hover:opacity-60 transition-opacity duration-500 animate-gradient-shift"></div>
 
-                                        <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 border-2 border-primary/40 dark:border-primary/30 shadow-2xl shadow-blue-500/30 comparison-card-hover overflow-visible">
+                                        <div className="relative bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl p-5 md:p-8 border-2 border-primary/40 dark:border-primary/30 shadow-2xl shadow-blue-500/30 comparison-card-hover overflow-visible">
                                             {/* Background Pattern */}
                                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-50/80 dark:from-blue-900/20 via-transparent to-transparent pointer-events-none rounded-3xl"></div>
 
@@ -420,7 +561,7 @@ const LandingPage: React.FC = () => {
 
                                             {/* Verified Badge */}
                                             <div className="absolute -top-4 right-6 z-20">
-                                                <div className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-lg shadow-emerald-500/40 flex items-center gap-2 hover:scale-105 transition-transform whitespace-nowrap">
+                                                <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-full shadow-lg shadow-emerald-500/40 flex items-center gap-1 md:gap-2 hover:scale-105 transition-transform whitespace-nowrap">
                                                     <span className="material-symbols-outlined text-sm">verified</span>
                                                     Verified by IITians
                                                 </div>
@@ -438,7 +579,7 @@ const LandingPage: React.FC = () => {
                                             </div>
 
                                             {/* Question Display - Dynamic! */}
-                                            <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900/80 dark:to-slate-900/40 rounded-2xl p-6 mb-8 border border-blue-200 dark:border-slate-600 overflow-hidden">
+                                            <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900/80 dark:to-slate-900/40 rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 md:mb-8 border border-blue-200 dark:border-slate-600 overflow-hidden">
                                                 {/* Regeneration Progress Bar */}
                                                 <div className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-primary to-accent animate-gradient-shift" style={{ width: '100%', animation: 'progress 3s linear infinite' }}></div>
                                                 <style>{`
@@ -523,17 +664,17 @@ const LandingPage: React.FC = () => {
                         </div>
 
 
-                        <div className="mt-16 w-full max-w-5xl mx-auto px-4">
-                            <div id="pay-section" className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-800 border-2 border-blue-500/20 dark:border-blue-500/30 shadow-[0_30px_80px_-20px_rgba(0,102,255,0.2)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)] group hover:shadow-[0_40px_90px_-20px_rgba(0,102,255,0.3)] transition-all duration-500">
+                        <div className="mt-10 md:mt-16 w-full max-w-5xl mx-auto px-2 md:px-4">
+                            <div id="pay-section" className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-white dark:bg-slate-800 border-2 border-blue-500/20 dark:border-blue-500/30 shadow-[0_30px_80px_-20px_rgba(0,102,255,0.2)] dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)] group hover:shadow-[0_40px_90px_-20px_rgba(0,102,255,0.3)] transition-all duration-500">
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-bl-[150px] -z-0 opacity-40"></div>
                                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/10 dark:bg-accent/5 rounded-tr-[100px] -z-0"></div>
                                 <div className="absolute right-20 top-20 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse-slow"></div>
                                 <div className="flex flex-col md:flex-row items-center justify-between">
-                                    <div className="flex-1 p-8 md:p-12 z-10 flex flex-col justify-center">
+                                    <div className="flex-1 p-6 md:p-12 z-10 flex flex-col justify-center">
                                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 text-primary-dark dark:text-primary-light text-xs font-bold uppercase tracking-wider w-fit mb-6 shadow-sm">
                                             Launch Offer
                                         </div>
-                                        <h3 className="text-4xl md:text-6xl font-display font-bold text-slate-900 dark:text-white mb-6 leading-[1.1]">
+                                        <h3 className="text-3xl md:text-6xl font-display font-bold text-slate-900 dark:text-white mb-4 md:mb-6 leading-[1.1]">
                                             10 <span className="text-primary">Inspired PrepAIred</span><br />Full Tests
                                         </h3>
                                         <div className="flex flex-col sm:flex-row sm:items-end gap-6 mb-8">
@@ -544,7 +685,7 @@ const LandingPage: React.FC = () => {
                                             <div className="flex flex-col">
                                                 <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wide mb-1">Your Price</p>
                                                 <div className="flex items-baseline gap-2">
-                                                    <span className="text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">₹499</span>
+                                                    <span className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">₹499</span>
                                                     <span className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded-full border border-red-200 dark:border-red-800 mb-2">80% OFF</span>
                                                 </div>
                                             </div>
@@ -585,14 +726,14 @@ const LandingPage: React.FC = () => {
                                             <p className="text-red-500 text-sm mt-2">{paymentError}</p>
                                         )}
                                     </div>
-                                    <div className="w-full md:w-[40%] relative min-h-[350px] md:min-h-[500px] flex items-center justify-center p-8 overflow-visible">
-                                        <div className="relative w-64 aspect-[3/4] bg-white dark:bg-slate-800 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-slate-100 dark:border-slate-700 z-20 flex flex-col items-center justify-center p-6 text-center transition-transform duration-500 hover:scale-105 rotate-[-3deg] group-hover:rotate-0">
+                                    <div className="w-full md:w-[40%] relative min-h-[280px] md:min-h-[500px] flex items-center justify-center p-4 md:p-8 overflow-visible">
+                                        <div className="relative w-48 md:w-64 aspect-[3/4] bg-white dark:bg-slate-800 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-slate-100 dark:border-slate-700 z-20 flex flex-col items-center justify-center p-4 md:p-6 text-center transition-transform duration-500 hover:scale-105 rotate-[-3deg] group-hover:rotate-0">
                                             <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/10 dark:to-transparent rounded-2xl z-0"></div>
                                             <div className="relative z-10 mb-6">
-                                                <div className="text-9xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-br from-primary to-blue-600 font-display leading-none tracking-tighter drop-shadow-sm">
+                                                <div className="text-7xl md:text-9xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-br from-primary to-blue-600 font-display leading-none tracking-tighter drop-shadow-sm">
                                                     10
                                                 </div>
-                                                <div className="text-6xl font-serif font-black text-slate-900 dark:text-white font-display tracking-tight -mt-4">
+                                                <div className="text-5xl md:text-6xl font-serif font-black text-slate-900 dark:text-white font-display tracking-tight -mt-2 md:-mt-4">
                                                     IPFT
                                                 </div>
                                             </div>
@@ -601,12 +742,12 @@ const LandingPage: React.FC = () => {
                                                 <p className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Full Syllabus Tests</p>
                                                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 font-medium">Verified by IITians</p>
                                             </div>
-                                            <div className="absolute -top-6 -right-6 size-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center shadow-lg shadow-blue-400/30 animate-pulse-slow border-4 border-white dark:border-slate-700 z-30">
-                                                <span className="text-white text-xs font-black text-center leading-tight uppercase transform -rotate-12 [text-shadow:-0.5px_-0.5px_0_#000,0.5px_-0.5px_0_#000,-0.5px_0.5px_0_#000,0.5px_0.5px_0_#000]">Best<br />Seller</span>
+                                            <div className="absolute -top-4 md:-top-6 -right-4 md:-right-6 size-14 md:size-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center shadow-lg shadow-blue-400/30 animate-pulse-slow border-4 border-white dark:border-slate-700 z-30">
+                                                <span className="text-white text-[10px] md:text-xs font-black text-center leading-tight uppercase transform -rotate-12 [text-shadow:-0.5px_-0.5px_0_#000,0.5px_-0.5px_0_#000,-0.5px_0.5px_0_#000,0.5px_0.5px_0_#000]">Best<br />Seller</span>
                                             </div>
                                         </div>
-                                        <div className="absolute z-10 w-64 aspect-[3/4] bg-slate-50 dark:bg-slate-700 rounded-2xl border border-slate-200 dark:border-slate-600 rotate-[6deg] scale-95 translate-x-4 shadow-lg"></div>
-                                        <div className="absolute z-0 w-64 aspect-[3/4] bg-slate-100 dark:bg-slate-600 rounded-2xl border border-slate-200 dark:border-slate-500 rotate-[12deg] scale-90 translate-x-8 shadow-md opacity-60"></div>
+                                        <div className="absolute z-10 w-48 md:w-64 aspect-[3/4] bg-slate-50 dark:bg-slate-700 rounded-2xl border border-slate-200 dark:border-slate-600 rotate-[6deg] scale-95 translate-x-3 md:translate-x-4 shadow-lg"></div>
+                                        <div className="absolute z-0 w-48 md:w-64 aspect-[3/4] bg-slate-100 dark:bg-slate-600 rounded-2xl border border-slate-200 dark:border-slate-500 rotate-[12deg] scale-90 translate-x-6 md:translate-x-8 shadow-md opacity-60"></div>
                                         <div className="absolute bottom-10 left-10 text-primary/10 animate-pulse">
                                             <span className="material-symbols-outlined text-8xl">auto_awesome</span>
                                         </div>
@@ -615,27 +756,61 @@ const LandingPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 border-t border-gray-200 dark:border-slate-800 pt-12 max-w-5xl w-full mx-auto px-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-16 md:mt-24 border-t border-gray-200 dark:border-slate-800 pt-8 md:pt-12 max-w-5xl w-full mx-auto px-4">
                             <div className="flex flex-col items-center text-center">
-                                <span className="text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">50k+</span>
-                                <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Questions Practiced</span>
+                                <span className="text-2xl md:text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">50k+</span>
+                                <span className="text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Questions Trained on</span>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <span className="text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">98%</span>
-                                <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Concept Retention</span>
+                                <span className="text-2xl md:text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">98%</span>
+                                <span className="text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Concept Retention in IPQs</span>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <span className="text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">24/7</span>
-                                <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">AI Tutor Availability</span>
+                                <span className="text-2xl md:text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">24/7</span>
+                                <span className="text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Test Availability</span>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <span className="text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">10k+</span>
-                                <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Active Students</span>
+                                <span className="text-2xl md:text-3xl font-display font-bold text-text-light dark:text-text-dark mb-1">IITians</span>
+                                <span className="text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Questions verified by Subject Experts</span>
                             </div>
                         </div>
 
                     </div>
                 </main>
+
+                {/* Floating Scroll Navigation Buttons */}
+                <div className="fixed right-3 md:right-6 bottom-3 md:bottom-6 z-50 flex flex-col gap-1.5 md:gap-2">
+                    <button
+                        onClick={scrollToPrevSection}
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center text-text-secondary-light dark:text-text-secondary-dark hover:text-primary"
+                        title="Previous section"
+                    >
+                        <span className="material-symbols-outlined">keyboard_arrow_up</span>
+                    </button>
+                    <button
+                        onClick={scrollToNextSection}
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center text-text-secondary-light dark:text-text-secondary-dark hover:text-primary"
+                        title="Next section"
+                    >
+                        <span className="material-symbols-outlined">keyboard_arrow_down</span>
+                    </button>
+                </div>
+
+                {/* Floating CTA Button - Appears when scrolled down */}
+                <button
+                    onClick={scrollToPaySection}
+                    className={`fixed left-1/2 -translate-x-1/2 bottom-4 md:bottom-8 z-40 px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-primary/90 to-accent/90 hover:from-primary hover:to-accent text-white font-semibold text-xs md:text-sm rounded-full shadow-lg shadow-blue-500/30 backdrop-blur-sm border border-white/20 transition-all duration-500 flex items-center gap-1.5 md:gap-2 group ${showFloatingCTA
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 translate-y-4 pointer-events-none'
+                        }`}
+                    style={{
+                        transitionProperty: 'opacity, transform',
+                        willChange: 'opacity, transform'
+                    }}
+                >
+                    <span>Get Started</span>
+                    <span className="material-symbols-outlined text-lg transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">arrow_outward</span>
+                </button>
             </div>
         </>
     );
