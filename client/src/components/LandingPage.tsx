@@ -41,6 +41,7 @@ const LandingPage: React.FC = () => {
     });
     const [darkMode, setDarkMode] = useState(true);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [paymentInitiated, setPaymentInitiated] = useState(false);
 
     // State for cycling equations
     const [equationIndex, setEquationIndex] = useState(0);
@@ -274,6 +275,9 @@ const LandingPage: React.FC = () => {
             return;
         }
 
+        // Set payment initiated state to show helpful message
+        setPaymentInitiated(true);
+
         // Initiate payment for free tier users
         await initiatePayment({
             userId: user.id,
@@ -341,7 +345,7 @@ const LandingPage: React.FC = () => {
                         <div className="text-center mb-10 md:mb-16 max-w-4xl mx-auto">
                             <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-bold leading-tight mb-4 md:mb-6 text-text-light dark:text-text-dark tracking-tight">
                                 Stop Panicking. <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Start Prep<span className="text-white">AI</span>ring.</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Start Prep<span className="text-primary">AI</span>ring.</span>
                             </h1>
                             <p className="text-text-secondary-light dark:text-text-secondary-dark text-base md:text-xl font-light leading-relaxed mb-6 md:mb-10 max-w-2xl mx-auto px-2">
                                 Experience the best way to prepare for your exams. Random test's will not tell you what you need to improve, but AI Analysis will.
@@ -724,6 +728,21 @@ const LandingPage: React.FC = () => {
                                         )}
                                         {paymentError && (
                                             <p className="text-red-500 text-sm mt-2">{paymentError}</p>
+                                        )}
+                                        {paymentInitiated && !isPaidUser && !paymentSuccess && (
+                                            <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl">
+                                                <div className="flex items-start gap-3">
+                                                    <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-xl shrink-0 mt-0.5">info</span>
+                                                    <div>
+                                                        <p className="text-amber-800 dark:text-amber-300 text-sm font-medium">
+                                                            Payment window opened!
+                                                        </p>
+                                                        <p className="text-amber-700 dark:text-amber-400/80 text-xs mt-1">
+                                                            If you're stuck on processing after completing payment, <button onClick={() => window.location.reload()} className="underline font-semibold hover:text-amber-900 dark:hover:text-amber-200 transition-colors">refresh this page</button> to access your tests.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="w-full md:w-[40%] relative min-h-[280px] md:min-h-[500px] flex items-center justify-center p-4 md:p-8 overflow-visible">

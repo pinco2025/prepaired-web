@@ -7,7 +7,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true); // Default to dark mode
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,7 +15,9 @@ const Sidebar: React.FC = () => {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
-    const isDark = localStorage.getItem('darkMode') === 'true';
+    const storedPreference = localStorage.getItem('darkMode');
+    // Default to dark mode if no preference is stored (null means first visit)
+    const isDark = storedPreference === null ? true : storedPreference === 'true';
     setDarkMode(isDark);
     if (isDark) {
       document.documentElement.classList.add('dark');

@@ -32,7 +32,7 @@ const SignUp: React.FC = () => {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -42,6 +42,22 @@ const SignUp: React.FC = () => {
         },
       });
       if (error) throw error;
+
+      // Check if user already exists (Supabase returns empty identities array for existing users)
+      if (data?.user?.identities && data.user.identities.length === 0) {
+        alert('An account with this email already exists. Please log in instead.');
+        navigate('/login');
+        return;
+      }
+
+      // Check if email confirmation is required (session will be null if confirmation needed)
+      if (data?.user && !data?.session) {
+        alert('Registration successful! Please check your email to confirm your account before logging in.');
+        navigate('/login');
+        return;
+      }
+
+      // If we have a session, user is logged in immediately (email confirmation disabled)
       navigate('/');
     } catch (error: any) {
       alert(error.error_description || error.message);
