@@ -308,3 +308,26 @@ h1, h2, h3, h4, h5, h6 {
 .checkmark-bounce:hover {
     transform: scale(1.2);
 }
+
+/* JEE Loader Animations */
+@keyframes orbit {
+    0% {
+        transform: rotate(0deg) translateX(48px) rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg) translateX(48px) rotate(-360deg);
+    }
+}
+
+@keyframes float-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.05); }
+}
+
+.animate-orbit {
+    animation: orbit 3s linear infinite;
+}
+
+.animate-float-bounce {
+    animation: float-bounce 2s ease-in-out infinite;
+}

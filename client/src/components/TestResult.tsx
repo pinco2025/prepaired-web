@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
+import JEELoader from './JEELoader';
 
 // Define interfaces for the result data based on sample_result.json
 interface SectionScore {
@@ -102,7 +103,7 @@ const TestResult: React.FC = () => {
   }, [submissionId]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading results...</div>;
+    return <JEELoader message="Loading results..." />;
   }
 
   if (!result) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import JEELoader from './JEELoader';
 
 type Props = {
   children: React.ReactElement;
@@ -21,11 +22,7 @@ const RequireAuth: React.FC<Props> = ({ children }) => {
 
   // Show loading spinner while checking auth state
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <JEELoader message="Verifying access..." />;
   }
 
   // Not logged in → redirect to login, save intended destination

@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { Test, Question } from '../data';
 import { usePageTitle } from '../hooks/usePageTitle';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import ImageWithProgress from './ImageWithProgress';
+import JEELoader from './JEELoader';
 
 // Interfaces
 interface AttemptComparison {
@@ -38,6 +40,18 @@ const TestReview: React.FC = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [isSolutionVisible, setIsSolutionVisible] = useState(true);
+    const sectionTabsRef = useRef<HTMLDivElement>(null);
+
+    // Function to scroll section tabs
+    const scrollSectionTabs = (direction: 'left' | 'right') => {
+        if (sectionTabsRef.current) {
+            const scrollAmount = 100;
+            sectionTabsRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -156,7 +170,7 @@ const TestReview: React.FC = () => {
         });
     };
 
-    if (loading) return <div className="flex justify-center items-center h-screen">Loading review...</div>;
+    if (loading) return <JEELoader message="Loading review..." />;
     if (error) return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
     if (!testData || !currentQuestion || !currentAnswer) return <div className="flex justify-center items-center h-screen">Data not available.</div>;
 
@@ -234,7 +248,7 @@ const TestReview: React.FC = () => {
                                 </div>
                                 {currentQuestion.image && (
                                     <div className="flex justify-center">
-                                        <img src={currentQuestion.image} alt="Question" className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                        <ImageWithProgress src={currentQuestion.image} alt="Question" className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
                                     </div>
                                 )}
                                 <div className="space-y-3">
@@ -281,7 +295,7 @@ const TestReview: React.FC = () => {
                                                         {renderHtml(option.text)}
                                                         {option.image && (
                                                             <div className="mt-4 flex justify-center">
-                                                                <img src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                                                <ImageWithProgress src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
                                                             </div>
                                                         )}
                                                     </div>
@@ -317,7 +331,7 @@ const TestReview: React.FC = () => {
                                                 </div>
                                                 {currentSolution.solution_image_url && (
                                                     <div className="flex justify-center mt-4">
-                                                        <img src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg" />
+                                                        <ImageWithProgress src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg max-w-full h-auto" />
                                                     </div>
                                                 )}
                                             </div>
@@ -332,17 +346,45 @@ const TestReview: React.FC = () => {
                     <div className="lg:col-span-3">
                         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border p-4 sticky top-24">
                             <h3 className="text-lg font-bold mb-4 px-2">Question Palette</h3>
-                            <div className="flex border-b mb-4 overflow-x-auto no-scrollbar">
-                                {sections.map((section, index) => (
-                                    <button
-                                        key={section}
-                                        onClick={() => handleSectionSelect(index)}
-                                        className={`flex-1 pb-2 text-sm font-medium whitespace-nowrap px-3 ${currentSectionIndex === index ? 'text-primary border-b-2 border-primary' : 'text-text-secondary-light hover:text-text-light'}`}
-                                        title={section}
-                                    >
-                                        {section}
-                                    </button>
-                                ))}
+                            {/* Section Navigation with Arrows */}
+                            <div className="flex items-center gap-1 mb-4 border-b border-border-light dark:border-border-dark">
+                                {/* Left Scroll Arrow */}
+                                <button
+                                    onClick={() => scrollSectionTabs('left')}
+                                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-all"
+                                    title="Scroll Left"
+                                >
+                                    <span className="material-icons-outlined text-[18px]">chevron_left</span>
+                                </button>
+
+                                {/* Section Tabs */}
+                                <div
+                                    ref={sectionTabsRef}
+                                    className="flex-1 flex overflow-x-auto no-scrollbar pb-1"
+                                >
+                                    {sections.map((section, index) => (
+                                        <button
+                                            key={section}
+                                            onClick={() => handleSectionSelect(index)}
+                                            className={`flex-shrink-0 pb-2 text-sm font-medium whitespace-nowrap px-3 transition-all duration-200 border-b-2 ${currentSectionIndex === index
+                                                ? 'text-primary border-primary'
+                                                : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary border-transparent hover:border-primary/50'
+                                                }`}
+                                            title={section}
+                                        >
+                                            {section}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Right Scroll Arrow */}
+                                <button
+                                    onClick={() => scrollSectionTabs('right')}
+                                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-all"
+                                    title="Scroll Right"
+                                >
+                                    <span className="material-icons-outlined text-[18px]">chevron_right</span>
+                                </button>
                             </div>
                             <div className="grid grid-cols-5 gap-3 mb-6 max-h-[60vh] overflow-y-auto p-4">
                                 {questionsBySection[currentSectionIndex].map((q, index) => (

@@ -5,6 +5,7 @@ import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import katex from 'katex'
 import 'katex/dist/katex.min.css';
+import ImageWithProgress from './ImageWithProgress';
 
 type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
 
@@ -48,7 +49,7 @@ interface TestInterfaceProps {
   exam?: 'Normal' | 'JEE' | 'NEET';
 }
 
-const escapeLatex = (s: string) => s.replace(/\\/g, "\\");
+const escapeLatex = (s: string) => s.replace(/\\/g, "\\\\");
 
 const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
@@ -667,7 +668,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
               </p>
               {currentQuestion.image && (
                 <div className="mb-8 flex justify-center">
-                  <img
+                  <ImageWithProgress
                     src={currentQuestion.image}
                     alt="Question Illustration"
                     className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
@@ -732,7 +733,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                       <div className="flex flex-col w-full gap-3">
                         <span className="text-xl text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
                         {option.image && (
-                          <img
+                          <ImageWithProgress
                             src={option.image}
                             alt={`Option ${option.id} Illustration`}
                             className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"

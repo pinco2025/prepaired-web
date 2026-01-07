@@ -6,6 +6,7 @@ import TestInstructions from './TestInstructions';
 import TestInterface from './TestInterface';
 import TestSubmitted from './TestSubmitted';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { useDataCache } from '../contexts/DataCacheContext';
 
 type TestStatus = 'instructions' | 'inProgress' | 'submitted';
 
@@ -13,6 +14,7 @@ const TestPage: React.FC = () => {
   usePageTitle('Test');
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
+  const { invalidateCache } = useDataCache();
   const [test, setTest] = useState<Test | null>(null);
   const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
   const [checkingAttempt, setCheckingAttempt] = useState(true);
@@ -104,6 +106,8 @@ const TestPage: React.FC = () => {
   };
 
   const handleSubmitSuccess = () => {
+    // Invalidate all caches so Dashboard and Tests show fresh data
+    invalidateCache('all');
     setTestStatus('submitted');
   };
 

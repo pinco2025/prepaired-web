@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SubjectsCard from './SubjectsCard';
 import PercentileCard, { ChartData } from './PercentileCard';
 import WeakAreasCard from './WeakAreasCard';
@@ -8,13 +8,15 @@ import AverageScoreCard from './AverageScoreCard';
 import DashboardSkeleton from './DashboardSkeleton';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
+import { useDataCache } from '../contexts/DataCacheContext';
 import { UserAnalytics } from '../data';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const Dashboard: React.FC = () => {
   usePageTitle('Dashboard');
   const { user } = useAuth();
-  const location = useLocation();
+  const { getCacheVersion } = useDataCache();
+  const dashboardCacheVersion = getCacheVersion('dashboard');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
@@ -55,7 +57,7 @@ const Dashboard: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [user, location.key]); // location.key changes on navigation, triggering re-fetch
+  }, [user, dashboardCacheVersion]); // Refetch when user changes or cache is invalidated
 
   useEffect(() => {
     const fetchHistoryData = async () => {

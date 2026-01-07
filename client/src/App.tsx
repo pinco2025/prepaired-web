@@ -8,6 +8,7 @@ import RequireAuth from './components/RequireAuth';
 import PublicOnlyRoute from './components/PublicOnlyRoute';
 import ComingSoon from './components/ComingSoon';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataCacheProvider } from './contexts/DataCacheContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
 import LandingPage from './components/LandingPage';
 import Subjects from './components/Subjects';
@@ -158,7 +159,9 @@ const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <DataCacheProvider>
+          <AppContent />
+        </DataCacheProvider>
       </AuthProvider>
     </Router>
   );

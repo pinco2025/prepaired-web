@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import './Tests.css';
 import { Test } from '../data';
 import { useAuth } from '../contexts/AuthContext';
+import { useDataCache } from '../contexts/DataCacheContext';
 import { usePageTitle } from '../hooks/usePageTitle';
+import JEELoader from './JEELoader';
 
 interface TestWithStatus extends Test {
     status: 'completed' | 'unlocked' | 'locked';
@@ -15,7 +17,8 @@ interface TestWithStatus extends Test {
 const Tests: React.FC = () => {
     usePageTitle('Tests');
     const { user } = useAuth();
-    const location = useLocation();
+    const { getCacheVersion } = useDataCache();
+    const testsCacheVersion = getCacheVersion('tests');
     const [tests, setTests] = useState<TestWithStatus[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -95,15 +98,14 @@ const Tests: React.FC = () => {
         return () => {
             mounted = false;
         };
-    }, [user?.id, location.key]); // location.key changes on navigation, triggering re-fetch
+    }, [user?.id, testsCacheVersion]); // Refetch when user changes or cache is invalidated
 
     if (isLoading) {
         return (
             <main className="flex-grow">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="flex flex-col items-center justify-center min-h-[400px]">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-                        <p className="text-text-secondary-light dark:text-text-secondary-dark">Loading tests...</p>
+                        <JEELoader variant="compact" message="Loading tests..." />
                     </div>
                 </div>
             </main>
