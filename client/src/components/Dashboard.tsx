@@ -23,11 +23,15 @@ const Dashboard: React.FC = () => {
   const [recentScores, setRecentScores] = useState<{ score: number; label: string }[]>([]);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchAnalytics = async () => {
       if (!user) {
-        setLoading(false);
+        if (mounted) setLoading(false);
         return;
       }
+
+      if (mounted) setLoading(true);
 
       try {
         const { data, error } = await supabase
@@ -36,17 +40,21 @@ const Dashboard: React.FC = () => {
           .eq('user_id', user.id)
           .single();
 
-        if (!error && data) {
+        if (mounted && !error && data) {
           setAnalytics(data);
         }
       } catch (error) {
         console.error('Error fetching analytics:', error);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     fetchAnalytics();
+
+    return () => {
+      mounted = false;
+    };
   }, [user, location.key]); // location.key changes on navigation, triggering re-fetch
 
   useEffect(() => {

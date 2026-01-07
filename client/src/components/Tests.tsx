@@ -21,10 +21,16 @@ const Tests: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchTestsAndSubmissions = async () => {
-            if (!user?.id) return;
+        let mounted = true;
 
-            setIsLoading(true);
+        const fetchTestsAndSubmissions = async () => {
+            if (!user?.id) {
+                if (mounted) setIsLoading(false);
+                return;
+            }
+
+            if (mounted) setIsLoading(true);
+
             try {
                 // Fetch all tests
                 const { data: testsData, error: testsError } = await supabase
@@ -32,6 +38,7 @@ const Tests: React.FC = () => {
                     .select('*')
                     .order('testID', { ascending: true });
 
+                if (!mounted) return;
                 if (testsError) throw testsError;
 
                 // Fetch user's submitted tests with result info
@@ -41,6 +48,7 @@ const Tests: React.FC = () => {
                     .eq('user_id', user.id)
                     .not('submitted_at', 'is', null);
 
+                if (!mounted) return;
                 if (submissionsError) throw submissionsError;
 
                 // Create a map of test_id to submission info
@@ -73,20 +81,20 @@ const Tests: React.FC = () => {
                     };
                 });
 
-                setTests(testsWithStatus);
+                if (mounted) setTests(testsWithStatus);
 
             } catch (error: any) {
-                setError(error.message);
+                if (mounted) setError(error.message);
             } finally {
-                setIsLoading(false);
+                if (mounted) setIsLoading(false);
             }
         };
 
-        if (user?.id) {
-            fetchTestsAndSubmissions();
-        } else {
-            setIsLoading(false);
-        }
+        fetchTestsAndSubmissions();
+
+        return () => {
+            mounted = false;
+        };
     }, [user?.id, location.key]); // location.key changes on navigation, triggering re-fetch
 
     if (isLoading) {
