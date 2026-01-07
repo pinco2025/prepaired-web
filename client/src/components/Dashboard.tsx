@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SubjectsCard from './SubjectsCard';
 import PercentileCard, { ChartData } from './PercentileCard';
 import WeakAreasCard from './WeakAreasCard';
@@ -15,6 +15,7 @@ const Dashboard: React.FC = () => {
   usePageTitle('Dashboard');
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [historyData, setHistoryData] = useState<ChartData[]>([]);
@@ -161,6 +162,58 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return <DashboardSkeleton />;
+  }
+
+  // Check if user has no analytics data or no attempts
+  const hasNoAttempts = !analytics || !analytics.attempt_no || analytics.attempt_no === 0;
+
+  if (hasNoAttempts) {
+    return (
+      <div className="p-3 sm:p-4 md:p-6 h-full md:h-screen flex flex-col items-center justify-center animate-fade-in-up">
+        <div className="max-w-md text-center">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 dark:from-primary/30 dark:to-secondary/30 flex items-center justify-center">
+            <svg
+              className="w-12 h-12 sm:w-16 sm:h-16 text-primary dark:text-primary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-text-light dark:text-text-dark mb-3">
+            No Tests Attempted Yet
+          </h2>
+          <p className="text-sm sm:text-base text-text-secondary-light dark:text-text-secondary-dark mb-8">
+            You haven't attempted any tests yet. Start your first test to see your performance analytics and track your progress!
+          </p>
+          <button
+            onClick={() => navigate('/tests')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+            Start Your First Test
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
