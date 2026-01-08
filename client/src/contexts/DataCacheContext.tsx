@@ -44,9 +44,13 @@ export const DataCacheProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
     }, []);
 
+    // Use ref to avoid recreating the callback on every version change
+    const cacheVersionsRef = useRef(cacheVersions);
+    cacheVersionsRef.current = cacheVersions;
+
     const getCacheVersion = useCallback((key: CacheKey): number => {
-        return cacheVersions[key];
-    }, [cacheVersions]);
+        return cacheVersionsRef.current[key];
+    }, []);
 
     // Global cacheVersion is max of all versions
     const cacheVersion = Math.max(

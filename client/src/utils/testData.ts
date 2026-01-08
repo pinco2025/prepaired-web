@@ -36,10 +36,24 @@ export interface Test {
 }
 
 export const fetchTestData = async (url: string): Promise<Test> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch test data from ${url}`);
+  // Add timeout to prevent indefinite hanging
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch test data from ${url}`);
+    }
+    const testData = await response.json();
+    return testData;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out. Please check your internet connection.');
+    }
+    throw error;
   }
-  const testData = await response.json();
-  return testData;
 };

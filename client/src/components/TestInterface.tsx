@@ -63,6 +63,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [studentTestId, setStudentTestId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [initError, setInitError] = useState<string | null>(null);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -251,150 +253,163 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
 
     const initializeTest = async () => {
-      if (!test || !test.url) return;
+      if (!test || !test.url) {
+        setIsLoading(false);
+        return;
+      }
 
       // Mark as initializing immediately
       initializationRef.current = true;
+      setIsLoading(true);
+      setInitError(null);
 
-      const data = await fetchTestData(test.url);
-
-      const adaptedTestData: LocalTest = {
-        id: data.testId,
-        testId: data.testId,
-        title: data.title,
-        description: `${Math.floor((data.duration ?? 0) / 60)} minutes | ${data.totalMarks ?? 0} Marks`,
-        duration: Number(data.duration ?? 0),
-        totalMarks: data.totalMarks ?? 0,
-        totalQuestions: (data.questions ?? []).length,
-        markingScheme: test.markingScheme,
-        instructions: [
-          'The test contains multiple-choice questions with a single correct answer.',
-          'Each correct answer will be awarded marks as per the question.',
-          'There is no negative marking for incorrect answers.',
-          'Unanswered questions will receive 0 marks.',
-          'You can navigate between questions and sections at any time during the test.',
-          'Ensure you have a stable internet connection throughout the duration of the test.',
-          'Do not close the browser window or refresh the page, as it may result in loss of progress.',
-          'The test will automatically submit once the timer runs out.',
-        ],
-        sections: (data.sections ?? []) as LocalSection[],
-        questions: (data.questions ?? []).map((q: any) => ({
-          id: q.id,
-          uuid: q.uuid,
-          text: q.text,
-          image: (q.image && q.image !== 0 && q.image !== "0") ? String(q.image) : null,
-          options: (q.options ?? []).map((o: any) => ({
-            id: o.id,
-            text: o.text,
-            image: (o.image && o.image !== 0 && o.image !== "0") ? String(o.image) : null,
-          })),
-          section: q.section
-        })),
-        exam: exam
-      };
-
-      setTestData(adaptedTestData);
-
-      const qCount = adaptedTestData.questions?.length ?? 0;
-      setQuestionStatuses(Array(qCount).fill('notVisited' as QuestionStatus));
-
-      const { data: authData } = await supabase.auth.getUser();
-      const user = (authData as any)?.user;
-      if (!user) {
-        console.error('User not logged in. Cannot fetch test start time.');
-        return;
-      }
-
-      let testStartTimeISO: string | null = null;
       try {
-        // First, try to find existing entry that hasn't been submitted
-        const { data: existingTests, error: fetchError } = await supabase
-          .from('student_tests')
-          .select('id, started_at, answers, submitted_at')
-          .eq('user_id', user.id)
-          .eq('test_id', data.testId)
-          .is('submitted_at', null) // Only get tests that haven't been submitted
-          .order('started_at', { ascending: false })
-          .limit(1);
+        const data = await fetchTestData(test.url);
 
-        if (fetchError) {
-          console.error('Error fetching student test:', fetchError);
+        const adaptedTestData: LocalTest = {
+          id: data.testId,
+          testId: data.testId,
+          title: data.title,
+          description: `${Math.floor((data.duration ?? 0) / 60)} minutes | ${data.totalMarks ?? 0} Marks`,
+          duration: Number(data.duration ?? 0),
+          totalMarks: data.totalMarks ?? 0,
+          totalQuestions: (data.questions ?? []).length,
+          markingScheme: test.markingScheme,
+          instructions: [
+            'The test contains multiple-choice questions with a single correct answer.',
+            'Each correct answer will be awarded marks as per the question.',
+            'There is no negative marking for incorrect answers.',
+            'Unanswered questions will receive 0 marks.',
+            'You can navigate between questions and sections at any time during the test.',
+            'Ensure you have a stable internet connection throughout the duration of the test.',
+            'Do not close the browser window or refresh the page, as it may result in loss of progress.',
+            'The test will automatically submit once the timer runs out.',
+          ],
+          sections: (data.sections ?? []) as LocalSection[],
+          questions: (data.questions ?? []).map((q: any) => ({
+            id: q.id,
+            uuid: q.uuid,
+            text: q.text,
+            image: (q.image && q.image !== 0 && q.image !== "0") ? String(q.image) : null,
+            options: (q.options ?? []).map((o: any) => ({
+              id: o.id,
+              text: o.text,
+              image: (o.image && o.image !== 0 && o.image !== "0") ? String(o.image) : null,
+            })),
+            section: q.section
+          })),
+          exam: exam
+        };
+
+        setTestData(adaptedTestData);
+
+        const qCount = adaptedTestData.questions?.length ?? 0;
+        setQuestionStatuses(Array(qCount).fill('notVisited' as QuestionStatus));
+
+        const { data: authData } = await supabase.auth.getUser();
+        const user = (authData as any)?.user;
+        if (!user) {
+          console.error('User not logged in. Cannot fetch test start time.');
+          return;
         }
 
-        const existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
-
-        if (existingTest) {
-          testStartTimeISO = (existingTest as any).started_at ?? new Date().toISOString();
-          setStudentTestId((existingTest as any).id);
-          // Load answers from DB if available
-          if ((existingTest as any).answers) {
-            setAnswers((existingTest as any).answers);
-          }
-        } else {
-          const { data: newStudentTest, error: insertError } = await supabase
-            .from('student_tests')
-            .insert({
-              test_id: data.testId,
-              user_id: user.id,
-              started_at: new Date().toISOString()
-            })
-            .select('id, started_at')
-            .single();
-
-          if (insertError) {
-            console.error('Failed to create a new student test entry.', insertError);
-            testStartTimeISO = new Date().toISOString();
-          } else if (newStudentTest) {
-            testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
-            setStudentTestId((newStudentTest as any).id);
-          } else {
-            testStartTimeISO = new Date().toISOString();
-          }
-        }
-      } catch (e) {
-        console.error('Error while fetching/creating student_tests entry', e);
-        testStartTimeISO = new Date().toISOString();
-      }
-
-      const testDuration = Number(data.duration ?? 0);
-      const now = new Date();
-      const startTime = new Date(testStartTimeISO!);
-      const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
-      let remainingTime = testDuration - elapsedTime;
-
-      if (remainingTime <= 0) {
-        setTimeLeft(0);
-        return;
-      }
-
-      setTimeLeft(remainingTime);
-
-      // Start the timer only once
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev === null || prev <= 1) {
-            if (timerRef.current) {
-              clearInterval(timerRef.current);
-              timerRef.current = null;
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Load saved answers from localStorage (fallback)
-      // Only use if we didn't already load from DB
-      if (!studentTestId || !answers || Object.keys(answers).length === 0) {
+        let testStartTimeISO: string | null = null;
         try {
-          const saved = localStorage.getItem(`test-answers-${data.testId}`);
-          if (saved) {
-            const savedAnswers = JSON.parse(saved);
-            setAnswers(savedAnswers);
+          // First, try to find existing entry that hasn't been submitted
+          const { data: existingTests, error: fetchError } = await supabase
+            .from('student_tests')
+            .select('id, started_at, answers, submitted_at')
+            .eq('user_id', user.id)
+            .eq('test_id', data.testId)
+            .is('submitted_at', null) // Only get tests that haven't been submitted
+            .order('started_at', { ascending: false })
+            .limit(1);
+
+          if (fetchError) {
+            console.error('Error fetching student test:', fetchError);
+          }
+
+          const existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
+
+          if (existingTest) {
+            testStartTimeISO = (existingTest as any).started_at ?? new Date().toISOString();
+            setStudentTestId((existingTest as any).id);
+            // Load answers from DB if available
+            if ((existingTest as any).answers) {
+              setAnswers((existingTest as any).answers);
+            }
+          } else {
+            const { data: newStudentTest, error: insertError } = await supabase
+              .from('student_tests')
+              .insert({
+                test_id: data.testId,
+                user_id: user.id,
+                started_at: new Date().toISOString()
+              })
+              .select('id, started_at')
+              .single();
+
+            if (insertError) {
+              console.error('Failed to create a new student test entry.', insertError);
+              testStartTimeISO = new Date().toISOString();
+            } else if (newStudentTest) {
+              testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
+              setStudentTestId((newStudentTest as any).id);
+            } else {
+              testStartTimeISO = new Date().toISOString();
+            }
           }
         } catch (e) {
-          console.warn('Could not read saved answers from localStorage', e);
+          console.error('Error while fetching/creating student_tests entry', e);
+          testStartTimeISO = new Date().toISOString();
         }
+
+        const testDuration = Number(data.duration ?? 0);
+        const now = new Date();
+        const startTime = new Date(testStartTimeISO!);
+        const elapsedTime = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+        let remainingTime = testDuration - elapsedTime;
+
+        if (remainingTime <= 0) {
+          setTimeLeft(0);
+          return;
+        }
+
+        setTimeLeft(remainingTime);
+
+        // Start the timer only once
+        timerRef.current = setInterval(() => {
+          setTimeLeft(prev => {
+            if (prev === null || prev <= 1) {
+              if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+              }
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+
+        // Load saved answers from localStorage (fallback)
+        // Only use if we didn't already load from DB
+        if (!studentTestId || !answers || Object.keys(answers).length === 0) {
+          try {
+            const saved = localStorage.getItem(`test-answers-${data.testId}`);
+            if (saved) {
+              const savedAnswers = JSON.parse(saved);
+              setAnswers(savedAnswers);
+            }
+          } catch (e) {
+            console.warn('Could not read saved answers from localStorage', e);
+          }
+        }
+
+        setIsLoading(false);
+      } catch (error: any) {
+        console.error('Failed to initialize test:', error);
+        setInitError(error?.message || 'Failed to load test. Please try again.');
+        setIsLoading(false);
       }
     };
 
@@ -630,6 +645,37 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
     setQuestionStatuses(newQuestionStatuses);
   };
+
+  // Show loading state during initialization
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin"></div>
+          <p className="text-text-secondary-light dark:text-text-secondary-dark">Loading test...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if initialization failed
+  if (initError) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 p-8 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg max-w-md text-center">
+          <span className="material-icons-outlined text-5xl text-red-500">error_outline</span>
+          <h3 className="text-xl font-bold text-text-light dark:text-text-dark">Failed to Load Test</h3>
+          <p className="text-text-secondary-light dark:text-text-secondary-dark">{initError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
