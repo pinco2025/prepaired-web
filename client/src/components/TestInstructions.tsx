@@ -1,27 +1,20 @@
 import React from 'react';
+import { Test } from '../data';
+import JEEMInstructions from './JEEMInstructions';
+import { formatDuration } from '../utils/formatters';
 
 interface TestInstructionsProps {
-  test: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number;
-    totalQuestions: number;
-    markingScheme: string;
-    instructions: string[];
-  };
+  test: Test;
   onStartTest: () => void;
 }
 
-const formatDuration = (seconds: number) => {
-  if (seconds < 3600) {
-    return `${Math.floor(seconds / 60)} Minute(s)`;
-  }
-  return `${(seconds / 3600).toFixed(1)} Hour(s)`;
-};
-
-
 const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }) => {
+  // Conditionally render the instructions component based on the template name
+  if (test.instructions === 'JEEM') {
+    return <JEEMInstructions test={test} onStartTest={onStartTest} />;
+  }
+
+  // Fallback to the original instructions format if no template matches
   return (
     <div className="max-w-4xl mx-auto bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 md:p-12">
       <div className="text-center mb-8">
@@ -54,11 +47,10 @@ const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }
       </div>
       <div className="mb-10">
         <h2 className="text-2xl font-semibold text-text-light dark:text-text-dark mb-6 text-center">Important Instructions</h2>
-        <ul className="space-y-4 text-text-secondary-light dark:text-text-secondary-dark list-disc list-inside">
-          {test.instructions.map((instruction, index) => (
-            <li key={index}>{instruction}</li>
-          ))}
-        </ul>
+        <div className="text-center text-red-500">
+            <p>Error: Instructions template not found.</p>
+            <p>Template name: {test.instructions}</p>
+        </div>
       </div>
       <div className="text-center">
         <button

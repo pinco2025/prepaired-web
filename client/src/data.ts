@@ -274,7 +274,7 @@ export interface Test {
   duration: number;
   totalQuestions: number;
   markingScheme: string;
-  instructions: string[];
+  instructions: string;
   url: string;
   exam?: 'Normal' | 'JEE' | 'NEET';
   type?: 'Boss' | 'Normal';
