@@ -143,8 +143,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Skip if initial load hasn't completed yet - initializeAuth handles it
         if (!initialLoadDone.current) return;
 
-        console.log('Auth state changed:', event);
-
         if (session?.user) {
           setUser(session.user);
 

@@ -137,21 +137,15 @@ const Dashboard: React.FC = () => {
   // Fetch chapter data for WeakAreasCard
   useEffect(() => {
     const fetchChapterData = async () => {
-      console.log('[DEBUG] analytics?.chapter_url:', analytics?.chapter_url);
       if (!analytics?.chapter_url) {
-        console.log('[DEBUG] No chapter_url found, skipping fetch');
         return;
       }
 
       try {
-        console.log('[DEBUG] Fetching chapter data from:', analytics.chapter_url);
         const response = await fetch(analytics.chapter_url);
-        console.log('[DEBUG] Chapter fetch response status:', response.status);
         const data = await response.json();
-        console.log('[DEBUG] Chapter data received:', data);
         // Extract chapters from the nested structure (data.chapters) if present
         const chapters = data.chapters || data;
-        console.log('[DEBUG] Extracted chapters:', chapters);
         setChapterData(chapters);
       } catch (err) {
         console.error('Error fetching chapter data:', err);

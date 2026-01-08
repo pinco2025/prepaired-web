@@ -138,25 +138,17 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     const currentAnswers = answersRef.current;
     const currentStudentTestId = studentTestIdRef.current;
 
-    console.log('handleSubmit called with:', {
-      testData: currentTestData?.testId,
-      answersCount: Object.keys(currentAnswers).length,
-      studentTestId: currentStudentTestId
-    });
-
     if (!currentTestData) {
       console.error('No test data available');
       return;
     }
 
     if (isSubmittingRef.current) {
-      console.log('Submission already in progress, skipping...');
       return;
     }
 
     isSubmittingRef.current = true;
     setIsSubmitting(true);
-    console.log('Starting submission...');
 
     // Clear timer immediately to prevent any further submissions
     if (timerRef.current) {
@@ -179,24 +171,19 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         submitted_at: new Date().toISOString()
       };
 
-      console.log('Submitting data:', submissionData);
-
       let error;
       let finalSubmissionId = currentStudentTestId;
 
       if (currentStudentTestId) {
-        console.log('Updating existing record:', currentStudentTestId);
         const { data: updateResult, error: updateError } = await supabase
           .from('student_tests')
           .update(submissionData)
           .eq('id', currentStudentTestId)
           .select();
 
-        console.log('Update result:', updateResult);
         error = updateError;
       } else {
         // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
-        console.log('No student test ID, creating new entry (fallback)');
         const { data: insertData, error: insertError } = await supabase.from('student_tests').insert([{
           test_id: currentTestData.testId,
           user_id: user.id,
@@ -220,8 +207,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         isSubmittingRef.current = false;
         setIsSubmitting(false);
       } else {
-        console.log('Submission DB update successful! Now triggering grade calculation...');
-
         // Trigger Score Calculation
         try {
           const { data: sessionData } = await supabase.auth.getSession();
@@ -239,7 +224,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
           // Proceed to navigation even if triggering calculation fails
         }
 
-        console.log('Submission and grading successful!');
         try {
           localStorage.removeItem(`test-answers-${currentTestData.testId}`);
         } catch (e) {
@@ -263,7 +247,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   useEffect(() => {
     // Prevent re-initialization using ref (survives re-renders and strict mode)
     if (initializationRef.current) {
-      console.log('Initialization already done, skipping...');
       return;
     }
 
@@ -272,7 +255,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
       // Mark as initializing immediately
       initializationRef.current = true;
-      console.log('Initializing test...');
 
       const data = await fetchTestData(test.url);
 
@@ -342,7 +324,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         const existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
 
         if (existingTest) {
-          console.log('Found existing unsubmitted student test entry:', (existingTest as any).id);
           testStartTimeISO = (existingTest as any).started_at ?? new Date().toISOString();
           setStudentTestId((existingTest as any).id);
           // Load answers from DB if available
@@ -350,7 +331,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
             setAnswers((existingTest as any).answers);
           }
         } else {
-          console.log('Creating new student test entry...');
           const { data: newStudentTest, error: insertError } = await supabase
             .from('student_tests')
             .insert({
@@ -367,7 +347,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
           } else if (newStudentTest) {
             testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
             setStudentTestId((newStudentTest as any).id);
-            console.log('Created new student test with ID:', (newStudentTest as any).id);
           } else {
             testStartTimeISO = new Date().toISOString();
           }
@@ -391,7 +370,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       setTimeLeft(remainingTime);
 
       // Start the timer only once
-      console.log('Starting timer with', remainingTime, 'seconds remaining');
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           if (prev === null || prev <= 1) {
@@ -434,7 +412,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   // Separate effect to handle submission when time runs out
   useEffect(() => {
     if (timeLeft === 0 && testData && !isSubmittingRef.current) {
-      console.log('Time expired, auto-submitting...');
       handleSubmit();
     }
   }, [timeLeft, testData, handleSubmit]);

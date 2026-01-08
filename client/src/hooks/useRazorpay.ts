@@ -106,8 +106,6 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
                 amount: amount
             };
 
-            console.log('Creating order with body:', requestBody);
-
             const response = await fetch('https://prepaired-backend.onrender.com/api/create-order', {
                 method: 'POST',
                 headers: {
@@ -116,23 +114,17 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
                 body: JSON.stringify(requestBody),
             });
 
-            console.log('Response status:', response.status);
-
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('API Error:', errorText);
-                // If the API doesn't exist yet, fall back to direct payment (for testing)
-                console.warn('create-order API not available, using direct payment mode');
             }
 
             let orderId: string | undefined;
             try {
                 const orderData = await response.json();
-                console.log('Order data:', orderData);
                 orderId = orderData.orderId; // Backend returns camelCase 'orderId'
             } catch {
                 // API might not exist yet - continue without order_id for testing
-                console.warn('Could not get order_id, proceeding in test mode');
             }
 
             // Open Razorpay checkout

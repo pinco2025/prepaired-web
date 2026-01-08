@@ -84,8 +84,7 @@ const ChapterDetails: React.FC = () => {
           data.forEach(row => {
             if (row.type && row.link) map[row.type] = row.link;
           });
-          setLinksMap(map)
-          console.log('linksMap:', map);
+          setLinksMap(map);
         }
       } catch (err: any) {
         console.error('Unexpected error fetching links:', err);

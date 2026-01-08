@@ -29,7 +29,6 @@ export const DataCacheProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     const invalidateCache = useCallback((key: CacheKey = 'all') => {
-        console.log('[DataCache] Invalidating cache:', key);
         setCacheVersions(prev => {
             if (key === 'all') {
                 return {

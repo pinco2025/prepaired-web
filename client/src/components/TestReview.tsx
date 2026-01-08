@@ -128,11 +128,16 @@ const TestReview: React.FC = () => {
         const currentQuestion = allQuestions[currentQuestionIndex];
         if (currentQuestion) {
             const sectionIndex = sections.findIndex(s => s === currentQuestion.section);
-            if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
-                setCurrentSectionIndex(sectionIndex);
+            if (sectionIndex !== -1) {
+                setCurrentSectionIndex(prevIndex => {
+                    if (prevIndex !== sectionIndex) {
+                        return sectionIndex;
+                    }
+                    return prevIndex;
+                });
             }
         }
-    }, [currentQuestionIndex, allQuestions, sections, currentSectionIndex]);
+    }, [currentQuestionIndex, allQuestions, sections]);
 
     const handleQuestionSelect = (questionIndex: number) => {
         const question = questionsBySection[currentSectionIndex][questionIndex];
@@ -228,196 +233,190 @@ const TestReview: React.FC = () => {
             </div>
 
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-                    {/* Left Column */}
-                    <div className="lg:col-span-9 flex flex-col gap-6">
-                        <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col overflow-hidden">
-                            <div className="px-6 py-4 border-b flex flex-wrap items-center justify-between gap-4 bg-background-light/50 dark:bg-white/5">
-                                <div className="flex items-center gap-4">
-                                    <span className="text-lg font-bold text-primary">Question {allQuestions.findIndex(q => q.id === currentQuestion.id) + 1}</span>
-                                    <span className="px-2.5 py-0.5 rounded-full bg-text-secondary-light/10 text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium uppercase tracking-wide">{currentQuestion.section}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {/* Placeholder button */}
-                                    <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark cursor-pointer hover:text-primary" title="Report Issue">flag</span>
-                                </div>
-                            </div>
-                            <div className="p-6 md:p-8 space-y-8">
-                                <div className="math-text-scope text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
-                                    {renderHtml(currentQuestion.text)}
-                                </div>
-                                {currentQuestion.image && (
-                                    <div className="flex justify-center">
-                                        <ImageWithProgress src={currentQuestion.image} alt="Question" className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
-                                    </div>
-                                )}
-                                <div className="space-y-3">
-                                    {(!currentQuestion.options || currentQuestion.options.length === 0) ? (
-                                        <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-sm">
-                                            {currentAnswer.status === 'Correct' ? (
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex items-center gap-2 text-success-light font-bold text-lg">
-                                                        <span className="material-icons-outlined">check_circle</span>
-                                                        Correct Answer: {currentAnswer.correct_response}
-                                                    </div>
-                                                    <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark ml-8">
-                                                        Your answer matched the correct answer.
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Your Answer</span>
-                                                        <div className="flex items-center gap-2 text-error-light font-bold text-lg">
-                                                            <span className="material-icons-outlined">cancel</span>
-                                                            {currentAnswer.user_response || "Not Attempted"}
-                                                        </div>
-                                                    </div>
-                                                    <div className="w-full h-px bg-border-light dark:bg-border-dark"></div>
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Correct Answer</span>
-                                                        <div className="flex items-center gap-2 text-success-light font-bold text-lg">
-                                                            <span className="material-icons-outlined">check_circle</span>
-                                                            {currentAnswer.correct_response}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        currentQuestion.options.map(option => {
-                                            const isCorrect = option.id.toLowerCase() === currentAnswer.correct_response.toLowerCase();
-                                            const isUserChoice = currentAnswer.user_response ? option.id.toLowerCase() === currentAnswer.user_response.toLowerCase() : false;
-                                            return (
-                                                <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
-                                                    <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
-                                                    <div className="flex-grow text-lg">
-                                                        {renderHtml(option.text)}
-                                                        {option.image && (
-                                                            <div className="mt-4 flex justify-center">
-                                                                <ImageWithProgress src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    {isUserChoice && (
-                                                        <div className={`text-xs font-bold uppercase tracking-wider ${currentAnswer.status === 'Correct' ? 'text-success-dark dark:text-success-light' : 'text-error-dark dark:text-error-light'}`}>
-                                                            Your Answer
-                                                        </div>
-                                                    )}
-                                                    {!isUserChoice && isCorrect && (
-                                                        <div className="text-xs font-bold uppercase tracking-wider text-success-dark dark:text-success-light">
-                                                            Correct Answer
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            </div>
-
-                            {currentSolution && (
-                                <div className="border-t border-border-light dark:border-border-dark bg-background-light/30 dark:bg-background-dark/30">
-                                    <div className="p-6 md:p-8">
-                                        <button onClick={() => setIsSolutionVisible(!isSolutionVisible)} className="flex items-center gap-2 text-primary font-semibold mb-4 hover:opacity-80 transition-opacity">
-                                            <span className="material-icons-outlined">{isSolutionVisible ? 'expand_less' : 'expand_more'}</span>
-                                            {isSolutionVisible ? 'Hide' : 'Show'} Solution
-                                        </button>
-                                        {isSolutionVisible && (
-                                            <div className="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-sm">
-                                                <h4 className="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide mb-3">Explanation</h4>
-                                                <div className="prose dark:prose-invert max-w-none text-base leading-relaxed whitespace-pre-line">
-                                                    {renderHtml(currentSolution.solution_text)}
-                                                </div>
-                                                {currentSolution.solution_image_url && (
-                                                    <div className="flex justify-center mt-4">
-                                                        <ImageWithProgress src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg max-w-full h-auto" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+                <div className="max-w-7xl mx-auto space-y-6">
+                    {/* Section Navigation Tabs - Full Width Above Both Columns */}
+                    <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-2">
+                        <div className="flex items-center justify-center gap-2 flex-wrap">
+                            {sections.map((section, index) => {
+                                const isActive = currentSectionIndex === index;
+                                return (
+                                    <button
+                                        key={section}
+                                        onClick={() => handleSectionSelect(index)}
+                                        className={`group relative px-6 py-3 text-sm font-semibold transition-all duration-300 rounded-xl
+                                            ${isActive
+                                                ? 'text-primary bg-primary/10 shadow-sm'
+                                                : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-primary hover:bg-primary/5'
+                                            }`}
+                                    >
+                                        <span className="relative z-10">{section}</span>
+                                        {/* Glowing Underline */}
+                                        <span
+                                            className={`absolute bottom-1.5 left-4 right-4 h-[3px] rounded-full transition-all duration-300
+                                                ${isActive
+                                                    ? 'bg-gradient-to-r from-primary via-blue-400 to-primary shadow-[0_0_12px_3px_rgba(59,130,246,0.5)]'
+                                                    : 'bg-transparent group-hover:bg-primary/30'
+                                                }`}
+                                        />
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {/* Right Column */}
-                    <div className="lg:col-span-3">
-                        <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border p-4 sticky top-24">
-                            <h3 className="text-lg font-bold mb-4 px-2">Question Palette</h3>
-                            {/* Section Navigation with Arrows */}
-                            <div className="flex items-center gap-1 mb-4 border-b border-border-light dark:border-border-dark">
-                                {/* Left Scroll Arrow */}
-                                <button
-                                    onClick={() => scrollSectionTabs('left')}
-                                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-all"
-                                    title="Scroll Left"
-                                >
-                                    <span className="material-icons-outlined text-[18px]">chevron_left</span>
-                                </button>
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+                        {/* Left Column */}
+                        <div className="lg:col-span-9 flex flex-col gap-4">
+                            {/* Question Card */}
+                            <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark flex flex-col overflow-hidden">
+                                <div className="px-6 py-4 border-b flex flex-wrap items-center justify-between gap-4 bg-background-light/50 dark:bg-white/5">
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-lg font-bold text-primary">Question {allQuestions.findIndex(q => q.id === currentQuestion.id) + 1}</span>
+                                        <span className="px-2.5 py-0.5 rounded-full bg-text-secondary-light/10 text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium uppercase tracking-wide">{currentQuestion.section}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        {/* Placeholder button */}
+                                        <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark cursor-pointer hover:text-primary" title="Report Issue">flag</span>
+                                    </div>
+                                </div>
+                                <div className="p-6 md:p-8 space-y-8">
+                                    <div className="math-text-scope text-lg text-text-light dark:text-text-dark leading-relaxed whitespace-pre-line">
+                                        {renderHtml(currentQuestion.text)}
+                                    </div>
+                                    {currentQuestion.image && (
+                                        <div className="flex justify-center">
+                                            <ImageWithProgress src={currentQuestion.image} alt="Question" className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                        </div>
+                                    )}
+                                    <div className="space-y-3">
+                                        {(!currentQuestion.options || currentQuestion.options.length === 0) ? (
+                                            <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark shadow-sm">
+                                                {currentAnswer.status === 'Correct' ? (
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="flex items-center gap-2 text-success-light font-bold text-lg">
+                                                            <span className="material-icons-outlined">check_circle</span>
+                                                            Correct Answer: {currentAnswer.correct_response}
+                                                        </div>
+                                                        <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark ml-8">
+                                                            Your answer matched the correct answer.
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col gap-4">
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Your Answer</span>
+                                                            <div className="flex items-center gap-2 text-error-light font-bold text-lg">
+                                                                <span className="material-icons-outlined">cancel</span>
+                                                                {currentAnswer.user_response || "Not Attempted"}
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-full h-px bg-border-light dark:bg-border-dark"></div>
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Correct Answer</span>
+                                                            <div className="flex items-center gap-2 text-success-light font-bold text-lg">
+                                                                <span className="material-icons-outlined">check_circle</span>
+                                                                {currentAnswer.correct_response}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            currentQuestion.options.map(option => {
+                                                const isCorrect = option.id.toLowerCase() === currentAnswer.correct_response.toLowerCase();
+                                                const isUserChoice = currentAnswer.user_response ? option.id.toLowerCase() === currentAnswer.user_response.toLowerCase() : false;
+                                                return (
+                                                    <div key={option.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden ${getOptionStyle(option.id)}`}>
+                                                        <div className="w-8 h-8 rounded-full border-2 border-border-light dark:border-border-dark flex items-center justify-center text-sm font-bold">{option.id.toUpperCase()}</div>
+                                                        <div className="flex-grow text-lg">
+                                                            {renderHtml(option.text)}
+                                                            {option.image && (
+                                                                <div className="mt-4 flex justify-center">
+                                                                    <ImageWithProgress src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        {isUserChoice && (
+                                                            <div className={`text-xs font-bold uppercase tracking-wider ${currentAnswer.status === 'Correct' ? 'text-success-dark dark:text-success-light' : 'text-error-dark dark:text-error-light'}`}>
+                                                                Your Answer
+                                                            </div>
+                                                        )}
+                                                        {!isUserChoice && isCorrect && (
+                                                            <div className="text-xs font-bold uppercase tracking-wider text-success-dark dark:text-success-light">
+                                                                Correct Answer
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })
+                                        )}
+                                    </div>
+                                </div>
 
-                                {/* Section Tabs */}
-                                <div
-                                    ref={sectionTabsRef}
-                                    className="flex-1 flex overflow-x-auto no-scrollbar pb-1"
-                                >
-                                    {sections.map((section, index) => (
-                                        <button
-                                            key={section}
-                                            onClick={() => handleSectionSelect(index)}
-                                            className={`flex-shrink-0 pb-2 text-sm font-medium whitespace-nowrap px-3 transition-all duration-200 border-b-2 ${currentSectionIndex === index
-                                                ? 'text-primary border-primary'
-                                                : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary border-transparent hover:border-primary/50'
-                                                }`}
-                                            title={section}
-                                        >
-                                            {section}
+                                {currentSolution && (
+                                    <div className="border-t border-border-light dark:border-border-dark bg-background-light/30 dark:bg-background-dark/30">
+                                        <div className="p-6 md:p-8">
+                                            <button onClick={() => setIsSolutionVisible(!isSolutionVisible)} className="flex items-center gap-2 text-primary font-semibold mb-4 hover:opacity-80 transition-opacity">
+                                                <span className="material-icons-outlined">{isSolutionVisible ? 'expand_less' : 'expand_more'}</span>
+                                                {isSolutionVisible ? 'Hide' : 'Show'} Solution
+                                            </button>
+                                            {isSolutionVisible && (
+                                                <div className="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-sm">
+                                                    <h4 className="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide mb-3">Explanation</h4>
+                                                    <div className="prose dark:prose-invert max-w-none text-base leading-relaxed whitespace-pre-line">
+                                                        {renderHtml(currentSolution.solution_text)}
+                                                    </div>
+                                                    {currentSolution.solution_image_url && (
+                                                        <div className="flex justify-center mt-4">
+                                                            <ImageWithProgress src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg max-w-full h-auto" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right Column */}
+                        <div className="lg:col-span-3">
+                            <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border p-4 sticky top-24">
+                                <h3 className="text-lg font-bold mb-4 px-2">Question Palette</h3>
+                                <div className="grid grid-cols-5 gap-3 mb-6 max-h-[60vh] overflow-y-auto p-4">
+                                    {questionsBySection[currentSectionIndex].map((q, index) => (
+                                        <button key={q.id} onClick={() => handleQuestionSelect(index)} className={`w-10 h-10 rounded-lg text-sm font-bold transition-opacity ${getPaletteStyle(q)} ${q.id === currentQuestion.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+                                            {allQuestions.findIndex(aq => aq.id === q.id) + 1}
                                         </button>
                                     ))}
                                 </div>
+                                <div className="space-y-3 pt-4 border-t">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-4 h-4 rounded bg-success-light"></div>
+                                        <span className="text-sm">Correct</span>
+                                        <span className="ml-auto font-bold">{stats['Correct'] || 0}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-4 h-4 rounded bg-error-light"></div>
+                                        <span className="text-sm">Incorrect</span>
+                                        <span className="ml-auto font-bold">{stats['Incorrect'] || 0}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                        <span className="text-sm">Not Attempted</span>
+                                        <span className="ml-auto font-bold">{stats['Unattempted'] || 0}</span>
+                                    </div>
+                                </div>
 
-                                {/* Right Scroll Arrow */}
-                                <button
-                                    onClick={() => scrollSectionTabs('right')}
-                                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-all"
-                                    title="Scroll Right"
-                                >
-                                    <span className="material-icons-outlined text-[18px]">chevron_right</span>
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-5 gap-3 mb-6 max-h-[60vh] overflow-y-auto p-4">
-                                {questionsBySection[currentSectionIndex].map((q, index) => (
-                                    <button key={q.id} onClick={() => handleQuestionSelect(index)} className={`w-10 h-10 rounded-lg text-sm font-bold transition-opacity ${getPaletteStyle(q)} ${q.id === currentQuestion.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
-                                        {allQuestions.findIndex(aq => aq.id === q.id) + 1}
+                                <div className="mt-6 grid grid-cols-2 gap-3">
+                                    <button onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))} disabled={currentQuestionIndex === 0} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                                        <span className="material-icons-outlined">arrow_back</span> Prev
                                     </button>
-                                ))}
-                            </div>
-                            <div className="space-y-3 pt-4 border-t">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-4 h-4 rounded bg-success-light"></div>
-                                    <span className="text-sm">Correct</span>
-                                    <span className="ml-auto font-bold">{stats['Correct'] || 0}</span>
+                                    <button onClick={() => setCurrentQuestionIndex(Math.min(allQuestions.length - 1, currentQuestionIndex + 1))} disabled={currentQuestionIndex === allQuestions.length - 1} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-white shadow-lg disabled:opacity-50 hover:opacity-90 transition-opacity">
+                                        Next <span className="material-icons-outlined">arrow_forward</span>
+                                    </button>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-4 h-4 rounded bg-error-light"></div>
-                                    <span className="text-sm">Incorrect</span>
-                                    <span className="ml-auto font-bold">{stats['Incorrect'] || 0}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                    <span className="text-sm">Not Attempted</span>
-                                    <span className="ml-auto font-bold">{stats['Unattempted'] || 0}</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 grid grid-cols-2 gap-3">
-                                <button onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))} disabled={currentQuestionIndex === 0} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-gray-800 disabled:opacity-50 transition-colors">
-                                    <span className="material-icons-outlined">arrow_back</span> Prev
-                                </button>
-                                <button onClick={() => setCurrentQuestionIndex(Math.min(allQuestions.length - 1, currentQuestionIndex + 1))} disabled={currentQuestionIndex === allQuestions.length - 1} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-white shadow-lg disabled:opacity-50 hover:opacity-90 transition-opacity">
-                                    Next <span className="material-icons-outlined">arrow_forward</span>
-                                </button>
                             </div>
                         </div>
                     </div>
