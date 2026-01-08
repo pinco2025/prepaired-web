@@ -546,10 +546,15 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     const sectionName = currentQ.section;
     const sectionIndex = testData.sections.findIndex(s => s.name === sectionName);
 
-    if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
-      setCurrentSectionIndex(sectionIndex);
+    if (sectionIndex !== -1) {
+      setCurrentSectionIndex(prevIndex => {
+        if (prevIndex !== sectionIndex) {
+          return sectionIndex;
+        }
+        return prevIndex;
+      });
     }
-  }, [currentQuestionIndex, testData, currentSectionIndex]);
+  }, [currentQuestionIndex, testData]);
 
   const sectionIndices = React.useMemo(() => {
     if (!testData?.sections || !testData?.questions) return {};
