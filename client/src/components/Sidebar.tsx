@@ -131,9 +131,9 @@ const Sidebar: React.FC = () => {
   };
 
   const menuItems = [
+    { to: "/super30", icon: "history_edu", label: "Super 30" },
     { to: "/dashboard", icon: "dashboard", label: "Dashboard" },
     { to: "/subjects", icon: "menu_book", label: "Subjects" },
-    { to: "/coming-soon", icon: "history_edu", label: "Revision" },
     { to: "/tests", icon: "quiz", label: "Tests & Analysis" },
     { to: "/coming-soon", icon: "school", label: "Mentorship" },
     { to: "/coming-soon", icon: "library_books", label: "Advanced Material" },
@@ -174,20 +174,32 @@ const Sidebar: React.FC = () => {
               onClick={() => mobile && setIsMobileMenuOpen(false)}
               className={({ isActive }) => {
                 const isActuallyActive = isActive && item.to !== '/coming-soon';
+                const isSuper30 = item.label === "Super 30";
 
-                return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors whitespace-nowrap overflow-hidden
+                return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all duration-300 whitespace-nowrap overflow-hidden
                         ${isActuallyActive
                     ? 'bg-primary/10 text-primary'
                     : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
                   }
-                        ${isCollapsed && !mobile ? 'justify-center' : ''}`
+                        ${isCollapsed && !mobile ? 'justify-center' : ''}
+                        ${isSuper30 ? 'hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] dark:hover:shadow-[0_0_15px_rgba(255,215,0,0.15)]' : ''}`
               }}
               title={isCollapsed && !mobile ? item.label : undefined}
             >
-              <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
-                {item.icon}
-              </span>
-              <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
+              {item.label === "Super 30" ? (
+                <span className={`shrink-0 font-black text-xl tracking-tighter transition-all duration-300 
+                  ${location.pathname === item.to ? 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]' : 'text-yellow-600/80 dark:text-yellow-500/80 group-hover:text-yellow-500 group-hover:drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'}
+                  `}
+                  style={{ fontFamily: 'monospace' }}
+                >
+                  30
+                </span>
+              ) : (
+                <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
+                  {item.icon}
+                </span>
+              )}
+              <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'} ${item.label === "Super 30" ? 'font-bold' : ''}`}>
                 {item.label}
               </span>
             </NavLink>
@@ -273,7 +285,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="md:hidden bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark p-4 flex items-center justify-between sticky top-0 z-40">
+      <div className="app-mobile-header md:hidden bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark p-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <img alt="prepAIred logo" className="h-8 w-8 object-contain" src="https://drive.google.com/thumbnail?id=1yLtX3YxubbDBsKYDj82qiaGbSkSX7aLv&sz=w1000" />
           <span className="text-xl font-bold text-text-light dark:text-text-dark">

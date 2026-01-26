@@ -27,7 +27,7 @@ module.exports = {
       },
       fontFamily: {
         display: ["Poppins", "sans-serif"],
-        serif: ["Space Grotesk"]
+        grotesk: ["Space Grotesk", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",

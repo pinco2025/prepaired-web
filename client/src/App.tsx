@@ -19,6 +19,7 @@ import TestPage from './components/TestPage';
 import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
 import TestReview from './components/TestReview';
+import Super30 from './components/Super30';
 import AppLayout from "./components/AppLayout";
 
 /**
@@ -46,6 +47,11 @@ const HomeRoute: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Free users get redirected to super30
+  if (isAuthenticated && !isPaidUser) {
+    return <Navigate to="/super30" replace />;
+  }
+
   // Everyone else sees the landing page
   return <LandingPage />;
 };
@@ -62,9 +68,9 @@ export const AppContent: React.FC = () => {
   const isTestSubmittedRoute = location.pathname === '/test-submitted';
 
   // Determine if we should show the sidebar
-  // Show sidebar only for authenticated paid users on protected routes
+  // Show sidebar for all authenticated users on protected routes
   // Hide sidebar when user is taking a test or on submission page
-  const showSidebar = !loading && isAuthenticated && isPaidUser && !isTestRoute && !isTestSubmittedRoute;
+  const showSidebar = !loading && isAuthenticated && !isTestRoute && !isTestSubmittedRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -125,8 +131,13 @@ export const AppContent: React.FC = () => {
                 <TestPage />
               </RequireAuth>
             } />
+            <Route path="/super30" element={
+              <RequireAuth allowFree>
+                <Super30 />
+              </RequireAuth>
+            } />
             <Route path="/coming-soon" element={
-              <RequireAuth>
+              <RequireAuth allowFree>
                 <ComingSoon />
               </RequireAuth>
             } />

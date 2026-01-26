@@ -2,9 +2,11 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import JEELoader from './JEELoader';
+import ComingSoon from './ComingSoon';
 
 type Props = {
   children: React.ReactElement;
+  allowFree?: boolean;
 };
 
 /**
@@ -16,7 +18,7 @@ type Props = {
  * - Authenticated + free tier → Redirect to /
  * - Authenticated + paid tier → Allow access
  */
-const RequireAuth: React.FC<Props> = ({ children }) => {
+const RequireAuth: React.FC<Props> = ({ children, allowFree = false }) => {
   const { isAuthenticated, isPaidUser, loading } = useAuth();
   const location = useLocation();
 
@@ -30,9 +32,15 @@ const RequireAuth: React.FC<Props> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Logged in but free tier → redirect to home
+  // Logged in but free tier
   if (!isPaidUser) {
-    return <Navigate to="/" replace />;
+    // If route allows free users, let them in
+    if (allowFree) {
+      return children;
+    }
+    // Otherwise show Coming Soon instead of redirecting to home
+    // This allows them to stay on the route but see the restricted message
+    return <ComingSoon />;
   }
 
   // Paid user → allow access
