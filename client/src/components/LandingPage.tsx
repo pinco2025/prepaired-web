@@ -5,8 +5,6 @@ import { useRazorpay } from '../hooks/useRazorpay';
 import { usePageTitle } from '../hooks/usePageTitle';
 import PaymentSuccessOverlay from './PaymentSuccessOverlay';
 import VideoPlayer from './VideoPlayer';
-import katex from 'katex';
-import 'katex/dist/katex.min.css';
 
 // Dynamic equations for the cycling effect - Inspired PrepAIred Questions (IPQs)
 // Based on the PYQ: s = t³ - 6t² + 3t + 4, find velocity when a = 0
@@ -37,8 +35,6 @@ const LandingPage: React.FC = () => {
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [paymentInitiated, setPaymentInitiated] = useState(false);
 
-    // State for cycling equations
-    const [equationIndex, setEquationIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const comparisonRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +76,7 @@ const LandingPage: React.FC = () => {
         }
 
         return () => clearTimeout(timeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [displayedTagline, isTyping, taglineIndex]);
 
     // Cycle through equations
@@ -150,7 +147,6 @@ const LandingPage: React.FC = () => {
         if (!container) return;
 
         const currentScroll = container.scrollTop;
-        const _containerHeight = container.clientHeight;
 
         // Find the next section to scroll to
         for (const sectionId of sectionIds) {

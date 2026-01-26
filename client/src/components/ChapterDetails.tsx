@@ -98,6 +98,7 @@ const ChapterDetails: React.FC = () => {
     fetchLinks();
     // Note: resourceTiles is stable in this example; if it's computed outside the component,
     // include it in deps or memoize it to avoid unnecessary fetches.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapter]);
 
   // Small helper to prettify route params

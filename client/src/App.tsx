@@ -11,8 +11,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataCacheProvider } from './contexts/DataCacheContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
 import LandingPage from './components/LandingPage';
-import Subjects from './components/Subjects';
-import SubjectDetails from './components/SubjectDetails';
 import ChapterDetails from './components/ChapterDetails';
 import Tests from './components/Tests';
 import TestPage from './components/TestPage';
@@ -57,7 +55,7 @@ const HomeRoute: React.FC = () => {
 };
 
 export const AppContent: React.FC = () => {
-  const { isPaidUser, isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
   // Check if user is on a test-taking route (hide sidebar during test)
