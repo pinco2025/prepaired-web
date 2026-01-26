@@ -40,9 +40,6 @@ const TestReview: React.FC = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [isSolutionVisible, setIsSolutionVisible] = useState(true);
-    const sectionTabsRef = useRef<HTMLDivElement>(null);
-
-    // scrollSectionTabs removed - was unused
 
     useEffect(() => {
         const fetchData = async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import SubjectBubble from './SubjectBubble';
 
 const colorMap: { [key: string]: { [key: string]: string; bg: string; border: string; shadow: string; liquid1: string; liquid2: string } } = {

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 
 const Sidebar: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(true); // Default to dark mode

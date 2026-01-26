@@ -150,7 +150,7 @@ const LandingPage: React.FC = () => {
         if (!container) return;
 
         const currentScroll = container.scrollTop;
-        const containerHeight = container.clientHeight;
+        const _containerHeight = container.clientHeight;
 
         // Find the next section to scroll to
         for (const sectionId of sectionIds) {

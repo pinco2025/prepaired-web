@@ -82,9 +82,9 @@ const Login: React.FC = () => {
                 <label className="block text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark" htmlFor="password">
                   Password
                 </label>
-                <a className="text-xs font-semibold text-primary hover:text-primary-light link-hover" href="#">
+                <button type="button" className="text-xs font-semibold text-primary hover:text-primary-light link-hover">
                   Forgot Password?
-                </a>
+                </button>
               </div>
               <div className="relative group">
                 <input
