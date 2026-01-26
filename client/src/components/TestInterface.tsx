@@ -49,7 +49,7 @@ interface TestInterfaceProps {
   exam?: 'Normal' | 'JEE' | 'NEET';
 }
 
-const escapeLatex = (s: string) => s.replace(/\\/g, "\\\\");
+// escapeLatex removed - was unused
 
 const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
@@ -177,7 +177,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       let finalSubmissionId = currentStudentTestId;
 
       if (currentStudentTestId) {
-        const { data: updateResult, error: updateError } = await supabase
+        const { error: updateError } = await supabase
           .from('student_tests')
           .update(submissionData)
           .eq('id', currentStudentTestId)
@@ -422,6 +422,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         timerRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [test?.url, test?.markingScheme, exam]); // Dependencies are stable
 
   // Separate effect to handle submission when time runs out
@@ -496,27 +497,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
   };
 
-  const handleNumericalChange = (value: string) => {
-    if (!currentQuestion) return;
-
-    const regex = /^-?\d*\.?\d{0,2}$/;
-    if (regex.test(value)) {
-      setNumericalAnswer(value);
-
-      const isValidNumber = !isNaN(parseFloat(value)) && isFinite(Number(value));
-      if (isValidNumber || value === '') {
-        setAnswers((prev) => ({ ...prev, [currentQuestion.uuid]: value }));
-      }
-
-      const newQuestionStatuses = [...questionStatuses];
-      if (value.length > 0) {
-        newQuestionStatuses[currentQuestionIndex] = 'answered';
-      } else {
-        newQuestionStatuses[currentQuestionIndex] = 'notAnswered';
-      }
-      setQuestionStatuses(newQuestionStatuses);
-    }
-  };
+  // handleNumericalChange removed - was unused (using handleKeypadClick instead)
 
   const handleMarkForReview = () => {
     if (!currentQuestion) return;

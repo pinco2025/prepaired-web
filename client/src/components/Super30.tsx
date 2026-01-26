@@ -57,7 +57,7 @@ const Super30: React.FC = () => {
     // Session tracking state
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
-    const [sessionAnswers, setSessionAnswers] = useState<{ PYQs: Record<string, string>; IPQs: Record<string, string> }>({ PYQs: {}, IPQs: {} });
+    const [, setSessionAnswers] = useState<{ PYQs: Record<string, string>; IPQs: Record<string, string> }>({ PYQs: {}, IPQs: {} });
 
     // Refs to track latest values for async callbacks
     const sessionIdRef = useRef<string | null>(null);
@@ -115,6 +115,7 @@ const Super30: React.FC = () => {
         setShowPYQSolution(false);
         setIsPYQAnswerChecked(false);
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentQuestionIndex, currentSubject]); // dependency on progress omitted to avoid loop, we only read on nav change
 
     // PYQ State

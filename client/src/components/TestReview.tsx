@@ -42,16 +42,7 @@ const TestReview: React.FC = () => {
     const [isSolutionVisible, setIsSolutionVisible] = useState(true);
     const sectionTabsRef = useRef<HTMLDivElement>(null);
 
-    // Function to scroll section tabs
-    const scrollSectionTabs = (direction: 'left' | 'right') => {
-        if (sectionTabsRef.current) {
-            const scrollAmount = 100;
-            sectionTabsRef.current.scrollBy({
-                left: direction === 'left' ? -scrollAmount : scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-    };
+    // scrollSectionTabs removed - was unused
 
     useEffect(() => {
         const fetchData = async () => {
