@@ -447,14 +447,18 @@ const Super30: React.FC = () => {
     const renderHtml = (htmlString: string) => {
         if (!htmlString) return null;
         const parts = htmlString.split(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g);
-        return parts.map((part, i) => {
-            if (part.startsWith('$$') && part.endsWith('$$')) {
-                return <span key={i} dangerouslySetInnerHTML={{ __html: katex.renderToString(part.slice(2, -2), { throwOnError: false, displayMode: true }) }} />;
-            } else if (part.startsWith('$') && part.endsWith('$')) {
-                return <span key={i} dangerouslySetInnerHTML={{ __html: katex.renderToString(part.slice(1, -1), { throwOnError: false }) }} />;
-            }
-            return <span key={i}>{part}</span>;
-        });
+        return (
+            <span className="whitespace-pre-wrap">
+                {parts.map((part, i) => {
+                    if (part.startsWith('$$') && part.endsWith('$$')) {
+                        return <span key={i} dangerouslySetInnerHTML={{ __html: katex.renderToString(part.slice(2, -2), { throwOnError: false, displayMode: true }) }} />;
+                    } else if (part.startsWith('$') && part.endsWith('$')) {
+                        return <span key={i} dangerouslySetInnerHTML={{ __html: katex.renderToString(part.slice(1, -1), { throwOnError: false }) }} />;
+                    }
+                    return <span key={i}>{part}</span>;
+                })}
+            </span>
+        );
     };
 
     const subjectTabs = [
