@@ -831,12 +831,21 @@ const Super30: React.FC = () => {
                                                 key={i}
                                                 disabled={isPYQAnswerChecked}
                                                 onClick={() => handlePYQAnswerSelect(i)}
-                                                className={`p-3 md:p-4 border-2 rounded-xl text-left flex items-center gap-4 transition-all ${borderColor} ${bgColor}`}
+                                                className={`p-3 md:p-4 border-2 rounded-xl text-left flex items-start gap-4 transition-all ${borderColor} ${bgColor}`}
                                             >
-                                                <span className={`font-bold text-xs w-6 h-6 shrink-0 rounded-full flex items-center justify-center transition-colors ${selectedPYQAnswer === i || (isPYQAnswerChecked && opt.id.toLowerCase() === currentQuestion.pyq.correctAnswer.toLowerCase()) ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                                <span className={`font-bold text-xs w-6 h-6 shrink-0 rounded-full flex items-center justify-center transition-colors mt-0.5 ${selectedPYQAnswer === i || (isPYQAnswerChecked && opt.id.toLowerCase() === currentQuestion.pyq.correctAnswer.toLowerCase()) ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                                     {String.fromCharCode(65 + i)}
                                                 </span>
-                                                <span className="text-sm md:text-base">{renderHtml(opt.text)}</span>
+                                                <div className="flex flex-col gap-2 w-full">
+                                                    {opt.text && <span className="text-sm md:text-base">{renderHtml(opt.text)}</span>}
+                                                    {opt.image && (
+                                                        <img
+                                                            src={opt.image}
+                                                            alt={`Option ${String.fromCharCode(65 + i)}`}
+                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700"
+                                                        />
+                                                    )}
+                                                </div>
                                             </button>
                                         );
                                     })}
@@ -896,10 +905,19 @@ const Super30: React.FC = () => {
                                                 key={i}
                                                 disabled={isAnswerChecked}
                                                 onClick={() => handleIPQAnswerSelect(i)}
-                                                className={`p-3 md:p-4 border-2 rounded-xl text-left flex items-center gap-4 transition-all ${borderColor} ${bgColor}`}
+                                                className={`p-3 md:p-4 border-2 rounded-xl text-left flex items-start gap-4 transition-all ${borderColor} ${bgColor}`}
                                             >
-                                                <span className="font-bold text-xs w-6 h-6 shrink-0 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">{String.fromCharCode(65 + i)}</span>
-                                                <span className="text-sm md:text-base">{renderHtml(opt.text)}</span>
+                                                <span className="font-bold text-xs w-6 h-6 shrink-0 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center mt-0.5">{String.fromCharCode(65 + i)}</span>
+                                                <div className="flex flex-col gap-2 w-full">
+                                                    {opt.text && <span className="text-sm md:text-base">{renderHtml(opt.text)}</span>}
+                                                    {opt.image && (
+                                                        <img
+                                                            src={opt.image}
+                                                            alt={`Option ${String.fromCharCode(65 + i)}`}
+                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700"
+                                                        />
+                                                    )}
+                                                </div>
                                             </button>
                                         )
                                     })}
