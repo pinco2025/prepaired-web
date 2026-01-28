@@ -806,7 +806,7 @@ const Super30: React.FC = () => {
                             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-premium">
                                 <div className="prose dark:prose-invert max-w-none">
                                     <div className="text-base md:text-lg font-medium">{renderHtml(currentQuestion.pyq.text)}</div>
-                                    {currentQuestion.pyq.image && <img src={currentQuestion.pyq.image} alt="Question" className="rounded-lg mt-4 max-w-full" />}
+                                    {currentQuestion.pyq.image && <img src={currentQuestion.pyq.image} alt="Question" className="rounded-lg mt-4 max-w-full bg-white p-2" />}
                                 </div>
                                 <div className="grid grid-cols-1 gap-3">
                                     {currentQuestion.pyq.options.map((opt, i) => {
@@ -842,7 +842,7 @@ const Super30: React.FC = () => {
                                                         <img
                                                             src={opt.image}
                                                             alt={`Option ${String.fromCharCode(65 + i)}`}
-                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700"
+                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700 bg-white p-2"
                                                         />
                                                     )}
                                                 </div>
@@ -858,7 +858,7 @@ const Super30: React.FC = () => {
                                             <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed break-words overflow-x-auto">
                                                 {renderHtml(currentQuestion.pyqSolution.solution_text)}
                                                 {currentQuestion.pyqSolution.solution_image_url && (
-                                                    <img src={currentQuestion.pyqSolution.solution_image_url} alt="Solution" className="mt-3 rounded-lg border border-indigo-200/50 max-w-full" />
+                                                    <img src={currentQuestion.pyqSolution.solution_image_url} alt="Solution" className="mt-3 rounded-lg border border-indigo-200/50 max-w-full bg-white p-2" />
                                                 )}
                                             </div>
                                         </div>
@@ -881,7 +881,7 @@ const Super30: React.FC = () => {
                             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-premium">
                                 <div className="prose dark:prose-invert max-w-none">
                                     <div className="text-base md:text-lg font-medium">{renderHtml(currentQuestion.ipq.text)}</div>
-                                    {currentQuestion.ipq.image && <img src={currentQuestion.ipq.image} alt="Question" className="rounded-lg mt-4 max-w-full" />}
+                                    {currentQuestion.ipq.image && <img src={currentQuestion.ipq.image} alt="Question" className="rounded-lg mt-4 max-w-full bg-white p-2" />}
                                 </div>
                                 <div className="grid grid-cols-1 gap-3">
                                     {currentQuestion.ipq.options.map((opt, i) => {
@@ -914,7 +914,7 @@ const Super30: React.FC = () => {
                                                         <img
                                                             src={opt.image}
                                                             alt={`Option ${String.fromCharCode(65 + i)}`}
-                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700"
+                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700 bg-white p-2"
                                                         />
                                                     )}
                                                 </div>
@@ -928,7 +928,7 @@ const Super30: React.FC = () => {
                                         <h4 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Detailed Solution</h4>
                                         <div className="prose dark:prose-invert max-w-none text-sm break-words overflow-x-auto">
                                             {renderHtml(currentQuestion.solution.solution_text)}
-                                            {currentQuestion.solution.solution_image_url && <img src={currentQuestion.solution.solution_image_url} alt="Solution" className="mt-4 rounded-lg max-w-full" />}
+                                            {currentQuestion.solution.solution_image_url && <img src={currentQuestion.solution.solution_image_url} alt="Solution" className="mt-4 rounded-lg max-w-full bg-white p-2" />}
                                         </div>
                                     </div>
                                 )}
