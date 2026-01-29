@@ -5,6 +5,7 @@ import { supabase } from '../utils/supabaseClient';
 import JEELoader from './JEELoader';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import ImageWithProgress from './ImageWithProgress';
 
 interface QuestionOption {
     id: string;
@@ -151,6 +152,7 @@ const Super30: React.FC = () => {
     }, [sessionId, timer]);
 
     const [loading, setLoading] = useState(true);
+    const [isDataReady, setIsDataReady] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [mergedData, setMergedData] = useState<Record<Subject, MergedQuestion[]>>({
         Physics: [],
@@ -300,6 +302,7 @@ const Super30: React.FC = () => {
 
                 setMergedData(newMergedData);
                 setLoading(false);
+                setIsDataReady(true);
 
             } catch (err: any) {
                 console.error("Error loading Super 30 data:", err);
@@ -345,6 +348,12 @@ const Super30: React.FC = () => {
     const totalQuestions = currentQuestions.length;
 
     const handleStartSession = async () => {
+        if (!isDataReady) {
+            // If user clicks start before data is ready, we can show a specific loading or just return
+            // Ideally button shows loading state
+            return;
+        }
+
         setSessionStarted(true);
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen().catch(() => { });
@@ -477,6 +486,18 @@ const Super30: React.FC = () => {
     const handlePrevQuestion = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(prev => prev - 1);
+        } else {
+            // Check if we can go to previous subject
+            const currentIndex = subjectTabs.findIndex(tab => tab.key === currentSubject);
+            if (currentIndex > 0) {
+                const prevSubject = subjectTabs[currentIndex - 1].key;
+                setCurrentSubject(prevSubject);
+                // We need to set index to last question of that subject
+                // But mergedData might not be fully ready if we access it directly here safely?
+                // It should be ready if we are in session.
+                const prevSubjectQuestions = mergedData[prevSubject] || [];
+                setCurrentQuestionIndex(Math.max(0, prevSubjectQuestions.length - 1));
+            }
         }
     };
 
@@ -544,7 +565,7 @@ const Super30: React.FC = () => {
         );
     };
 
-    if (loading) return <JEELoader message="Loading Super 30 Content..." />;
+    if (loading && sessionStarted) return <JEELoader message="Loading Super 30 Content..." />;
     if (error) return <div className="flex items-center justify-center h-screen text-red-500">{error}</div>;
 
     if (!sessionStarted) {
@@ -591,11 +612,27 @@ const Super30: React.FC = () => {
                         <div className="pt-4 flex flex-col items-center gap-4 w-full">
                             <button
                                 onClick={handleStartSession}
-                                className="group relative bg-blue-600 hover:bg-blue-500 text-white px-20 py-5 rounded-2xl font-black text-xl transition-all shadow-[0_0_40px_rgba(37,99,235,0.25)] hover:shadow-[0_0_60px_rgba(37,99,235,0.4)] flex items-center gap-3 hover:-translate-y-1"
+                                disabled={error !== null}
+                                className="group relative bg-blue-600 hover:bg-blue-500 disabled:bg-slate-400 text-white px-20 py-5 rounded-2xl font-black text-xl transition-all shadow-[0_0_40px_rgba(37,99,235,0.25)] hover:shadow-[0_0_60px_rgba(37,99,235,0.4)] flex items-center gap-3 hover:-translate-y-1"
                             >
-                                <span className="material-symbols-outlined text-2xl">rocket_launch</span>
-                                Boost My Percentile
-                                <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+                                {isDataReady ? (
+                                    <>
+                                        <span className="material-symbols-outlined text-2xl">rocket_launch</span>
+                                        Boost My Percentile
+                                        <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {error ? (
+                                            <span>Error Loading Content</span>
+                                        ) : (
+                                            <>
+                                                <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                <span>Loading Content...</span>
+                                            </>
+                                        )}
+                                    </>
+                                )}
                             </button>
 
                             <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
@@ -867,7 +904,15 @@ const Super30: React.FC = () => {
                             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-premium">
                                 <div className="prose dark:prose-invert max-w-none">
                                     <div className="text-base md:text-lg font-medium">{renderHtml(currentQuestion.pyq.text)}</div>
-                                    {currentQuestion.pyq.image && <img src={currentQuestion.pyq.image} alt="Question" className="rounded-lg mt-4 max-w-full bg-white p-2" />}
+                                    {currentQuestion.pyq.image && (
+                                        <div className="mt-4 max-w-full bg-white p-2 rounded-lg">
+                                            <ImageWithProgress
+                                                src={currentQuestion.pyq.image}
+                                                alt="Question"
+                                                className="max-w-full h-auto rounded-lg"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-1 gap-3">
                                     {currentQuestion.pyq.options.map((opt, i) => {
@@ -900,11 +945,13 @@ const Super30: React.FC = () => {
                                                 <div className="flex flex-col gap-2 w-full">
                                                     {opt.text && <span className="text-sm md:text-base">{renderHtml(opt.text)}</span>}
                                                     {opt.image && (
-                                                        <img
-                                                            src={opt.image}
-                                                            alt={`Option ${String.fromCharCode(65 + i)}`}
-                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700 bg-white p-2"
-                                                        />
+                                                        <div className="max-w-[200px] max-h-[150px] bg-white p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                                                            <ImageWithProgress
+                                                                src={opt.image}
+                                                                alt={`Option ${String.fromCharCode(65 + i)}`}
+                                                                className="w-auto h-auto object-contain max-w-full max-h-full"
+                                                            />
+                                                        </div>
                                                     )}
                                                 </div>
                                             </button>
@@ -919,7 +966,13 @@ const Super30: React.FC = () => {
                                             <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed break-words overflow-x-auto">
                                                 {renderHtml(currentQuestion.pyqSolution.solution_text)}
                                                 {currentQuestion.pyqSolution.solution_image_url && (
-                                                    <img src={currentQuestion.pyqSolution.solution_image_url} alt="Solution" className="mt-3 rounded-lg border border-indigo-200/50 max-w-full bg-white p-2" />
+                                                    <div className="mt-3 rounded-lg border border-indigo-200/50 max-w-full bg-white p-2">
+                                                        <ImageWithProgress
+                                                            src={currentQuestion.pyqSolution.solution_image_url}
+                                                            alt="Solution"
+                                                            className="max-w-full h-auto rounded-lg"
+                                                        />
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -942,7 +995,15 @@ const Super30: React.FC = () => {
                             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-premium">
                                 <div className="prose dark:prose-invert max-w-none">
                                     <div className="text-base md:text-lg font-medium">{renderHtml(currentQuestion.ipq.text)}</div>
-                                    {currentQuestion.ipq.image && <img src={currentQuestion.ipq.image} alt="Question" className="rounded-lg mt-4 max-w-full bg-white p-2" />}
+                                    {currentQuestion.ipq.image && (
+                                        <div className="mt-4 max-w-full bg-white p-2 rounded-lg">
+                                            <ImageWithProgress
+                                                src={currentQuestion.ipq.image}
+                                                alt="Question"
+                                                className="max-w-full h-auto rounded-lg"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-1 gap-3">
                                     {currentQuestion.ipq.options.map((opt, i) => {
@@ -972,11 +1033,13 @@ const Super30: React.FC = () => {
                                                 <div className="flex flex-col gap-2 w-full">
                                                     {opt.text && <span className="text-sm md:text-base">{renderHtml(opt.text)}</span>}
                                                     {opt.image && (
-                                                        <img
-                                                            src={opt.image}
-                                                            alt={`Option ${String.fromCharCode(65 + i)}`}
-                                                            className="max-w-[200px] max-h-[150px] w-auto h-auto object-contain rounded-md border border-slate-200 dark:border-slate-700 bg-white p-2"
-                                                        />
+                                                        <div className="max-w-[200px] max-h-[150px] bg-white p-2 rounded-md border border-slate-200 dark:border-slate-700">
+                                                            <ImageWithProgress
+                                                                src={opt.image}
+                                                                alt={`Option ${String.fromCharCode(65 + i)}`}
+                                                                className="w-auto h-auto object-contain max-w-full max-h-full"
+                                                            />
+                                                        </div>
                                                     )}
                                                 </div>
                                             </button>
@@ -989,7 +1052,15 @@ const Super30: React.FC = () => {
                                         <h4 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Detailed Solution</h4>
                                         <div className="prose dark:prose-invert max-w-none text-sm break-words overflow-x-auto">
                                             {renderHtml(currentQuestion.solution.solution_text)}
-                                            {currentQuestion.solution.solution_image_url && <img src={currentQuestion.solution.solution_image_url} alt="Solution" className="mt-4 rounded-lg max-w-full bg-white p-2" />}
+                                            {currentQuestion.solution.solution_image_url && (
+                                                <div className="mt-4 rounded-lg max-w-full bg-white p-2">
+                                                    <ImageWithProgress
+                                                        src={currentQuestion.solution.solution_image_url}
+                                                        alt="Solution"
+                                                        className="max-w-full h-auto rounded-lg"
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -1007,7 +1078,13 @@ const Super30: React.FC = () => {
                     {/* Centered Navigation Buttons (Absolute) */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="flex gap-4 pointer-events-auto">
-                            <button onClick={handlePrevQuestion} disabled={currentQuestionIndex === 0} className="px-5 py-2 rounded-lg border hover:bg-slate-50 disabled:opacity-50 text-sm font-medium transition-colors shadow-sm bg-white dark:bg-slate-800 dark:border-slate-700">Previous</button>
+                            <button
+                                onClick={handlePrevQuestion}
+                                disabled={currentQuestionIndex === 0 && subjectTabs.findIndex(tab => tab.key === currentSubject) === 0}
+                                className="px-5 py-2 rounded-lg border hover:bg-slate-50 disabled:opacity-50 text-sm font-medium transition-colors shadow-sm bg-white dark:bg-slate-800 dark:border-slate-700"
+                            >
+                                Previous
+                            </button>
                             <button onClick={handleNextQuestion} className="px-5 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm min-w-[100px]">
                                 {
                                     currentQuestionIndex < totalQuestions - 1 ? 'Next' :
@@ -1050,7 +1127,7 @@ const Super30: React.FC = () => {
                     {/* Previous Button - Icon Only or Small Text */}
                     <button
                         onClick={handlePrevQuestion}
-                        disabled={currentQuestionIndex === 0}
+                        disabled={currentQuestionIndex === 0 && subjectTabs.findIndex(tab => tab.key === currentSubject) === 0}
                         className="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800/50"
                     >
                         <span className="material-symbols-outlined text-xl">arrow_back</span>

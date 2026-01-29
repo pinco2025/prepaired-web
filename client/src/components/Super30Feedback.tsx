@@ -67,7 +67,7 @@ const Super30Feedback: React.FC<Super30FeedbackProps> = ({ sessionId, onClose })
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto scrollbar-premium">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto scrollbar-premium">
             <style>{`
                 .star-rating {
                     display: flex;
