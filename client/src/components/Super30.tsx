@@ -237,6 +237,67 @@ const Super30: React.FC = () => {
                     }
                 });
 
+                // Shuffle Helper
+                const shuffleArray = <T,>(array: T[]): T[] => {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                    return array;
+                };
+
+                // Apply Randomization
+                Object.keys(newMergedData).forEach((subject) => {
+                    const subj = subject as Subject;
+
+                    // 1. Shuffle the order of questions in this subject section
+                    newMergedData[subj] = shuffleArray(newMergedData[subj]);
+
+                    // 2. Shuffle the options within each question
+                    newMergedData[subj].forEach((q) => {
+                        // Helper to find index of correct answer
+                        const getCorrectIndex = (options: any[], correctId: string) =>
+                            options.findIndex(o => o.id.toLowerCase() === correctId.toLowerCase());
+
+                        let pyqCorrectIndex = -1;
+
+                        // Shuffle PYQ options
+                        if (q.pyq && q.pyq.options) {
+                            q.pyq.options = shuffleArray([...q.pyq.options]);
+                            pyqCorrectIndex = getCorrectIndex(q.pyq.options, q.pyq.correctAnswer);
+                        }
+
+                        // Shuffle IPQ options with collision check
+                        if (q.ipq && q.ipq.options) {
+                            q.ipq.options = shuffleArray([...q.ipq.options]);
+
+                            // If we have a valid PYQ index and enough options to swap, ensure difference
+                            if (pyqCorrectIndex !== -1 && q.ipq.options.length > 1) {
+                                let attempts = 0;
+                                let ipqCorrectIndex = getCorrectIndex(q.ipq.options, q.ipq.correctAnswer);
+
+                                // Try re-shuffling a few times
+                                while (attempts < 10 && ipqCorrectIndex === pyqCorrectIndex) {
+                                    q.ipq.options = shuffleArray([...q.ipq.options]);
+                                    ipqCorrectIndex = getCorrectIndex(q.ipq.options, q.ipq.correctAnswer);
+                                    attempts++;
+                                }
+
+                                // If still same, force swap
+                                if (ipqCorrectIndex === pyqCorrectIndex) {
+                                    // Swap with next available index
+                                    let swapIndex = (ipqCorrectIndex + 1) % q.ipq.options.length;
+
+                                    // Perform swap
+                                    const temp = q.ipq.options[ipqCorrectIndex];
+                                    q.ipq.options[ipqCorrectIndex] = q.ipq.options[swapIndex];
+                                    q.ipq.options[swapIndex] = temp;
+                                }
+                            }
+                        }
+                    });
+                });
+
                 setMergedData(newMergedData);
                 setLoading(false);
 

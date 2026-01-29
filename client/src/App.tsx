@@ -18,6 +18,7 @@ import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
 import TestReview from './components/TestReview';
 import Super30 from './components/Super30';
+import Pyq2026 from './components/Pyq2026';
 import AppLayout from "./components/AppLayout";
 
 /**
@@ -137,6 +138,11 @@ export const AppContent: React.FC = () => {
             <Route path="/coming-soon" element={
               <RequireAuth allowFree>
                 <ComingSoon />
+              </RequireAuth>
+            } />
+            <Route path="/pyq-2026" element={
+              <RequireAuth allowFree>
+                <Pyq2026 />
               </RequireAuth>
             } />
             <Route path="/test-submitted" element={

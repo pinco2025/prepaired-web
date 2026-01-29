@@ -131,11 +131,11 @@ const Sidebar: React.FC = () => {
 
   const menuItems = [
     { to: "/super30", icon: "history_edu", label: "Super 30" },
+    { to: "/pyq-2026", icon: "restore_page", label: "2026 PYQ" },
     { to: "/dashboard", icon: "dashboard", label: "Dashboard" },
     { to: "/subjects", icon: "menu_book", label: "Subjects" },
     { to: "/tests", icon: "quiz", label: "Tests & Analysis" },
     { to: "/coming-soon", icon: "school", label: "Mentorship" },
-    { to: "/coming-soon", icon: "library_books", label: "Advanced Material" },
     { to: "/coming-soon", icon: "schedule", label: "Schedule & Routine" },
   ];
 
@@ -174,6 +174,7 @@ const Sidebar: React.FC = () => {
               className={({ isActive }) => {
                 const isActuallyActive = isActive && item.to !== '/coming-soon';
                 const isSuper30 = item.label === "Super 30";
+                const isPYQ = item.label === "2026 PYQ";
 
                 return `flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all duration-300 whitespace-nowrap overflow-hidden
                         ${isActuallyActive
@@ -181,7 +182,8 @@ const Sidebar: React.FC = () => {
                     : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
                   }
                         ${isCollapsed && !mobile ? 'justify-center' : ''}
-                        ${isSuper30 ? 'hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] dark:hover:shadow-[0_0_15px_rgba(255,215,0,0.15)]' : ''}`
+                        ${isSuper30 ? 'hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] dark:hover:shadow-[0_0_15px_rgba(255,215,0,0.15)]' : ''}
+                        ${isPYQ ? 'hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] dark:hover:shadow-[0_0_15px_rgba(34,211,238,0.15)]' : ''}`
               }}
               title={isCollapsed && !mobile ? item.label : undefined}
             >
@@ -193,12 +195,19 @@ const Sidebar: React.FC = () => {
                 >
                   30
                 </span>
+              ) : item.label === "2026 PYQ" ? (
+                <span className={`material-symbols-outlined shrink-0 text-xl transition-all duration-300 
+                  ${location.pathname === item.to ? 'drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] filled' : 'group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]'}
+                  `}
+                >
+                  {item.icon}
+                </span>
               ) : (
                 <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
                   {item.icon}
                 </span>
               )}
-              <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'} ${item.label === "Super 30" ? 'font-bold' : ''}`}>
+              <span className={`transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'} ${item.label === "Super 30" || item.label === "2026 PYQ" ? 'font-bold' : ''} ${item.label === "2026 PYQ" ? 'text-cyan-600 dark:text-cyan-400' : ''}`}>
                 {item.label}
               </span>
             </NavLink>
