@@ -108,12 +108,7 @@ const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, classNa
                 {/* Modern Loading Skeleton with Glassmorphism */}
                 {loading && (
                     <div
-                        className={`relative flex flex-col items-center justify-center rounded-2xl overflow-hidden p-4 ${className}`}
-                        style={{
-                            minHeight: '220px',
-                            minWidth: '200px',
-                            background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.06) 0%, rgba(53, 178, 255, 0.06) 50%, rgba(56, 182, 255, 0.06) 100%)'
-                        }}
+                        className={`relative flex flex-col items-center justify-center rounded-2xl overflow-hidden p-4 min-h-[220px] min-w-[200px] bg-gradient-to-br from-blue-500/5 via-sky-400/5 to-cyan-400/5 ${className}`}
                     >
                         {/* Animated shimmer overlay */}
                         <div
@@ -137,11 +132,9 @@ const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, classNa
 
                         {/* Glassmorphism card */}
                         <div
-                            className="relative z-10 px-8 py-6 rounded-2xl backdrop-blur-sm"
+                            className="relative z-10 px-8 py-6 rounded-2xl backdrop-blur-sm bg-blue-500/5 shadow-2xl border border-sky-400/15"
                             style={{
-                                background: 'rgba(0, 102, 255, 0.05)',
                                 boxShadow: '0 8px 32px rgba(0, 102, 255, 0.1)',
-                                border: '1px solid rgba(56, 182, 255, 0.15)',
                             }}
                         >
                             {/* Circular Progress Indicator with gradient */}

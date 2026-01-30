@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Physics Concept Exploration Map - prepAIred</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        .grid-bg-light {
+          background-size: 40px 40px;
+          background-image:
+            linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+          mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+          -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+        }
+        .grid-bg-dark {
+          background-size: 40px 40px;
+          background-image:
+            linear-gradient(to right, rgba(0, 102, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+          mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+          -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+        }
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 102, 255, 0.2);
+            border-radius: 20px;
+        }
+        .learning-path-svg {
+            filter: drop-shadow(0 0 2px rgba(0, 102, 255, 0.1));
+        }
+        .node-glow {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255,255,255,0.8);
+        }
+        .node-glow:hover {
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.4), inset 0 2px 4px rgba(255,255,255,0.9);
+            transform: scale(1.05) translateY(-5px);
+        }
+        .node-inner-shadow {
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .constellation-line {
+            stroke-dasharray: 4, 8;
+            stroke-linecap: round;
+        }
+        .pulse-ring {
+            animation: pulse-ring 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.4); opacity: 1; }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 102, 255, 0); opacity: 0; }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 102, 255, 0); opacity: 0; }
+        }
+        .floating {
+            animation: float 8s ease-in-out infinite;
+        }
+        .floating-delayed {
+            animation: float 8s ease-in-out 4s infinite;
+        }
+        .floating-reverse {
+            animation: float-reverse 9s ease-in-out 2s infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes float-reverse {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(15px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0066ff",
+              "background-light": "#f8fafc","background-dark": "#0f172a",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1e293b",
+              "text-light": "#1e293b",
+              "text-dark": "#f1f5f9",
+              "text-secondary-light": "#64748b",
+              "text-secondary-dark": "#94a3b8",
+              "border-light": "#e2e8f0",
+              "border-dark": "#334155",
+            },
+            fontFamily: {
+              display: ["Poppins", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "0.75rem",
+              xl: "1rem",
+              '2xl': "1.5rem",
+              '3xl': "2rem",
+            },
+            boxShadow: {
+                'card-light': '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+                'card-dark': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                'glow': '0 0 20px rgba(0, 102, 255, 0.3)',
+                'glow-strong': '0 0 30px rgba(0, 102, 255, 0.5)',
+            }
+          },
+        },
+      };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark antialiased overflow-hidden">
+<div class="flex h-screen">
+<aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-shrink-0 hidden md:flex flex-col z-20">
+<div class="h-20 flex items-center px-6 border-b border-border-light/50 dark:border-border-dark/50">
+<div class="flex items-center gap-3">
+<img alt="prepAIred logo" class="h-8 w-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdzj_WfIjmmM52JXz4zKQrlQgJkA4UmPvuySjzEbq9Bsdj31RsY7ncfFrEi-fD-BWSo0ZTpLvMe7hOv0DP_1JXMQbL8BW_EgaawiBsr0daDGG68D4iJN_47bGlm98RGzILkKm4sgrjxbv04CENGDP2nGSO6OWmZ8vg5Q9-vdcYbpfJrfN1QRe-Abx_bYN4iP1dZnaJMNe-Jycl4XN4_crPSiEv3ULZH5fzZGU9CbUHu7gVaJ3NCZ4o0LRozC1uo6aoEl7HLrY5k_En"/>
+<span class="text-xl font-bold text-text-light dark:text-text-dark">prep<span class="text-primary">AI</span>red</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto sidebar-scroll py-6 px-4 flex flex-col justify-between">
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark transition-colors font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark transition-colors font-medium" href="#">
+<span class="material-symbols-outlined">library_books</span>
+                    Subjects
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-medium" href="#">
+<span class="material-symbols-outlined filled">history_edu</span>
+                    2026 PYQ
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark transition-colors font-medium" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+                    Calendar
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark transition-colors font-medium" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+                    Reports
+                </a>
+<div class="pt-6 pb-2">
+<p class="px-4 text-xs font-semibold text-text-secondary-light/70 dark:text-text-secondary-dark/70 uppercase tracking-wider">Settings</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark transition-colors font-medium" href="#">
+<span class="material-symbols-outlined">notifications</span>
+                    Notifications
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark transition-colors font-medium" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</div>
+<div class="mt-8">
+<div class="flex items-center gap-3 px-2 py-2 rounded-xl border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5">
+<img alt="User profile" class="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHE3oUlM1yUb7TA8XdWQV26WNdHzcgBDSKirGjXJIdxcOt5I09wPGatmTzwvZ-v8L8w-jPYAcySvVhjDZxdFNtQcHuxuydZ_luTJLKBeLxGz4fZl1bDm5NxbGWchY27b1ZydID7ghZJmMq6GSuBo0taVI_RRmVifP0b70PpM3btYMLVoRMdBXGhwwrDElzljgyoI9FbZIn8pSLFH0axsXyHGbcCPoCl2HG6R_vzcK3HrsyGv1OMaOwkcAXSX-uxUsV21-SnO9-vbyo"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold text-text-light dark:text-text-dark truncate">Alex Morgan</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">JEE Aspirant</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden relative">
+<div class="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10 bg-fixed pointer-events-none opacity-60"></div>
+<header class="md:hidden bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm border-b border-border-light dark:border-border-dark h-16 flex items-center justify-between px-4 z-30">
+<div class="flex items-center gap-2">
+<img alt="prepAIred logo" class="h-8 w-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdzj_WfIjmmM52JXz4zKQrlQgJkA4UmPvuySjzEbq9Bsdj31RsY7ncfFrEi-fD-BWSo0ZTpLvMe7hOv0DP_1JXMQbL8BW_EgaawiBsr0daDGG68D4iJN_47bGlm98RGzILkKm4sgrjxbv04CENGDP2nGSO6OWmZ8vg5Q9-vdcYbpfJrfN1QRe-Abx_bYN4iP1dZnaJMNe-Jycl4XN4_crPSiEv3ULZH5fzZGU9CbUHu7gVaJ3NCZ4o0LRozC1uo6aoEl7HLrY5k_En"/>
+<span class="text-lg font-bold text-text-light dark:text-text-dark">prep<span class="text-primary">AI</span>red</span>
+</div>
+<button class="text-text-light dark:text-text-dark">
+<span class="material-icons-outlined">menu</span>
+</button>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 sidebar-scroll">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<nav class="flex items-center gap-2 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-2">
+<a class="hover:text-primary transition-colors" href="#">2026 PYQ</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-text-light dark:text-text-dark font-medium">Physics</span>
+</nav>
+<h1 class="text-3xl font-bold text-text-light dark:text-text-dark flex items-center gap-3 tracking-tight">
+<span class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary text-2xl">hub</span>
+</span>
+                            Physics Concept Map
+                        </h1>
+</div>
+<div class="flex items-center gap-6 bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-border-light dark:border-border-dark hover:shadow-md transition-shadow">
+<div class="text-right">
+<p class="text-[10px] text-text-secondary-light uppercase font-extrabold tracking-widest mb-1">Total Mastery</p>
+<p class="text-2xl font-bold text-primary leading-none">35%</p>
+</div>
+<div class="w-14 h-14 relative">
+<svg class="w-full h-full transform -rotate-90 drop-shadow-sm">
+<circle class="text-border-light dark:text-border-dark/30" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-dasharray="150.7" stroke-dashoffset="97.9" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">star</span>
+</div>
+</div>
+</div>
+</div>
+<div class="relative min-h-[750px] w-full bg-gradient-to-br from-surface-light/80 to-surface-light/40 dark:from-surface-dark/80 dark:to-surface-dark/40 rounded-[2.5rem] border border-border-light dark:border-border-dark backdrop-blur-xl shadow-card-light dark:shadow-card-dark overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-400/20 rounded-full blur-[100px]"></div>
+</div>
+<div class="absolute inset-0 grid-bg-light dark:grid-bg-dark opacity-30 pointer-events-none"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none learning-path-svg" preserveAspectRatio="none" viewBox="0 0 1200 900">
+<defs>
+<linearGradient id="lineGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#0066ff" stop-opacity="0.2"></stop>
+<stop offset="50%" stop-color="#0066ff" stop-opacity="0.5"></stop>
+<stop offset="100%" stop-color="#0066ff" stop-opacity="0.2"></stop>
+</linearGradient>
+</defs>
+<g class="stroke-primary/30 dark:stroke-primary/40">
+<line class="constellation-line" stroke="url(#lineGradient)" stroke-width="1.5" x1="300" x2="600" y1="240" y2="450"></line>
+<line class="constellation-line" stroke="url(#lineGradient)" stroke-width="1.5" x1="900" x2="600" y1="240" y2="450"></line>
+<line class="constellation-line" stroke="url(#lineGradient)" stroke-width="1.5" x1="300" x2="600" y1="690" y2="450"></line>
+<line class="constellation-line" stroke="url(#lineGradient)" stroke-width="1.5" x1="900" x2="600" y1="690" y2="450"></line>
+<line class="opacity-20" stroke-dasharray="2, 4" stroke-width="1" x1="300" x2="900" y1="240" y2="240"></line> 
+<line class="opacity-20" stroke-dasharray="2, 4" stroke-width="1" x1="300" x2="300" y1="240" y2="690"></line> 
+<line class="opacity-20" stroke-dasharray="2, 4" stroke-width="1" x1="900" x2="900" y1="240" y2="690"></line> 
+<line class="opacity-20" stroke-dasharray="2, 4" stroke-width="1" x1="300" x2="900" y1="690" y2="690"></line> 
+</g>
+</svg>
+<div class="absolute left-[20%] top-[20%] z-10 floating -translate-x-1/2 -translate-y-1/2">
+<div class="group cursor-pointer relative">
+<div class="relative w-32 h-32">
+<svg class="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md">
+<circle class="text-gray-200 dark:text-gray-700" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-width="2"></circle>
+<circle class="text-green-500 transition-all duration-1000 ease-out" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-dasharray="377" stroke-dashoffset="37.7" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-[6px] rounded-full bg-surface-light dark:bg-surface-dark border border-white/50 dark:border-white/10 flex flex-col items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_4px_8px_rgba(0,0,0,0.05)] node-inner-shadow group-hover:scale-95 transition-transform duration-300">
+<div class="w-10 h-10 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-1 group-hover:bg-green-500 group-hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined text-green-500 group-hover:text-white text-xl">speed</span>
+</div>
+<p class="text-[9px] font-bold text-text-secondary-light uppercase tracking-wider mb-0.5">Chap 01</p>
+<p class="text-sm font-bold text-green-600 dark:text-green-400">90%</p>
+</div>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-center w-40">
+<h3 class="text-base font-bold text-text-light dark:text-text-dark group-hover:text-primary transition-colors">Kinematics</h3>
+<span class="inline-block px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold mt-1 dark:bg-green-900/30 dark:text-green-400">Mastered</span>
+</div>
+</div>
+</div>
+<div class="absolute left-[80%] top-[20%] z-10 floating-delayed -translate-x-1/2 -translate-y-1/2">
+<div class="group cursor-pointer relative">
+<div class="relative w-32 h-32">
+<svg class="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md">
+<circle class="text-gray-200 dark:text-gray-700" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-width="2"></circle>
+<circle class="text-primary transition-all duration-1000 ease-out" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-[6px] rounded-full bg-surface-light dark:bg-surface-dark border border-white/50 dark:border-white/10 flex flex-col items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_4px_8px_rgba(0,0,0,0.05)] node-inner-shadow group-hover:scale-95 transition-transform duration-300">
+<div class="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1 group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-gray-400">
+<span class="material-symbols-outlined text-xl">bolt</span>
+</div>
+<p class="text-[9px] font-bold text-text-secondary-light uppercase tracking-wider mb-0.5">Chap 03</p>
+<p class="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark">Start</p>
+</div>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-center w-40">
+<h3 class="text-base font-bold text-text-light dark:text-text-dark group-hover:text-primary transition-colors">Work, Energy &amp; Power</h3>
+</div>
+</div>
+</div>
+<div class="absolute left-[50%] top-[45%] z-20 -translate-x-1/2 -translate-y-1/2">
+<div class="group cursor-pointer relative">
+<div class="absolute -inset-10 rounded-full border border-primary/20 pulse-ring"></div>
+<div class="absolute -inset-4 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
+<div class="relative w-48 h-48">
+<svg class="absolute inset-0 w-full h-full -rotate-90 drop-shadow-xl">
+<circle class="text-gray-200 dark:text-gray-700" cx="96" cy="96" fill="transparent" r="90" stroke="currentColor" stroke-width="2"></circle>
+<circle class="text-primary transition-all duration-1000 ease-out" cx="96" cy="96" fill="transparent" r="90" stroke="currentColor" stroke-dasharray="565" stroke-dashoffset="254" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<div class="absolute inset-[8px] rounded-full bg-white dark:bg-surface-dark border-4 border-primary/10 flex flex-col items-center justify-center shadow-2xl group-hover:scale-95 transition-transform duration-300 backdrop-blur-sm">
+<div class="absolute inset-0 rounded-full bg-gradient-to-b from-white to-blue-50 dark:from-surface-dark dark:to-surface-dark opacity-80"></div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 text-white rounded-full flex items-center justify-center mb-2 shadow-lg shadow-primary/40 group-hover:shadow-primary/60 transition-shadow">
+<span class="material-symbols-outlined text-4xl">balance</span>
+</div>
+<p class="text-[10px] font-bold text-text-secondary-light uppercase tracking-wider mb-0.5">Current Focus</p>
+<p class="text-3xl font-bold text-text-light dark:text-text-dark">55%</p>
+</div>
+</div>
+<div class="absolute -right-8 bottom-4">
+<button class="flex items-center gap-2 bg-primary text-white text-xs font-bold py-2 px-4 rounded-full shadow-lg shadow-primary/30 hover:bg-blue-600 hover:scale-105 transition-all">
+<span>Continue</span>
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-6 text-center w-64">
+<h3 class="text-2xl font-bold text-text-light dark:text-text-dark text-primary drop-shadow-sm">Laws of Motion</h3>
+<p class="text-sm text-text-secondary-light mt-1">Concept Mastery in progress</p>
+</div>
+</div>
+</div>
+<div class="absolute left-[20%] top-[70%] z-10 floating-reverse -translate-x-1/2 -translate-y-1/2">
+<div class="group cursor-pointer relative">
+<div class="relative w-32 h-32">
+<svg class="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md">
+<circle class="text-gray-200 dark:text-gray-700" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-width="2"></circle>
+<circle class="text-primary transition-all duration-1000 ease-out" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-[6px] rounded-full bg-surface-light dark:bg-surface-dark border border-white/50 dark:border-white/10 flex flex-col items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_4px_8px_rgba(0,0,0,0.05)] node-inner-shadow group-hover:scale-95 transition-transform duration-300">
+<div class="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1 group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-gray-400">
+<span class="material-symbols-outlined text-xl">public</span>
+</div>
+<p class="text-[9px] font-bold text-text-secondary-light uppercase tracking-wider mb-0.5">Chap 05</p>
+<p class="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark">Start</p>
+</div>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-center w-40">
+<h3 class="text-base font-bold text-text-light dark:text-text-dark group-hover:text-primary transition-colors">Gravitation</h3>
+</div>
+</div>
+</div>
+<div class="absolute left-[80%] top-[70%] z-10 floating -translate-x-1/2 -translate-y-1/2">
+<div class="group cursor-pointer relative">
+<div class="relative w-32 h-32">
+<svg class="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md">
+<circle class="text-gray-200 dark:text-gray-700" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-width="2"></circle>
+<circle class="text-primary transition-all duration-1000 ease-out" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-[6px] rounded-full bg-surface-light dark:bg-surface-dark border border-white/50 dark:border-white/10 flex flex-col items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_4px_8px_rgba(0,0,0,0.05)] node-inner-shadow group-hover:scale-95 transition-transform duration-300">
+<div class="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1 group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-gray-400">
+<span class="material-symbols-outlined text-xl">cyclone</span>
+</div>
+<p class="text-[9px] font-bold text-text-secondary-light uppercase tracking-wider mb-0.5">Chap 04</p>
+<p class="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark">Start</p>
+</div>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 text-center w-40">
+<h3 class="text-base font-bold text-text-light dark:text-text-dark group-hover:text-primary transition-colors">Rotational Motion</h3>
+</div>
+</div>
+</div>
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-10 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border border-primary/20 p-5 rounded-2xl w-[90%] md:max-w-xs z-30 shadow-2xl shadow-primary/10 transition-transform hover:-translate-y-1">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0 text-yellow-600 dark:text-yellow-400">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div>
+<h4 class="font-bold text-text-light dark:text-text-dark mb-1 text-sm">
+                                Study Tip: Impulse
+                            </h4>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark leading-relaxed mb-3">
+                                Focus on the relationship between force and time in <span class="font-semibold text-primary">Laws of Motion</span>.
+                            </p>
+<button class="w-full py-2 bg-primary/10 text-primary text-xs rounded-lg font-semibold hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2">
+<span>View Flashcard</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark flex items-center gap-4 hover:border-primary/30 transition-colors shadow-sm">
+<div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500">
+<span class="material-symbols-outlined text-2xl">task_alt</span>
+</div>
+<div>
+<p class="text-3xl font-bold text-text-light dark:text-text-dark">12</p>
+<p class="text-sm font-medium text-text-secondary-light">Chapters Completed</p>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark flex items-center gap-4 hover:border-primary/30 transition-colors shadow-sm">
+<div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">trending_up</span>
+</div>
+<div>
+<p class="text-3xl font-bold text-text-light dark:text-text-dark">840</p>
+<p class="text-sm font-medium text-text-secondary-light">Practice Score</p>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark flex items-center gap-4 hover:border-primary/30 transition-colors shadow-sm">
+<div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-500">
+<span class="material-symbols-outlined text-2xl">military_tech</span>
+</div>
+<div>
+<p class="text-3xl font-bold text-text-light dark:text-text-dark">Top 5%</p>
+<p class="text-sm font-medium text-text-secondary-light">Global Percentile</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

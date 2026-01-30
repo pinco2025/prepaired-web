@@ -20,6 +20,8 @@ import TestReview from './components/TestReview';
 import Super30 from './components/Super30';
 import Pyq2026 from './components/Pyq2026';
 import AppLayout from "./components/AppLayout";
+import ChapterSelection from './components/ChapterSelection';
+import QuestionPractice from './components/QuestionPractice';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -116,8 +118,18 @@ export const AppContent: React.FC = () => {
               </RequireAuth>
             } />
             <Route path="/subjects/:subject/:grade" element={
-              <RequireAuth>
-                <ComingSoon />
+              <RequireAuth allowFree>
+                <ChapterSelection />
+              </RequireAuth>
+            } />
+            <Route path="/pyq-2026/:subject" element={
+              <RequireAuth allowFree>
+                <ChapterSelection />
+              </RequireAuth>
+            } />
+            <Route path="/pyq-2026/:subject/practice/:chapterCode" element={
+              <RequireAuth allowFree>
+                <QuestionPractice />
               </RequireAuth>
             } />
             <Route path="/tests" element={
