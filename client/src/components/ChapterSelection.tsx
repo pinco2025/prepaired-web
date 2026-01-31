@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { withTimeout } from '../utils/promiseUtils';
 
 interface Chapter {
     code: string;
@@ -35,36 +36,27 @@ const ChapterSelection: React.FC = () => {
     const FETCH_TIMEOUT = 5000; // 5 seconds for initial load
     const CHECK_TIMEOUT = 3000; // 3 seconds for chapter check
 
-    // Helper: Fetch with timeout
-    const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeout = 5000) => {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
-        try {
-            const response = await fetch(url, { ...options, signal: controller.signal });
-            clearTimeout(id);
-            return response;
-        } catch (error) {
-            clearTimeout(id);
-            throw error;
-        }
-    };
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // Parallelize fetching Chapters and Supabase URL
                 const [chaptersResult, supabaseResult] = await Promise.allSettled([
-                    fetchWithTimeout('/chapters.json', {}, FETCH_TIMEOUT),
-                    supabase
-                        .from('question_set')
-                        .select('url')
-                        .eq('set_id', '26-pyq')
-                        .single()
+                    withTimeout(fetch('/chapters.json'), FETCH_TIMEOUT),
+                    withTimeout(
+                        Promise.resolve(supabase
+                            .from('question_set')
+                            .select('url')
+                            .eq('set_id', '26-pyq')
+                            .single()),
+                        FETCH_TIMEOUT
+                    )
                 ]);
 
                 // 1. Handle Chapters
                 if (chaptersResult.status === 'fulfilled') {
-                    const res = chaptersResult.value;
+                    const res = chaptersResult.value as Response;
                     if (!res.ok) throw new Error('Failed to fetch chapters');
                     const chaptersData: ChaptersData = await res.json();
 
@@ -78,21 +70,24 @@ const ChapterSelection: React.FC = () => {
                 }
 
                 // 2. Handle Base URL (Non-blocking failure)
-                if (supabaseResult.status === 'fulfilled' && !supabaseResult.value.error) {
-                    const setRow = supabaseResult.value.data;
-                    if (setRow?.url) {
-                        let rawBaseUrl = setRow.url
-                            .replace('github.com', 'raw.githubusercontent.com')
-                            .replace('/tree/', '/');
-                        if (rawBaseUrl.endsWith('/')) {
-                            rawBaseUrl = rawBaseUrl.slice(0, -1);
+                if (supabaseResult.status === 'fulfilled') {
+                    const sbVal = supabaseResult.value as any; // Cast to any or appropriate type 
+                    if (!sbVal.error && sbVal.data) {
+                        const setRow = sbVal.data;
+                        if (setRow?.url) {
+                            let rawBaseUrl = setRow.url
+                                .replace('github.com', 'raw.githubusercontent.com')
+                                .replace('/tree/', '/');
+                            if (rawBaseUrl.endsWith('/')) {
+                                rawBaseUrl = rawBaseUrl.slice(0, -1);
+                            }
+                            setBaseUrl(rawBaseUrl);
                         }
-                        setBaseUrl(rawBaseUrl);
+                    } else {
+                        console.warn('Failed to fetch base URL or timed out. Availability check will be skipped.');
                     }
-                } else {
-                    console.warn('Failed to fetch base URL or timed out. Availability check will be skipped.');
-                }
 
+                }
             } catch (err) {
                 setError('Error loading data. Please check your connection.');
                 console.error(err);
@@ -126,7 +121,7 @@ const ChapterSelection: React.FC = () => {
             const checkUrl = `${baseUrl}/${subject}/${chapterCode}_questions.json`;
 
             // Use short timeout for check
-            const response = await fetchWithTimeout(checkUrl, { method: 'HEAD' }, CHECK_TIMEOUT);
+            const response = await withTimeout(fetch(checkUrl, { method: 'HEAD' }), CHECK_TIMEOUT);
 
             if (response.ok) {
                 navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);

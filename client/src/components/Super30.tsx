@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePageTitle } from '../hooks/usePageTitle';
 import Super30Feedback from './Super30Feedback';
 import { supabase } from '../utils/supabaseClient';
+import { withTimeout } from '../utils/promiseUtils';
 import JEELoader from './JEELoader';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -164,11 +165,13 @@ const Super30: React.FC = () => {
         const fetchData = async () => {
             try {
                 // 1. Fetch the GitHub folder URL from Supabase
-                const { data: setRow, error: dbError } = await supabase
-                    .from('question_set')
-                    .select('url')
-                    .eq('set_id', 'super-30')
-                    .single();
+                const { data: setRow, error: dbError } = await withTimeout(
+                    Promise.resolve(supabase
+                        .from('question_set')
+                        .select('url')
+                        .eq('set_id', 'super-30')
+                        .single())
+                );
 
                 if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);
                 if (!setRow?.url) throw new Error('No URL found for Super 30 set');
@@ -188,10 +191,10 @@ const Super30: React.FC = () => {
 
                 // 3. Fetch all 4 JSON files using the raw base URL
                 const [pyqRes, ipqRes, solRes, pyqSolRes] = await Promise.all([
-                    fetch(`${rawBaseUrl}/PYQ.json`),
-                    fetch(`${rawBaseUrl}/IPQ.json`),
-                    fetch(`${rawBaseUrl}/IPQ_sol.json`),
-                    fetch(`${rawBaseUrl}/PYQ_sol.json`)
+                    withTimeout(fetch(`${rawBaseUrl}/PYQ.json`)),
+                    withTimeout(fetch(`${rawBaseUrl}/IPQ.json`)),
+                    withTimeout(fetch(`${rawBaseUrl}/IPQ_sol.json`)),
+                    withTimeout(fetch(`${rawBaseUrl}/PYQ_sol.json`))
                 ]);
 
                 if (!pyqRes.ok || !ipqRes.ok || !solRes.ok || !pyqSolRes.ok) {

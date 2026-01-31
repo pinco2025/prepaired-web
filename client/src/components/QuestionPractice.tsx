@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import ImageWithProgress from './ImageWithProgress';
@@ -18,7 +19,11 @@ const RenderText: React.FC<{ text: string }> = ({ text }) => {
             {parts.map((part, index) => {
                 if (part.startsWith('$$') && part.endsWith('$$')) {
                     // Display math
-                    return <BlockMath key={index} math={part.slice(2, -2)} />;
+                    return (
+                        <div key={index} className="overflow-x-auto custom-scrollbar">
+                            <BlockMath math={part.slice(2, -2)} />
+                        </div>
+                    );
                 } else if (part.startsWith('$') && part.endsWith('$')) {
                     // Inline math
                     return <InlineMath key={index} math={part.slice(1, -1)} />;
@@ -99,7 +104,7 @@ const QuestionPractice: React.FC = () => {
                 setLoading(true);
 
                 // 0. Fetch Chapters (Parallelized with Supabase check if possible, but keep simple for now)
-                const chaptersRes = await fetch('/chapters.json');
+                const chaptersRes = await withTimeout(fetch('/chapters.json'));
                 let chaptersData: any = {};
                 if (chaptersRes.ok) {
                     chaptersData = await chaptersRes.json();
@@ -119,11 +124,13 @@ const QuestionPractice: React.FC = () => {
                 }
 
                 // 1. Fetch the GitHub folder URL from Supabase (using super-30 set as reference for the repo)
-                const { data: setRow, error: dbError } = await supabase
-                    .from('question_set')
-                    .select('url')
-                    .eq('set_id', '26-pyq')
-                    .single();
+                const { data: setRow, error: dbError } = await withTimeout(
+                    Promise.resolve(supabase
+                        .from('question_set')
+                        .select('url')
+                        .eq('set_id', '26-pyq')
+                        .single())
+                );
 
                 if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);
                 if (!setRow?.url) throw new Error('No URL found for Super 30 set');
@@ -141,12 +148,12 @@ const QuestionPractice: React.FC = () => {
                 const solutionUrl = `${rawBaseUrl}/${subject}/${chapterCode}_solutions.json`;
 
                 // Fetch Questions
-                const questionsRes = await fetch(questionUrl);
+                const questionsRes = await withTimeout(fetch(questionUrl));
                 if (!questionsRes.ok) throw new Error('Failed to load questions');
                 const questionsData: QuestionsJsonResponse = await questionsRes.json();
 
                 // Fetch Solutions
-                const solutionsRes = await fetch(solutionUrl);
+                const solutionsRes = await withTimeout(fetch(solutionUrl));
                 if (!solutionsRes.ok) throw new Error('Failed to load solutions');
                 const solutionsData: SolutionsJsonResponse = await solutionsRes.json();
 
@@ -420,7 +427,7 @@ const QuestionPractice: React.FC = () => {
                             {showSolution && currentSolution && (
                                 <div className="mt-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
                                     <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Detailed Solution</h3>
-                                    <div className="prose dark:prose-invert max-w-none text-text-light dark:text-text-dark break-words overflow-x-auto">
+                                    <div className="prose dark:prose-invert max-w-none text-text-light dark:text-text-dark break-words whitespace-pre-wrap">
                                         {currentSolution.text && (
                                             <div>
                                                 <RenderText text={currentSolution.text} />
@@ -492,7 +499,7 @@ const QuestionPractice: React.FC = () => {
 
             {/* Footer Navigation */}
             <footer className="fixed bottom-0 left-0 right-0 md:static h-16 md:h-auto md:min-h-[5rem] bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark flex items-center px-6 md:px-8 z-40 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-none">
-                <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4 md:gap-2">
+                <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4 md:gap-2 relative">
 
                     {/* Previous Button */}
                     <button
@@ -507,8 +514,8 @@ const QuestionPractice: React.FC = () => {
                         <span className="hidden md:inline ml-2">{showPrevChapterParams ? 'Previous Chapter' : 'Previous'}</span>
                     </button>
 
-                    {/* Check Answer (Center on Mobile) */}
-                    <div className="flex-1 flex justify-center md:items-center md:justify-end md:order-last">
+                    {/* Check Answer (Center on Mobile & Desktop) */}
+                    <div className="flex-1 flex justify-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto">
                         <button
                             onClick={() => setShowSolution(!showSolution)}
                             className={`flex items-center justify-center w-14 h-14 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl font-bold transition-all shadow-md md:shadow-sm ${showSolution
