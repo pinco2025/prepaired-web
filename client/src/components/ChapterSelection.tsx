@@ -363,7 +363,7 @@ const ChapterSelection: React.FC = () => {
                     onWheel={handleWheel}
                 >
                     {/* Controls overlay - Hides on drag */}
-                    <div className={`absolute bottom-6 right-6 z-30 flex flex-col gap-2 pointer-events-auto transition-opacity duration-300 ${isDragging ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <div className={`absolute bottom-24 md:bottom-6 right-4 md:right-6 z-30 flex flex-col gap-2 pointer-events-auto transition-opacity duration-300 ${isDragging ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                         {isDrifted && (
                             <button
                                 onClick={handleResetView}
