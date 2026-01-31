@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import JEELoader from './JEELoader';
 import ComingSoon from './ComingSoon';
+import PageSkeleton from './PageSkeleton';
 
 type Props = {
   children: React.ReactElement;
@@ -24,7 +24,7 @@ const RequireAuth: React.FC<Props> = ({ children, allowFree = false }) => {
 
   // Show loading spinner while checking auth state
   if (loading) {
-    return <JEELoader message="Verifying access..." />;
+    return <PageSkeleton />;
   }
 
   // Not logged in → redirect to login, save intended destination

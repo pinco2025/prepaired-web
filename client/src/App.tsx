@@ -22,6 +22,7 @@ import Pyq2026 from './components/Pyq2026';
 import AppLayout from "./components/AppLayout";
 import ChapterSelection from './components/ChapterSelection';
 import QuestionPractice from './components/QuestionPractice';
+import PageSkeleton from './components/PageSkeleton';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -37,9 +38,7 @@ const HomeRoute: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <PageSkeleton />
     );
   }
 

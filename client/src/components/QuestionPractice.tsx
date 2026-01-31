@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
@@ -81,6 +81,7 @@ interface SolutionsJsonResponse {
 const QuestionPractice: React.FC = () => {
     const { subject, chapterCode } = useParams<{ subject: string; chapterCode: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [questions, setQuestions] = useState<Question[]>([]);
     const [solutions, setSolutions] = useState<{ [key: string]: Solution }>({});
@@ -174,16 +175,80 @@ const QuestionPractice: React.FC = () => {
                 setShowSolution(false);
                 setUserAnswers({});
 
-            } catch (err) {
+            } catch (err: any) {
                 console.error(err);
+
+                // Smart Navigation Logic: If fetching fails (likely 404 or empty), try to skip to next/prev
+                const direction = location.state?.direction;
+
+                if (direction && (err.message === 'Failed to load questions' || err.message.includes('404'))) {
+                    console.log(`Failed to load ${chapterCode}, skipping (${direction})...`);
+
+                    // We need chapters list to find next
+                    // Since we fetched it in step 0, we can try to use state or re-fetch (but re-fetch inside catch is messy)
+                    // Better approach: ensure we have chaptersData available here.
+                    // Actually, let's just refetch strictly for navigation calculation if needed, 
+                    // OR leverage the setNextChapter/setPrevChapter logic if we can.
+
+                    // But nextChapter/prevChapter state setters might not have run or finished if we failed early?
+                    // Actually, step 0 runs before step 1/2. So we *likely* have cached locally in `chaptersData` var if we scope it out.
+
+                    // Re-fetching chapters strictly for the skip logic (safest to avoid scope issues)
+                    try {
+                        const chRes = await fetch('/chapters.json');
+                        if (chRes.ok) {
+                            const chData = await chRes.json();
+                            const list = chData[subject!] || [];
+                            const currentIndex = list.findIndex((c: any) => c.code === chapterCode);
+
+                            if (currentIndex !== -1) {
+                                let newTarget = null;
+                                if (direction === 'next' && currentIndex < list.length - 1) {
+                                    newTarget = list[currentIndex + 1].code;
+                                } else if (direction === 'prev' && currentIndex > 0) {
+                                    newTarget = list[currentIndex - 1].code;
+                                }
+
+                                if (newTarget) {
+                                    // Replace current history entry so user doesn't get stuck in back-button loop of empty pages
+                                    navigate(`/pyq-2026/${subject}/practice/${newTarget}`, {
+                                        replace: true,
+                                        state: { direction }
+                                    });
+                                    return; // Stop processing, we are navigating away
+                                }
+                            }
+                        }
+                    } catch (navErr) {
+                        console.error("Navigation skip failed", navErr);
+                    }
+                }
+
                 setError('Failed to load practice data');
+                setLoading(false); // Only unset loading if we actually error out and don't navigate
             } finally {
-                setLoading(false);
+                // strict mode double set protection?
+                // If we navigated away, the component unmounts/remounts, so this finally block runs on unmounted component?
+                // It's mostly fine, React handles it.
+                // But if we navigated, we want loading to stay true potentially?
+                // use 'return' in catch block avoids finally? No.
+                // We should only setLoading(false) if we didn't navigate.
+                // But we can't easily know if navigate happened synchronous enough.
+                // Actually, if we navigate, this component dies.
+                // So setLoading(false) might trigger warning "update on unmounted component".
+                // We can use a ref to track mounted state.
+
+                // For now, simple check:
+                // If we errored and didn't redirect, we set loading false.
+                // If we redirected, we effectively don't care.
+                if (!location.state?.skipping) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchData();
-    }, [subject, chapterCode]);
+    }, [subject, chapterCode, navigate, location.state]);
 
     const handleOptionSelect = (optionId: string) => {
         if (showSolution) return; // Prevent changing answer after proper check
@@ -210,7 +275,7 @@ const QuestionPractice: React.FC = () => {
             setShowSolution(false);
         } else if (nextChapter) {
             // Navigate to Next Chapter
-            navigate(`/pyq-2026/${subject}/practice/${nextChapter}`);
+            navigate(`/pyq-2026/${subject}/practice/${nextChapter}`, { state: { direction: 'next' } });
         }
     };
 
@@ -222,7 +287,7 @@ const QuestionPractice: React.FC = () => {
             setShowSolution(false);
         } else if (prevChapter) {
             // Navigate to Previous Chapter
-            navigate(`/pyq-2026/${subject}/practice/${prevChapter}`);
+            navigate(`/pyq-2026/${subject}/practice/${prevChapter}`, { state: { direction: 'prev' } });
         }
     };
 

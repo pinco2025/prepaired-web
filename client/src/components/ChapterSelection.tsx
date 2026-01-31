@@ -24,6 +24,8 @@ const ChapterSelection: React.FC = () => {
     // Check State
     const [baseUrl, setBaseUrl] = useState<string | null>(null);
     const [checkingChapter, setCheckingChapter] = useState<string | null>(null);
+    const [showComingSoon, setShowComingSoon] = useState(false);
+    const [comingSoonChapterName, setComingSoonChapterName] = useState<string>('');
 
     // Pan State
     const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -126,7 +128,10 @@ const ChapterSelection: React.FC = () => {
             if (response.ok) {
                 navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);
             } else if (response.status === 404) {
-                alert("This chapter is not added or present yet.");
+                // Find chapter name for the popup
+                const ch = chapters.find(c => c.code === chapterCode);
+                setComingSoonChapterName(ch?.name || chapterCode);
+                setShowComingSoon(true);
             } else {
                 // Other error (500 etc) -> Fail Open
                 console.warn(`Check failed with status ${response.status}. Failing open.`);
@@ -457,6 +462,53 @@ const ChapterSelection: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Custom Coming Soon Popup */}
+            {showComingSoon && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 px-6" style={{ zIndex: 9999 }}>
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+                        onClick={() => setShowComingSoon(false)}
+                    ></div>
+
+                    {/* Modal Content */}
+                    <div className="relative w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-3xl shadow-2xl overflow-hidden border border-white/20 dark:border-white/10 animate-in zoom-in-95 duration-300">
+                        {/* Decorative background accent */}
+                        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-primary/20 to-violet-500/20 -z-10"></div>
+                        <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-primary/30 rounded-full blur-3xl"></div>
+
+                        <div className="p-8 flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-lg flex items-center justify-center mb-6 transform rotate-3 border border-slate-100 dark:border-slate-700">
+                                <span className="material-symbols-outlined text-5xl text-primary bg-gradient-to-br from-primary to-violet-500 bg-clip-text text-transparent">rocket_launch</span>
+                            </div>
+
+                            <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">
+                                Coming Soon!
+                            </h3>
+
+                            <div className="space-y-4 mb-8">
+                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                                    Team <span className="text-primary font-bold">prepAIred</span> is meticulously crafting high-quality questions for <br />
+                                    <span className="font-bold text-slate-800 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md mt-1 inline-block text-sm border border-slate-200 dark:border-slate-700">
+                                        {comingSoonChapterName}
+                                    </span>
+                                </p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    In the meantime, feel free to explore and practice questions from other available chapters!
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setShowComingSoon(false)}
+                                className="w-full py-3.5 rounded-xl bg-primary hover:bg-blue-600 text-white font-bold text-lg shadow-lg shadow-primary/25 transition-all transform hover:-translate-y-1 active:scale-95"
+                            >
+                                Got it, thanks!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
