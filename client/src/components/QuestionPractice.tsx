@@ -104,8 +104,8 @@ const QuestionPractice: React.FC = () => {
             try {
                 setLoading(true);
 
-                // 0. Fetch Chapters (Parallelized with Supabase check if possible, but keep simple for now)
-                const chaptersRes = await withTimeout(fetch('/chapters.json'));
+                // 0. Fetch Chapters
+                const chaptersRes = await withTimeout(fetch('/chapters.json'), 15000, 'Chapters fetch timed out');
                 let chaptersData: any = {};
                 if (chaptersRes.ok) {
                     chaptersData = await chaptersRes.json();
@@ -130,7 +130,9 @@ const QuestionPractice: React.FC = () => {
                         .from('question_set')
                         .select('url')
                         .eq('set_id', '26-pyq')
-                        .single())
+                        .single()),
+                    15000,
+                    'Supabase URL fetch timed out'
                 );
 
                 if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);
@@ -149,25 +151,35 @@ const QuestionPractice: React.FC = () => {
                 const solutionUrl = `${rawBaseUrl}/${subject}/${chapterCode}_solutions.json`;
 
                 // Fetch Questions
-                const questionsRes = await withTimeout(fetch(questionUrl));
-                if (!questionsRes.ok) throw new Error('Failed to load questions');
+                console.log('Fetching questions from:', questionUrl);
+                const questionsRes = await withTimeout(fetch(questionUrl), 15000, `Questions fetch timed out for ${questionUrl}`);
+                if (!questionsRes.ok) throw new Error(`Failed to load questions from ${questionUrl} (${questionsRes.status})`);
                 const questionsData: QuestionsJsonResponse = await questionsRes.json();
 
-                // Fetch Solutions
-                const solutionsRes = await withTimeout(fetch(solutionUrl));
-                if (!solutionsRes.ok) throw new Error('Failed to load solutions');
-                const solutionsData: SolutionsJsonResponse = await solutionsRes.json();
+                // Fetch Solutions (Non-blocking)
+                try {
+                    console.log('Fetching solutions from:', solutionUrl);
+                    const solutionsRes = await withTimeout(fetch(solutionUrl), 10000, 'Solutions fetch timed out');
+                    if (solutionsRes.ok) {
+                        const solutionsData: SolutionsJsonResponse = await solutionsRes.json();
+                        // Map solutions by UUID
+                        const solMap: { [key: string]: Solution } = {};
+                        if (solutionsData.solutions) {
+                            solutionsData.solutions.forEach(sol => {
+                                solMap[sol.uuid] = sol;
+                            });
+                        }
+                        setSolutions(solMap);
+                    } else {
+                        console.warn('Solutions not found or failed to load:', solutionUrl);
+                    }
+                } catch (solErr) {
+                    console.warn('Error loading solutions:', solErr);
+                }
 
                 setQuestions(questionsData.questions || []);
+                // Solutions are already set above if successful
 
-                // Map solutions by UUID
-                const solMap: { [key: string]: Solution } = {};
-                if (solutionsData.solutions) {
-                    solutionsData.solutions.forEach(sol => {
-                        solMap[sol.uuid] = sol;
-                    });
-                }
-                setSolutions(solMap);
 
                 // Reset state for new chapter
                 setCurrentQuestionIndex(0);
@@ -224,7 +236,7 @@ const QuestionPractice: React.FC = () => {
                     }
                 }
 
-                setError('Failed to load practice data');
+                setError(`Failed to load practice data: ${err.message}`);
                 setLoading(false); // Only unset loading if we actually error out and don't navigate
             } finally {
                 // strict mode double set protection?
