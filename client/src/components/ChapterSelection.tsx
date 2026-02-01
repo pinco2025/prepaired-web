@@ -448,7 +448,7 @@ const ChapterSelection: React.FC = () => {
                                                             </div>
                                                         </>
                                                     ) : (
-                                                        <h3 className="text-[10px] md:text-xs font-bold leading-tight line-clamp-3 px-1 transition-all duration-300">
+                                                        <h3 className="text-[10px] md:text-xs font-bold leading-tight line-clamp-3 px-1 transition-all duration-300 break-all whitespace-normal">
                                                             {node.name}
                                                         </h3>
                                                     )}
