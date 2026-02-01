@@ -609,12 +609,10 @@ h6 {
   0%,
   100% {
     box-shadow: 0 0 0 0px rgba(234, 179, 8, 0.4);
-    filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.3));
   }
 
   50% {
     box-shadow: 0 0 0 4px rgba(234, 179, 8, 0);
-    filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.6));
   }
 }
 
