@@ -68,9 +68,10 @@ export const AppContent: React.FC = () => {
   const isTestSubmittedRoute = location.pathname === '/test-submitted';
 
   // Determine if we should show the sidebar
-  // Show sidebar for all authenticated users on protected routes
+  // Show sidebar for all authenticated users on protected routes OR on specific public routes for everyone
   // Hide sidebar when user is taking a test or on submission page
-  const showSidebar = !loading && isAuthenticated && !isTestRoute && !isTestSubmittedRoute;
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026'].some(path => location.pathname.startsWith(path));
+  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -121,16 +122,21 @@ export const AppContent: React.FC = () => {
                 <ChapterSelection />
               </RequireAuth>
             } />
+
+            {/* Public Access Routes (Guests & Users) */}
             <Route path="/pyq-2026/:subject" element={
-              <RequireAuth allowFree>
-                <ChapterSelection />
-              </RequireAuth>
+              <ChapterSelection />
             } />
             <Route path="/pyq-2026/:subject/practice/:chapterCode" element={
-              <RequireAuth allowFree>
-                <QuestionPractice />
-              </RequireAuth>
+              <QuestionPractice />
             } />
+            <Route path="/pyq-2026" element={
+              <Pyq2026 />
+            } />
+            <Route path="/super30" element={
+              <Super30 />
+            } />
+
             <Route path="/tests" element={
               <RequireAuth>
                 <Tests />
@@ -141,19 +147,10 @@ export const AppContent: React.FC = () => {
                 <TestPage />
               </RequireAuth>
             } />
-            <Route path="/super30" element={
-              <RequireAuth allowFree>
-                <Super30 />
-              </RequireAuth>
-            } />
+
             <Route path="/coming-soon" element={
               <RequireAuth allowFree>
                 <ComingSoon />
-              </RequireAuth>
-            } />
-            <Route path="/pyq-2026" element={
-              <RequireAuth allowFree>
-                <Pyq2026 />
               </RequireAuth>
             } />
             <Route path="/test-submitted" element={

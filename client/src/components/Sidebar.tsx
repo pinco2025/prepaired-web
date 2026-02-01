@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../utils/supabaseClient';
+import { withTimeout } from '../utils/promiseUtils';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -12,6 +14,52 @@ const Sidebar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [showSuper30Preview, setShowSuper30Preview] = useState(false);
+  const [previewPos, setPreviewPos] = useState({ top: 0, left: 0 });
+
+  // Close preview on route change
+  useEffect(() => {
+    setShowSuper30Preview(false);
+  }, [location.pathname]);
+
+  const handleMouseEnter = (e: React.MouseEvent, label: string) => {
+    // Only show preview if it's Super 30 AND we are NOT currently on the Super 30 page
+    if (label === "Super 30" && !isMobileMenuOpen && !location.pathname.includes('/super30')) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPreviewPos({
+        top: rect.top,
+        left: rect.right + 10 // 10px offset from sidebar
+      });
+      setShowSuper30Preview(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowSuper30Preview(false);
+  };
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      // If preview is open, check if mouse is far from the trigger area.
+      // This is a safety cleanup in case onMouseLeave didn't fire (e.g. moving fast to main content)
+      if (showSuper30Preview && !isMobileMenuOpen) {
+        // Simple heuristic: if we are far right of the sidebar (sidebar is usually width 72px or 288px)
+        // We can check if the target is NOT inside the sidebar.
+        const sidebar = document.querySelector('aside');
+        if (sidebar && !sidebar.contains(e.target as Node)) {
+          setShowSuper30Preview(false);
+        }
+      }
+    };
+
+    if (showSuper30Preview) {
+      window.addEventListener('mousemove', handleGlobalMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+    };
+  }, [showSuper30Preview, isMobileMenuOpen]);
 
   useEffect(() => {
     const storedPreference = localStorage.getItem('darkMode');
@@ -116,7 +164,8 @@ const Sidebar: React.FC = () => {
     setIsUserMenuOpen(false);
 
     try {
-      const { error } = await supabase.auth.signOut();
+      // Wrap signOut in a timeout to prevent hanging (3s max)
+      const { error } = await withTimeout(supabase.auth.signOut(), 3000, 'Sign out timed out');
       if (error) {
         console.error('Sign out error:', error);
       }
@@ -171,6 +220,8 @@ const Sidebar: React.FC = () => {
               key={item.label}
               to={item.to}
               onClick={() => mobile && setIsMobileMenuOpen(false)}
+              onMouseEnter={(e) => handleMouseEnter(e, item.label)}
+              onMouseLeave={handleMouseLeave}
               className={({ isActive }) => {
                 const isActuallyActive = isActive && item.to !== '/coming-soon';
                 const isSuper30 = item.label === "Super 30";
@@ -183,6 +234,7 @@ const Sidebar: React.FC = () => {
                   }
                         ${isCollapsed && !mobile ? 'justify-center' : ''}
                         ${isSuper30 ? 'hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] dark:hover:shadow-[0_0_15px_rgba(255,215,0,0.15)]' : ''}
+                        ${isSuper30 && !location.pathname.includes('/super30') ? 'animate-gold-pulse' : ''}
                         ${isPYQ ? 'hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] dark:hover:shadow-[0_0_15px_rgba(34,211,238,0.15)]' : ''}`
               }}
               title={isCollapsed && !mobile ? item.label : undefined}
@@ -231,60 +283,62 @@ const Sidebar: React.FC = () => {
           </button>
 
 
-          {/* User Menu */}
-          <div className="relative" ref={userMenuRef}>
-            {isUserMenuOpen && (
-              <div
-                className={`absolute bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark overflow-hidden z-20
+          {/* User Menu - Only show if user is logged in */}
+          {user && (
+            <div className="relative" ref={userMenuRef}>
+              {isUserMenuOpen && (
+                <div
+                  className={`absolute bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark overflow-hidden z-20
                 ${isCollapsed && !mobile
-                    ? 'left-full bottom-0 ml-4 w-48'
-                    : 'bottom-full left-0 w-full mb-2'
+                      ? 'left-full bottom-0 ml-4 w-48'
+                      : 'bottom-full left-0 w-full mb-2'
+                    }`}
+                >
+                  <div className="py-2">
+                    <div className="px-4 py-2 border-b border-border-light dark:border-border-dark mb-1">
+                      <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
+                      <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      disabled={isSigningOut}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 active:bg-red-500/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none ${isSigningOut ? 'opacity-60 pointer-events-none' : ''}`}
+                    >
+                      {isSigningOut ? (
+                        <span className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        <span className="material-icons-outlined text-lg">logout</span>
+                      )}
+                      <span>{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={toggleUserMenu}
+                className={`w-full flex items-center gap-3 rounded-xl transition-colors whitespace-nowrap overflow-hidden
+                ${isCollapsed && !mobile
+                    ? 'justify-center p-2 hover:bg-background-light dark:hover:bg-white/5'
+                    : 'p-2 border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5 hover:bg-border-light/50 dark:hover:bg-white/10'
                   }`}
               >
-                <div className="py-2">
-                  <div className="px-4 py-2 border-b border-border-light dark:border-border-dark mb-1">
-                    <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
-                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
-                  </div>
-                  <button
-                    onClick={handleSignOut}
-                    disabled={isSigningOut}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 active:bg-red-500/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none ${isSigningOut ? 'opacity-60 pointer-events-none' : ''}`}
-                  >
-                    {isSigningOut ? (
-                      <span className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></span>
-                    ) : (
-                      <span className="material-icons-outlined text-lg">logout</span>
-                    )}
-                    <span>{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
-                  </button>
+                <img
+                  alt="User profile"
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-white/10 shrink-0"
+                  src={user?.user_metadata?.avatar_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23e0e7ff'/%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' fill='%236366f1'/%3E%3C/svg%3E"}
+                />
+                <div className={`flex-1 min-w-0 text-left transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'block'}`} style={{ display: isCollapsed && !mobile ? 'none' : 'block' }}>
+                  <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
                 </div>
-              </div>
-            )}
-            <button
-              onClick={toggleUserMenu}
-              className={`w-full flex items-center gap-3 rounded-xl transition-colors whitespace-nowrap overflow-hidden
-                ${isCollapsed && !mobile
-                  ? 'justify-center p-2 hover:bg-background-light dark:hover:bg-white/5'
-                  : 'p-2 border border-border-light dark:border-border-dark bg-background-light/50 dark:bg-white/5 hover:bg-border-light/50 dark:hover:bg-white/10'
-                }`}
-            >
-              <img
-                alt="User profile"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-white/10 shrink-0"
-                src={user?.user_metadata?.avatar_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23e0e7ff'/%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' fill='%236366f1'/%3E%3C/svg%3E"}
-              />
-              <div className={`flex-1 min-w-0 text-left transition-all duration-300 ${isCollapsed && !mobile ? 'w-0 opacity-0 hidden' : 'block'}`} style={{ display: isCollapsed && !mobile ? 'none' : 'block' }}>
-                <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
-              </div>
-              <span
-                className={`material-symbols-outlined text-text-secondary-light text-lg transition-transform duration-300 shrink-0 ${isCollapsed && !mobile ? 'hidden' : 'block'}`}
-                style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: isCollapsed && !mobile ? 'none' : 'block' }}
-              >
-                expand_less
-              </span>
-            </button>
-          </div>
+                <span
+                  className={`material-symbols-outlined text-text-secondary-light text-lg transition-transform duration-300 shrink-0 ${isCollapsed && !mobile ? 'hidden' : 'block'}`}
+                  style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: isCollapsed && !mobile ? 'none' : 'block' }}
+                >
+                  expand_less
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -292,6 +346,26 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
+      {showSuper30Preview && !isMobileMenuOpen && createPortal(
+        <div
+          className="fixed z-[9999] p-4 rounded-xl bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border border-yellow-500/30 shadow-xl animate-fade-in-up w-64 pointer-events-none"
+          style={{
+            top: `${previewPos.top}px`,
+            left: `${previewPos.left}px`,
+            transform: 'translateY(-10%)' // Slightly center it vertically relative to the item
+          }}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl font-black text-yellow-500" style={{ fontFamily: 'monospace' }}>30</span>
+            <h3 className="text-lg font-bold text-text-light dark:text-text-dark">Super 30 Series</h3>
+          </div>
+          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark leading-relaxed">
+            A curated collection of the 30 most critical questions to master your concepts. <span className="text-yellow-600 dark:text-yellow-400 font-medium">High yield, maximum impact.</span>
+          </p>
+        </div>,
+        document.body
+      )}
+
       {/* Mobile Top Bar */}
       <div className="app-mobile-header md:hidden bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark p-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
@@ -300,7 +374,10 @@ const Sidebar: React.FC = () => {
             prep<span className="text-primary">AI</span>red
           </span>
         </div>
-        <button onClick={toggleMobileMenu} className="text-text-light dark:text-text-dark focus:outline-none">
+        <button
+          onClick={toggleMobileMenu}
+          className={`text-text-light dark:text-text-dark focus:outline-none rounded-xl px-4 py-0.5 border border-transparent transition-all duration-300 ${!location.pathname.includes('/super30') ? 'animate-gold-pulse text-yellow-500 border-yellow-500/30' : ''}`}
+        >
           <span className="material-icons-outlined text-3xl">menu</span>
         </button>
       </div>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import Super30Feedback from './Super30Feedback';
 import { supabase } from '../utils/supabaseClient';
@@ -350,7 +352,15 @@ const Super30: React.FC = () => {
     const currentQuestion = currentQuestions[currentQuestionIndex];
     const totalQuestions = currentQuestions.length;
 
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
     const handleStartSession = async () => {
+        if (!user) {
+            navigate('/login', { state: { from: '/super30' } });
+            return;
+        }
+
         if (!isDataReady) {
             // If user clicks start before data is ready, we can show a specific loading or just return
             // Ideally button shows loading state
