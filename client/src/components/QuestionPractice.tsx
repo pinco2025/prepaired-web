@@ -502,7 +502,7 @@ const QuestionPractice: React.FC = () => {
 
                             {/* Solution Display */}
                             {showSolution && currentSolution && (
-                                <div className="mt-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
+                                <div className="mt-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 overflow-x-auto">
                                     <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Detailed Solution</h3>
                                     <div className="prose dark:prose-invert max-w-none text-text-light dark:text-text-dark break-words whitespace-pre-wrap">
                                         {currentSolution.text && (
