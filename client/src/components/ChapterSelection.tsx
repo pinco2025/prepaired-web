@@ -410,7 +410,7 @@ const ChapterSelection: React.FC = () => {
                                     <div
                                         key={node.code}
                                         title={node.name} // Native tooltip for full name
-                                        className={`absolute rounded-full flex flex-col items-center justify-center text-center p-3 cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 shadow-sm backdrop-blur-sm border-2 ${themeClass} ${floatClass}`}
+                                        className={`absolute rounded-full flex flex-col items-center justify-center text-center p-1 cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 shadow-sm backdrop-blur-sm border-2 ${themeClass} ${floatClass}`}
                                         style={{
                                             width: `${node.size}px`,
                                             height: `${node.size}px`,
@@ -448,7 +448,7 @@ const ChapterSelection: React.FC = () => {
                                                             </div>
                                                         </>
                                                     ) : (
-                                                        <h3 className="text-[10px] md:text-xs font-bold leading-tight line-clamp-3 px-1 transition-all duration-300 break-all whitespace-normal">
+                                                        <h3 className="text-[9px] md:text-[10px] font-bold leading-tight line-clamp-3 px-1 transition-all duration-300 break-words hyphens-auto">
                                                             {node.name}
                                                         </h3>
                                                     )}
