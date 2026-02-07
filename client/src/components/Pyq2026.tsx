@@ -14,7 +14,7 @@ const Pyq2026: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-3 md:p-8 sidebar-scroll">
                 <div className="max-w-7xl mx-auto h-full flex flex-col">
                     <div className="mb-5 md:mb-8">
-                        <h1 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark">2026 Previous Year Questions</h1>
+                        <h1 className="text-2xl md:text-4xl font-black text-text-light dark:text-text-dark tracking-tight">2026 Previous Year Questions</h1>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1">Select your preferred attempt mode for JEE Main 2026 preparation.</p>
                     </div>
 

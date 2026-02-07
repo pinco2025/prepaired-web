@@ -17,7 +17,7 @@ const Login: React.FC = () => {
         password,
       });
       if (error) throw error;
-      navigate('/');
+      navigate('/question-set');
     } catch (error: any) {
       alert(error.error_description || error.message);
     }
@@ -25,7 +25,7 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const redirectTo = window.location.origin + '/';
+      const redirectTo = window.location.origin + '/question-set';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo },

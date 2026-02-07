@@ -17,7 +17,7 @@ const SignUp: React.FC = () => {
         const { data } = await supabase.auth.getSession();
         const session = data?.session ?? null;
         if (session && mounted) {
-          navigate('/', { replace: true });
+          navigate('/question-set', { replace: true });
         }
       } catch (err) {
         // ignore and allow registration UI
@@ -58,7 +58,7 @@ const SignUp: React.FC = () => {
       }
 
       // If we have a session, user is logged in immediately (email confirmation disabled)
-      navigate('/');
+      navigate('/question-set');
     } catch (error: any) {
       alert(error.error_description || error.message);
     }

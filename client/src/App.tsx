@@ -23,6 +23,9 @@ import AppLayout from "./components/AppLayout";
 import ChapterSelection from './components/ChapterSelection';
 import QuestionPractice from './components/QuestionPractice';
 import PageSkeleton from './components/PageSkeleton';
+import QuestionSet from './components/QuestionSet';
+import CondensedPractice from './components/CondensedPractice';
+import PricingPlans from './components/PricingPlans';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -42,14 +45,14 @@ const HomeRoute: React.FC = () => {
     );
   }
 
-  // Paid users get redirected to dashboard
+  // Paid users get redirected to question-set
   if (isAuthenticated && isPaidUser) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/question-set" replace />;
   }
 
-  // Free users get redirected to super30
+  // Free users get redirected to question-set
   if (isAuthenticated && !isPaidUser) {
-    return <Navigate to="/super30" replace />;
+    return <Navigate to="/question-set" replace />;
   }
 
   // Everyone else sees the landing page
@@ -59,6 +62,9 @@ const HomeRoute: React.FC = () => {
 export const AppContent: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+
+  // TEMPORARY: Mocking lite user for verification
+  const isLiteUser = true; // subscriptionType?.toLowerCase() === 'lite';
 
   // Check if user is on a test-taking route (hide sidebar during test)
   // Matches /tests/:testId but not /tests (the list page)
@@ -70,7 +76,8 @@ export const AppContent: React.FC = () => {
   // Determine if we should show the sidebar
   // Show sidebar for all authenticated users on protected routes OR on specific public routes for everyone
   // Hide sidebar when user is taking a test or on submission page
-  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026'].some(path => location.pathname.startsWith(path));
+  const isCondensedPracticeRoute = /^\/question-set\/[^/]+\/practice$/.test(location.pathname);
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute;
   const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute;
 
   return (
@@ -98,9 +105,21 @@ export const AppContent: React.FC = () => {
 
             {/* Protected routes - require IPFT-01-2026 subscription */}
             <Route path="/dashboard" element={
-              <RequireAuth>
-                <Dashboard />
-              </RequireAuth>
+              isLiteUser ? (
+                <RequireAuth allowFree>
+                  <ComingSoon
+                    title="Dashboard for"
+                    subtitle="Performance Analytics"
+                    message="Detailed performance tracking and analytics coming soon for Lite plan users."
+                    highlight="Lite Plan"
+                    date="15 March 2025"
+                  />
+                </RequireAuth>
+              ) : (
+                <RequireAuth>
+                  <Dashboard />
+                </RequireAuth>
+              )
             } />
             <Route path="/subjects/:subject/:grade/:chapter" element={
               <RequireAuth>
@@ -136,16 +155,49 @@ export const AppContent: React.FC = () => {
             <Route path="/super30" element={
               <Super30 />
             } />
+            <Route path="/question-set" element={
+              <QuestionSet />
+            } />
+            <Route path="/question-set/:subject/practice" element={
+              <CondensedPractice />
+            } />
+            <Route path="/pricing" element={
+              <PricingPlans />
+            } />
 
             <Route path="/tests" element={
-              <RequireAuth>
-                <Tests />
-              </RequireAuth>
+              isLiteUser ? (
+                <RequireAuth allowFree>
+                  <ComingSoon
+                    title="Test Series for"
+                    subtitle="Lite Plan"
+                    message="Full mock tests and deep analysis coming soon for Lite plan users."
+                    highlight="Lite Users"
+                    date="15 March 2025"
+                  />
+                </RequireAuth>
+              ) : (
+                <RequireAuth>
+                  <Tests />
+                </RequireAuth>
+              )
             } />
             <Route path="/tests/:testId" element={
-              <RequireAuth>
-                <TestPage />
-              </RequireAuth>
+              isLiteUser ? (
+                <RequireAuth allowFree>
+                  <ComingSoon
+                    title="Test Interface for"
+                    subtitle="Lite Plan"
+                    message="Test taking interface coming soon for Lite plan users."
+                    highlight="Lite Users"
+                    date="15 March 2025"
+                  />
+                </RequireAuth>
+              ) : (
+                <RequireAuth>
+                  <TestPage />
+                </RequireAuth>
+              )
             } />
 
             <Route path="/coming-soon" element={

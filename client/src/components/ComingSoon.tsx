@@ -1,8 +1,29 @@
 import React from 'react';
 import { usePageTitle } from '../hooks/usePageTitle';
 
-const ComingSoon: React.FC = () => {
-  usePageTitle('Test Series - Coming Soon');
+interface ComingSoonProps {
+  title?: string;
+  subtitle?: string;
+  message?: string;
+  highlight?: string;
+  date?: string;
+}
+
+const ComingSoon: React.FC<ComingSoonProps> = ({
+  title = "Test Series for",
+  subtitle = "Session 2",
+  message = "Full syllabus tests with detailed solutions",
+  highlight = "JEE Mains",
+  date = "15 February 2025"
+}) => {
+  usePageTitle('Coming Soon');
+
+  // Parse date for display
+  const dateObj = new Date(date);
+  const day = dateObj.getDate();
+  const month = dateObj.toLocaleString('default', { month: 'long' });
+  const year = dateObj.getFullYear();
+
   return (
     <main className="flex-grow flex items-center justify-center min-h-[100dvh] overflow-x-hidden overflow-y-auto relative px-4 py-12">
       {/* Subtle background */}
@@ -16,12 +37,12 @@ const ComingSoon: React.FC = () => {
 
         {/* Title */}
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-light dark:text-white mb-3">
-          Test Series for{' '}
-          <span className="text-primary">JEE Mains</span>
+          {title}{' '}
+          <span className="text-primary">{highlight}</span>
         </h1>
 
         <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 mb-8 sm:mb-12">
-          Session 2
+          {subtitle}
         </p>
 
         {/* Date - Main Focus */}
@@ -31,14 +52,14 @@ const ComingSoon: React.FC = () => {
           </p>
           <div className="inline-flex items-baseline gap-2 sm:gap-3">
             <span className="text-6xl sm:text-7xl md:text-8xl font-black text-primary leading-none">
-              15
+              {day}
             </span>
             <div className="text-left">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-text-light dark:text-white">
-                February
+                {month}
               </div>
               <div className="text-sm sm:text-base text-slate-400 dark:text-slate-500">
-                2025
+                {year}
               </div>
             </div>
           </div>
@@ -49,7 +70,7 @@ const ComingSoon: React.FC = () => {
 
         {/* Simple tagline */}
         <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
-          Full syllabus tests with detailed solutions
+          {message}
         </p>
 
       </div>

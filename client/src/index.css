@@ -26,6 +26,14 @@ body {
   .scroll-momentum {
     -webkit-overflow-scrolling: touch;
   }
+
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .path-shadow {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  }
 }
 
 /* Headings use Poppins (font-display) */
@@ -618,4 +626,84 @@ h6 {
 
 .animate-gold-pulse {
   animation: soft-gold-pulse 2s infinite ease-in-out;
+}
+
+/* Modal Animations */
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-content-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes premium-icon-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-modal-backdrop {
+  animation: modal-backdrop-in 0.2s ease-out forwards;
+}
+
+.animate-modal-content {
+  animation: modal-content-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-premium-icon {
+  animation: premium-icon-pulse 2s ease-in-out infinite;
+}
+
+/* Hide Scrollbar Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sidebar Question Set Glow Animation */
+@keyframes sidebar-cyan-pulse {
+  0% {
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.25), 0 0 12px rgba(6, 182, 212, 0.15);
+    border-color: rgba(6, 182, 212, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4), 0 0 18px rgba(6, 182, 212, 0.25), 0 0 24px rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.45);
+  }
+
+  100% {
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.25), 0 0 12px rgba(6, 182, 212, 0.15);
+    border-color: rgba(6, 182, 212, 0.25);
+  }
+}
+
+.sidebar-question-set-glow {
+  animation: sidebar-cyan-pulse 2.5s ease-in-out infinite;
+  border: 1px solid rgba(6, 182, 212, 0.25);
 }

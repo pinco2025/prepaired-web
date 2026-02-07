@@ -172,7 +172,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Computed values
   const isAuthenticated = user !== null;
-  const isPaidUser = subscriptionType?.toLowerCase() === PAID_SUBSCRIPTION.toLowerCase();
+  const isPaidUser = subscriptionType?.toLowerCase() === PAID_SUBSCRIPTION.toLowerCase() ||
+    subscriptionType?.toLowerCase() === 'lite';
 
   const value: AuthContextValue = {
     user,

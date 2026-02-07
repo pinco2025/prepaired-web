@@ -583,12 +583,8 @@ const Super30: React.FC = () => {
 
     if (!sessionStarted) {
         return (
-            <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto">
-                <style>{`
-                    .math-grid { background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 24px 24px; }
-                    .dark .math-grid { background-image: radial-gradient(#334155 0.5px, transparent 0.5px); }
-                `}</style>
-                <main className="flex-1 flex flex-col items-center justify-center math-grid relative px-6 py-12">
+            <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark overflow-y-auto">
+                <main className="flex-1 flex flex-col items-center justify-center relative px-6 py-12">
 
                     <div className="max-w-4xl w-full text-center space-y-8 flex flex-col items-center">
 
@@ -700,7 +696,7 @@ const Super30: React.FC = () => {
 
 
     return (
-        <div className="h-[100dvh] flex flex-col bg-background-light dark:bg-background-dark overflow-hidden">
+        <div className="h-[100dvh] flex flex-col bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark overflow-hidden">
             <style>{`
                 body:has(.super30-session-active) [class*="sidebar"],
                 body:has(.super30-session-active) aside,
