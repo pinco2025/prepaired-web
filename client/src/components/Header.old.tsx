@@ -11,7 +11,6 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, subscriptionType } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
-  const isHome = location.pathname === '/';
 
 
   useEffect(() => {
@@ -186,7 +185,7 @@ const Header: React.FC = () => {
                 <>
                   <button onClick={toggleMenu} aria-haspopup="true" aria-expanded={isMenuOpen} className="ml-4 w-10 h-10 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
                     <img
-                      alt="User profile picture"
+                      alt="User profile"
                       className="w-10 h-10 rounded-full object-cover"
                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHE3oUlM1yUb7TA8XdWQV26WNdHzcgBDSKirGjXJIdxcOt5I09wPGatmTzwvZ-v8L8w-jPYAcySvVhjDZxdFNtQcHuxuydZ_luTJLKBeLxGz4fZl1bDm5NxbGWchY27b1ZydID7ghZJmMq6GSuBo0taVI_RRmVifP0b70PpM3btYMLVoRMdBXGhwwrDElzljgyoI9FbZIn8pSLFH0axsXyHGbcCPoCl2HG6R_vzcK3HrsyGv1OMaOwkcAXSX-uxUsV21-SnO9-vbyo"
                     />
@@ -204,15 +203,15 @@ const Header: React.FC = () => {
                         </p>
                       </div>
                       <nav className="py-2">
-                        <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
+                        <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="/edit-profile">
                           <span className="material-icons-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> person </span>
                           <span>Edit Profile</span>
                         </a>
-                        <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
+                        <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="/settings">
                           <span className="material-icons-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> settings </span>
                           <span>Settings</span>
                         </a>
-                        <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="#">
+                        <a className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-light dark:text-text-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors" href="/help">
                           <span className="material-icons-outlined text-xl text-text-secondary-light dark:text-text-secondary-dark"> help_center </span>
                           <span>Help Center</span>
                         </a>

@@ -45,9 +45,9 @@ const SubjectMastery: React.FC = () => {
         <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark relative overflow-hidden h-full flex flex-col">
             <div className="flex items-center justify-between mb-8 relative z-10">
                 <h2 className="text-xl font-semibold text-text-light dark:text-text-dark">Subject Mastery</h2>
-                <a href="#" onClick={(e) => e.preventDefault()} className="text-sm font-medium text-primary hover:text-primary/80">
+                <button type="button" onClick={(e) => e.preventDefault()} className="text-sm font-medium text-primary hover:text-primary/80">
                     View Details
-                </a>
+                </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 place-items-center relative z-10 flex-grow">
                 {subjects.map((subject) => (

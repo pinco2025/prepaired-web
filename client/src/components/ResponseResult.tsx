@@ -280,7 +280,6 @@ const ResponseResult: React.FC = () => {
         );
     }
     const totalMarks = 300;
-    const scorePct = totalMarks > 0 ? (totalStats.total_marks / totalMarks) * 100 : 0;
 
     const statusColor = (s?: string) => {
         if (!s) return 'text-text-secondary-light dark:text-text-secondary-dark';

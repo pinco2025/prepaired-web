@@ -8,17 +8,17 @@ const RecommendedForYou = () => {
         <div className="p-4 border border-border-light dark:border-border-dark rounded-lg">
           <h3 className="font-semibold">Weak Topic: Rotational Motion</h3>
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1 mb-3">Focus on this area to improve your Physics score.</p>
-          <a className="text-sm font-semibold text-primary hover:underline" href="#">Start Practice</a>
+          <a className="text-sm font-semibold text-primary hover:underline" href="/practice">Start Practice</a>
         </div>
         <div className="p-4 border border-border-light dark:border-border-dark rounded-lg">
           <h3 className="font-semibold">Video Lecture: p-Block Elements</h3>
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1 mb-3">A quick revision video to solidify your concepts.</p>
-          <a className="text-sm font-semibold text-primary hover:underline" href="#">Watch Now</a>
+          <a className="text-sm font-semibold text-primary hover:underline" href="/video">Watch Now</a>
         </div>
         <div className="p-4 border border-border-light dark:border-border-dark rounded-lg">
           <h3 className="font-semibold">Timed Quiz: Calculus</h3>
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1 mb-3">Challenge yourself with a 20-minute quiz.</p>
-          <a className="text-sm font-semibold text-primary hover:underline" href="#">Take Quiz</a>
+          <a className="text-sm font-semibold text-primary hover:underline" href="/quiz">Take Quiz</a>
         </div>
       </div>
     </div>

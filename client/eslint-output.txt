@@ -1,0 +1,27 @@
+
+C:\Users\Harshit Sayal\Desktop\BDP\prepAIred\prepaired-dev\prepaired-web\client\src\components\Header.old.tsx
+   14:9   warning  'isHome' is assigned a value but never used                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  188:21  warning  Redundant alt attribute. Screen-readers already announce `img` tags as an image. You donΓÇÖt need to use the words `image`, `photo,` or `picture` (or any specified custom words) in the alt prop                                                                                                                                                                    jsx-a11y/img-redundant-alt
+  207:25  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  211:25  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  215:25  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+C:\Users\Harshit Sayal\Desktop\BDP\prepAIred\prepaired-dev\prepaired-web\client\src\components\PercentileDistributionGraph.tsx
+  281:8  warning  React Hook useMemo has a missing dependency: 'allTicks'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Harshit Sayal\Desktop\BDP\prepAIred\prepaired-dev\prepaired-web\client\src\components\ResponseResult.tsx
+  283:11  warning  'scorePct' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Harshit Sayal\Desktop\BDP\prepAIred\prepaired-dev\prepaired-web\client\src\components\SubjectMastery.tsx
+  48:17  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+C:\Users\Harshit Sayal\Desktop\BDP\prepAIred\prepaired-dev\prepaired-web\client\src\components\Subjects.tsx
+  7:12  warning  'isFadingIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Harshit Sayal\Desktop\BDP\prepAIred\prepaired-dev\prepaired-web\client\src\srcs\components\RecommendedForYou.js
+  11:11  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  16:11  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  21:11  warning  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+Γ£û 12 problems (0 errors, 12 warnings)
+

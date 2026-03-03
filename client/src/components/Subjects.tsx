@@ -4,19 +4,16 @@ import GradeSelection from './GradeSelection';
 const Subjects: React.FC = () => {
     const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
     const [isFadingOut, setIsFadingOut] = useState(false);
-    const [isFadingIn, setIsFadingIn] = useState(false);
 
     const handleSubjectClick = (subject: string) => {
         setIsFadingOut(true);
         setTimeout(() => {
             setSelectedSubject(subject);
             setIsFadingOut(false);
-            setIsFadingIn(true);
         }, 300);
     };
 
     const handleBack = () => {
-        setIsFadingIn(false);
         setTimeout(() => {
             setSelectedSubject(null);
         }, 300);

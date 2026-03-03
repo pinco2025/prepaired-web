@@ -61,6 +61,8 @@ function estimatePercentile(pair: PercentileBracketPair): number {
     return 50;
 }
 
+const allTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 99.9];
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const PercentileDistributionGraph: React.FC<Props> = ({ percentileReport, totalMarks = 300 }) => {
@@ -257,7 +259,6 @@ const PercentileDistributionGraph: React.FC<Props> = ({ percentileReport, totalM
     }, [xScale, yScale, chartH, margin.top, zoomDomain]);
 
     // ── X-axis ticks ─────────────────────────────────────────────────
-    const allTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 99.9];
 
     // Filter ticks so they don't overlap (prioritizing the right-most higher percentiles)
     const visibleTicks = useMemo(() => {
