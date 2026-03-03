@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import './Tests.css';
 import { Test } from '../data';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,36 +37,37 @@ const Tests: React.FC = () => {
 
             try {
                 // Fetch all tests
-                const { data: testsData, error: testsError } = await supabase
-                    .from('tests')
-                    .select('*')
-                    .order('testID', { ascending: true });
+                const testsSnap = await getDocs(
+                    query(collection(db, 'tests'), orderBy('testID'))
+                );
+                const testsData = testsSnap.docs.map(d => d.data() as Test);
 
                 if (!mounted) return;
-                if (testsError) throw testsError;
 
                 // Fetch user's submitted tests with result info
-                const { data: submissionsData, error: submissionsError } = await supabase
-                    .from('student_tests')
-                    .select('id, test_id, result_url')
-                    .eq('user_id', user.id)
-                    .not('submitted_at', 'is', null);
+                const subsSnap = await getDocs(
+                    query(
+                        collection(db, 'student_tests'),
+                        where('user_id', '==', user.id),
+                        where('submitted_at', '!=', null)
+                    )
+                );
+                const submissionsData = subsSnap.docs.map(d => ({ ...d.data(), _docId: d.id }));
 
                 if (!mounted) return;
-                if (submissionsError) throw submissionsError;
 
                 // Create a map of test_id to submission info
                 const submissionsMap = new Map<string, { id: string; hasResult: boolean }>();
-                submissionsData.forEach(s => {
+                submissionsData.forEach((s: any) => {
                     submissionsMap.set(s.test_id, {
-                        id: s.id,
+                        id: s._docId,
                         hasResult: !!s.result_url
                     });
                 });
 
                 let firstUnlockedFound = false;
                 const testsWithStatus: TestWithStatus[] = (testsData || []).map(test => {
-                    const submissionInfo = submissionsMap.get(test.testID);
+                    const submissionInfo = test.testID ? submissionsMap.get(String(test.testID)) : undefined;
                     const isCompleted = !!submissionInfo;
                     let status: 'completed' | 'unlocked' | 'locked' = 'locked';
 

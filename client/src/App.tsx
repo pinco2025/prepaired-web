@@ -26,6 +26,8 @@ import PageSkeleton from './components/PageSkeleton';
 import QuestionSet from './components/QuestionSet';
 import CondensedPractice from './components/CondensedPractice';
 import PricingPlans from './components/PricingPlans';
+import ResponseUpload from './components/ResponseUpload';
+import ResponseResult from './components/ResponseResult';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -77,7 +79,7 @@ export const AppContent: React.FC = () => {
   // Show sidebar for all authenticated users on protected routes OR on specific public routes for everyone
   // Hide sidebar when user is taking a test or on submission page
   const isCondensedPracticeRoute = /^\/question-set\/[^/]+\/practice$/.test(location.pathname);
-  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute;
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing', '/response-upload', '/response-result'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute;
   const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute;
 
   return (
@@ -160,6 +162,12 @@ export const AppContent: React.FC = () => {
             } />
             <Route path="/question-set/:subject/practice" element={
               <CondensedPractice />
+            } />
+            <Route path="/response-upload" element={
+              <ResponseUpload />
+            } />
+            <Route path="/response-result" element={
+              <ResponseResult />
             } />
             <Route path="/pricing" element={
               <PricingPlans />

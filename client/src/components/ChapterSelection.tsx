@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
 import { withTimeout } from '../utils/promiseUtils';
 
 interface Chapter {
@@ -43,15 +44,11 @@ const ChapterSelection: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Parallelize fetching Chapters and Supabase URL
-                const [chaptersResult, supabaseResult] = await Promise.allSettled([
+                // Parallelize fetching Chapters and Firestore URL
+                const [chaptersResult, firestoreResult] = await Promise.allSettled([
                     withTimeout(fetch('/chapters.json'), FETCH_TIMEOUT),
                     withTimeout(
-                        Promise.resolve(supabase
-                            .from('question_set')
-                            .select('url')
-                            .eq('set_id', '26-pyq')
-                            .single()),
+                        getDoc(doc(db, 'question_set', '26-pyq')),
                         FETCH_TIMEOUT
                     )
                 ]);
@@ -72,10 +69,10 @@ const ChapterSelection: React.FC = () => {
                 }
 
                 // 2. Handle Base URL (Non-blocking failure)
-                if (supabaseResult.status === 'fulfilled') {
-                    const sbVal = supabaseResult.value as any; // Cast to any or appropriate type 
-                    if (!sbVal.error && sbVal.data) {
-                        const setRow = sbVal.data;
+                if (firestoreResult.status === 'fulfilled') {
+                    const docSnap = firestoreResult.value as any;
+                    if (docSnap.exists && docSnap.exists()) {
+                        const setRow = docSnap.data();
                         if (setRow?.url) {
                             let rawBaseUrl = setRow.url
                                 .replace('github.com', 'raw.githubusercontent.com')

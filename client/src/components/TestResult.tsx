@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
 import { usePageTitle } from '../hooks/usePageTitle';
 import JEELoader from './JEELoader';
 
@@ -72,13 +73,10 @@ const TestResult: React.FC = () => {
       if (!submissionId) return;
 
       try {
-        const { data: submissionData, error: submissionError } = await supabase
-          .from('student_tests')
-          .select('started_at, submitted_at, result_url')
-          .eq('id', submissionId)
-          .single();
+        const docSnap = await getDoc(doc(db, 'student_tests', submissionId));
 
-        if (submissionError) throw submissionError;
+        if (!docSnap.exists()) throw new Error('Submission not found');
+        const submissionData = docSnap.data();
 
         setSubmissionTime(submissionData.submitted_at);
         setStartTime(submissionData.started_at);

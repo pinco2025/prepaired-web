@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JEE 2026 Analysis Report</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-dark": "#0e44b3",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "accent-physics": "#8b5cf6",
+                        "accent-chem": "#10b981",
+                        "accent-math": "#f59e0b",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "glow": "0 0 15px rgba(19, 91, 236, 0.15)",
+                        "glow-hover": "0 0 25px rgba(19, 91, 236, 0.25)",
+                        "card": "0 2px 8px rgba(0,0,0,0.04), 0 0 2px rgba(0,0,0,0.04)"
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-card {
+            @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-card backdrop-blur-sm;
+        }
+        .progress-bar-bg {
+            @apply w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden;
+        }
+        .progress-bar-fill {
+            @apply h-full rounded-full transition-all duration-1000 ease-out;
+        }
+        .gauge-semi {
+             position: relative;
+             width: 200px;
+             height: 100px;
+             border-radius: 100px 100px 0 0;
+             background: conic-gradient(from 180deg at 50% 100%, #135bec 0%, #135bec 85%, #e2e8f0 85%, #e2e8f0 100%);
+             overflow: hidden;
+        }
+        .gauge-semi::before {
+             content: '';
+             position: absolute;
+             bottom: 0;
+             left: 50%;
+             transform: translateX(-50%);
+             width: 160px;
+             height: 80px;
+             background: white;
+             border-radius: 80px 80px 0 0;
+        }
+        .dark .gauge-semi::before {
+             background: #0f172a; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-body min-h-screen flex flex-col antialiased bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200/60 dark:border-slate-800/60 bg-white/80 dark:bg-[#101622]/80 backdrop-blur-md px-6 lg:px-10 py-3">
+<div class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
+<div class="size-8 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">school</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight font-display">prepAIred</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-medium leading-normal" href="#">Analysis</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">Mock Tests</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">Profile</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1280px] mx-auto p-6 lg:p-10 flex flex-col gap-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-primary text-xs font-bold uppercase tracking-wide">Jan 29 • Shift 1</span>
+<span class="px-2.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold uppercase tracking-wide">Analyzed</span>
+</div>
+<h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white font-display">JEE Mains 2026 Analysis Report</h1>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-lg">download</span>
+        Download PDF
+    </button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div class="lg:col-span-4 glass-card p-6 flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl text-primary">emoji_events</span>
+</div>
+<h3 class="text-slate-500 dark:text-slate-400 font-medium text-sm uppercase tracking-wider">Overall Score</h3>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="text-6xl font-black text-slate-900 dark:text-white tracking-tight font-display">184</span>
+<span class="text-xl text-slate-400 font-medium">/ 300</span>
+</div>
+<div class="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-lg">trending_up</span>
+        +24 from last mock
+    </div>
+</div>
+<div class="lg:col-span-4 glass-card p-6 flex flex-col justify-between relative overflow-hidden">
+<h3 class="text-slate-500 dark:text-slate-400 font-medium text-sm uppercase tracking-wider">Projected AIR</h3>
+<div class="mt-4">
+<span class="text-5xl font-black text-slate-900 dark:text-white tracking-tight font-display">~12,500</span>
+</div>
+<p class="mt-2 text-xs text-slate-400 leading-relaxed">
+        Based on historic cutoffs and difficulty level of Jan 29 S1. <br/>Range: 11,000 - 14,000
+    </p>
+</div>
+<div class="lg:col-span-4 glass-card p-6 flex flex-col items-center justify-center text-center relative">
+<h3 class="text-slate-500 dark:text-slate-400 font-medium text-sm uppercase tracking-wider absolute top-6 left-6">Percentile</h3>
+<div class="mt-8 relative">
+<div class="gauge-semi mx-auto"></div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
+<span class="block text-3xl font-black text-slate-900 dark:text-white font-display">98.85</span>
+<span class="text-xs text-slate-400 font-medium uppercase">%ile</span>
+</div>
+</div>
+<div class="mt-2 text-xs text-slate-400">Top 1.2% of candidates</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 glass-card p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white font-display">Subject-wise Performance</h3>
+<div class="flex gap-4 text-xs font-medium text-slate-500">
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-physics"></span>Physics</div>
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-chem"></span>Chemistry</div>
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-math"></span>Maths</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-sm font-medium">
+<span class="text-slate-700 dark:text-slate-200">Physics</span>
+<span class="text-slate-900 dark:text-white font-bold">72 / 100</span>
+</div>
+<div class="progress-bar-bg">
+<div class="progress-bar-fill bg-accent-physics" style="width: 72%;"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm font-medium">
+<span class="text-slate-700 dark:text-slate-200">Chemistry</span>
+<span class="text-slate-900 dark:text-white font-bold">84 / 100</span>
+</div>
+<div class="progress-bar-bg">
+<div class="progress-bar-fill bg-accent-chem" style="width: 84%;"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm font-medium">
+<span class="text-slate-700 dark:text-slate-200">Mathematics</span>
+<span class="text-slate-900 dark:text-white font-bold">28 / 100</span>
+</div>
+<div class="progress-bar-bg">
+<div class="progress-bar-fill bg-accent-math" style="width: 28%;"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4">
+<div>
+<h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Question Type</h4>
+<div class="flex gap-2 h-24 items-end">
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full bg-blue-100 dark:bg-blue-900/30 rounded-t-lg relative overflow-hidden h-[75%] transition-all group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50">
+<div class="absolute bottom-0 w-full bg-primary h-[85%]"></div>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">MCQ</span>
+</div>
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full bg-blue-100 dark:bg-blue-900/30 rounded-t-lg relative overflow-hidden h-[75%] transition-all group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50">
+<div class="absolute bottom-0 w-full bg-indigo-500 h-[60%]"></div>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Numerical</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col justify-center space-y-3">
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500">MCQ Accuracy</span>
+<span class="font-bold text-slate-900 dark:text-white">85%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500">Numerical Accuracy</span>
+<span class="font-bold text-slate-900 dark:text-white">60%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1 glass-card p-6 flex flex-col gap-6">
+<div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white font-display mb-4">Accuracy &amp; Speed</h3>
+<div class="relative size-32 mx-auto mb-4">
+<svg class="size-full rotate-[-90deg]" viewBox="0 0 36 36">
+<path class="text-slate-100 dark:text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path class="text-primary drop-shadow-md" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="78, 100" stroke-width="3"></path>
+</svg>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+<span class="text-2xl font-bold text-slate-900 dark:text-white block">78%</span>
+<span class="text-[10px] uppercase text-slate-400 font-semibold">Accuracy</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Time Spent vs Avg</h4>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-accent-physics"></span>
+<span class="text-slate-700 dark:text-slate-300">Physics</span>
+</div>
+<div class="text-right">
+<span class="font-bold text-slate-900 dark:text-white">45m</span>
+<span class="text-xs text-slate-400">/ 55m avg</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-accent-chem"></span>
+<span class="text-slate-700 dark:text-slate-300">Chemistry</span>
+</div>
+<div class="text-right">
+<span class="font-bold text-slate-900 dark:text-white">40m</span>
+<span class="text-xs text-slate-400">/ 45m avg</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-accent-math"></span>
+<span class="text-slate-700 dark:text-slate-300">Maths</span>
+</div>
+<div class="text-right">
+<span class="font-bold text-slate-900 dark:text-white">95m</span>
+<span class="text-xs text-red-500">/ 80m avg</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="glass-card p-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white font-display mb-2">Shift Context (Jan 29 S1)</h3>
+<p class="text-sm text-slate-500 mb-6">How you compare against others in this specific shift.</p>
+<div class="space-y-6">
+<div class="relative pt-6 pb-2">
+<div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full relative">
+<div class="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-3 bg-slate-300 rounded-full"></div> 
+<div class="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-3 bg-slate-300 rounded-full"></div> 
+<div class="absolute top-1/2 -translate-y-1/2 left-[35%] flex flex-col items-center group cursor-pointer">
+<div class="w-3 h-3 bg-slate-400 dark:bg-slate-600 rounded-full ring-4 ring-white dark:ring-slate-900"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Avg: 105</div>
+</div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[61.3%] flex flex-col items-center z-10">
+<div class="w-4 h-4 bg-primary rounded-full ring-4 ring-white dark:ring-slate-900 shadow-lg"></div>
+<div class="absolute -top-9 bg-primary text-white text-xs font-bold px-2 py-1 rounded after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-t-primary after:border-transparent">You: 184</div>
+</div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[95%] flex flex-col items-center group cursor-pointer">
+<div class="w-3 h-3 bg-yellow-400 rounded-full ring-4 ring-white dark:ring-slate-900"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Top: 285</div>
+</div>
+</div>
+<div class="flex justify-between text-xs text-slate-400 font-medium mt-2">
+<span>0</span>
+<span>Average</span>
+<span>Topper</span>
+<span>300</span>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border border-slate-100 dark:border-slate-800">
+                This shift was rated <span class="font-bold text-red-500">Moderate to Tough</span> compared to Jan 27. Physics was formula-based, but Mathematics was lengthy. Your score of 184 puts you well above the shift average.
+            </div>
+</div>
+</div>
+<div class="glass-card p-6 bg-gradient-to-br from-white to-red-50/50 dark:from-slate-900 dark:to-red-900/10">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-red-500">warning</span>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white font-display">Focus Areas</h3>
+</div>
+<p class="text-sm text-slate-500 mb-6">AI identified recurring concept gaps in your attempt.</p>
+<div class="flex flex-wrap gap-2">
+<div class="px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm font-semibold border border-red-200 dark:border-red-800 flex items-center gap-2">
+<span>Calculus (Integration)</span>
+<span class="text-[10px] bg-white dark:bg-red-900/50 px-1.5 rounded uppercase">High</span>
+</div>
+<div class="px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm font-semibold border border-red-200 dark:border-red-800 flex items-center gap-2">
+<span>Rotational Motion</span>
+<span class="text-[10px] bg-white dark:bg-red-900/50 px-1.5 rounded uppercase">High</span>
+</div>
+<div class="px-3 py-1.5 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm font-medium border border-orange-200 dark:border-orange-800">
+                Chemical Bonding
+            </div>
+<div class="px-3 py-1.5 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm font-medium border border-orange-200 dark:border-orange-800">
+                Probability
+            </div>
+<div class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-700">
+                Electrostatics
+            </div>
+<div class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-700">
+                Modern Physics
+            </div>
+</div>
+<div class="mt-6 pt-4 border-t border-red-100 dark:border-slate-800">
+<p class="text-xs text-slate-500 font-medium mb-2">AI Insight:</p>
+<p class="text-sm text-slate-700 dark:text-slate-300 italic">
+                "You consistently spent over 4 minutes on calculus problems but got 60% of them wrong. Consider revisiting definite integration properties."
+            </p>
+</div>
+</div>
+</div>
+<div class="glass-card p-8 bg-gradient-to-r from-primary/5 via-transparent to-transparent">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white font-display mb-6">What's Next?</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md transition-shadow cursor-pointer group">
+<div class="size-12 rounded-full bg-blue-50 dark:bg-blue-900/20 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1 text-center sm:text-left">
+<h3 class="font-bold text-slate-900 dark:text-white mb-1">View Paper with Solutions</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Review every question with detailed explanations.</p>
+</div>
+<button class="text-primary font-semibold text-sm hover:underline">Review Now →</button>
+</div>
+<div class="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl border border-primary/20 bg-primary/5 dark:bg-primary/10 hover:shadow-md hover:shadow-primary/5 transition-all cursor-pointer group relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full -mr-8 -mt-8"></div>
+<div class="size-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">swords</span>
+</div>
+<div class="flex-1 text-center sm:text-left z-10">
+<h3 class="font-bold text-slate-900 dark:text-white mb-1">Challenge Yourself</h3>
+<p class="text-sm text-slate-600 dark:text-slate-300">Join the Free All-India Mock Test this Sunday.</p>
+</div>
+<button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors z-10">Register</button>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#101622]">
+<div class="max-w-[1280px] mx-auto px-6 text-center text-slate-500 dark:text-slate-400 text-sm">
+<p>© 2026 prepAIred. All rights reserved.</p>
+</div>
+</footer>
+
+</body></html>

@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { auth, db } from '../utils/firebaseClient';
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { usePageTitle } from '../hooks/usePageTitle';
+
+const googleProvider = new GoogleAuthProvider();
 
 const SignUp: React.FC = () => {
   usePageTitle('Sign Up');
@@ -11,67 +21,61 @@ const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let mounted = true;
-    const check = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        const session = data?.session ?? null;
-        if (session && mounted) {
-          navigate('/question-set', { replace: true });
-        }
-      } catch (err) {
-        // ignore and allow registration UI
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigate('/question-set', { replace: true });
       }
-    };
-    check();
-    return () => {
-      mounted = false;
-    };
+    });
+    return () => unsubscribe();
   }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
-      if (error) throw error;
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Check if user already exists (Supabase returns empty identities array for existing users)
-      if (data?.user?.identities && data.user.identities.length === 0) {
+      // Set display name
+      await updateProfile(user, { displayName: fullName });
+
+      // Create user document in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        id: user.uid,
+        email: user.email,
+        full_name: fullName,
+        subscription_tier: null,
+        exam_type: null,
+        created_at: new Date().toISOString(),
+      });
+
+      navigate('/question-set');
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
         alert('An account with this email already exists. Please log in instead.');
         navigate('/login');
         return;
       }
-
-      // Check if email confirmation is required (session will be null if confirmation needed)
-      if (data?.user && !data?.session) {
-        alert('Registration successful! Please check your email to confirm your account before logging in.');
-        navigate('/login');
-        return;
-      }
-
-      // If we have a session, user is logged in immediately (email confirmation disabled)
-      navigate('/question-set');
-    } catch (error: any) {
-      alert(error.error_description || error.message);
+      alert(error.message);
     }
   };
 
   const handleGoogleSignUp = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-      });
-      if (error) throw error;
+      const { user } = await signInWithPopup(auth, googleProvider);
+
+      // Create user document in Firestore if it doesn't exist
+      await setDoc(doc(db, 'users', user.uid), {
+        id: user.uid,
+        email: user.email,
+        full_name: user.displayName,
+        avatar_url: user.photoURL,
+        subscription_tier: null,
+        exam_type: null,
+        created_at: new Date().toISOString(),
+      }, { merge: true });
+
+      navigate('/question-set');
     } catch (error: any) {
-      alert(error.error_description || error.message);
+      alert(error.message);
     }
   };
 

@@ -1,39 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
 import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
 import ImageWithProgress from './ImageWithProgress';
-
-// Enhanced text renderer that mimics TestInterface
-const RenderText: React.FC<{ text: string }> = ({ text }) => {
-    if (!text) return null;
-
-    // Split by both $$ (display) and $ (inline) delimiters
-    // Logic adapted from TestInterface.tsx
-    const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g);
-
-    return (
-        <span>
-            {parts.map((part, index) => {
-                if (part.startsWith('$$') && part.endsWith('$$')) {
-                    // Display math
-                    return (
-                        <div key={index} className="overflow-x-auto custom-scrollbar">
-                            <BlockMath math={part.slice(2, -2)} />
-                        </div>
-                    );
-                } else if (part.startsWith('$') && part.endsWith('$')) {
-                    // Inline math
-                    return <InlineMath key={index} math={part.slice(1, -1)} />;
-                }
-                // Plain text - render as is (no dangerouslySetInnerHTML), preserving formatting via CSS
-                return <span key={index}>{part}</span>;
-            })}
-        </span>
-    );
-};
+import {
+    RenderMath,
+    MCQOptions,
+    SolutionDisplay,
+} from './question';
 
 interface Option {
     id: string;
@@ -124,18 +100,15 @@ const QuestionPractice: React.FC = () => {
                     }
                 }
 
-                // 1. Fetch the GitHub folder URL from Supabase (using super-30 set as reference for the repo)
-                const { data: setRow, error: dbError } = await withTimeout(
-                    Promise.resolve(supabase
-                        .from('question_set')
-                        .select('url')
-                        .eq('set_id', '26-pyq')
-                        .single()),
+                // 1. Fetch the GitHub folder URL from Firestore
+                const setDocSnap = await withTimeout(
+                    getDoc(doc(db, 'question_set', '26-pyq')),
                     15000,
-                    'Supabase URL fetch timed out'
+                    'Firestore URL fetch timed out'
                 );
 
-                if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);
+                if (!setDocSnap.exists()) throw new Error('No URL found for Super 30 set');
+                const setRow = setDocSnap.data();
                 if (!setRow?.url) throw new Error('No URL found for Super 30 set');
 
                 // 2. Transform the GitHub URL to a Raw Content URL
@@ -445,10 +418,10 @@ const QuestionPractice: React.FC = () => {
                                 </div>
 
                                 <div className="text-lg md:text-xl font-medium leading-relaxed text-text-light dark:text-text-dark mb-2 whitespace-pre-wrap break-words">
-                                    <RenderText text={currentQuestion.text} />
+                                    <RenderMath text={currentQuestion.text} />
                                 </div>
                                 {currentQuestion.image && (
-                                    <div className="p-4 bg-white rounded-xl border border-gray-200 mt-2 w-fit mx-auto flex justify-center max-w-full">
+                                    <div className="mt-2 w-full flex justify-center">
                                         <ImageWithProgress
                                             src={currentQuestion.image}
                                             alt="Question"
@@ -459,70 +432,22 @@ const QuestionPractice: React.FC = () => {
                             </div>
 
                             {/* Options */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {currentQuestion.options && currentQuestion.options.map((option, index) => {
-                                    const optionId = option.id; // 'a', 'b', etc.
-                                    const isSelected = selectedOption === optionId;
-                                    const isCorrect = currentQuestion.correctAnswer && currentQuestion.correctAnswer.toLowerCase() === optionId.toLowerCase();
-
-                                    let borderClass = 'border-border-light dark:border-border-dark hover:border-primary/50 hover:bg-background-light dark:hover:bg-white/5';
-                                    if (showSolution) {
-                                        if (isCorrect) borderClass = 'border-green-500 bg-green-50 dark:bg-green-900/10';
-                                        else if (isSelected) borderClass = 'border-red-500 bg-red-50 dark:bg-red-900/10';
-                                    } else if (isSelected) {
-                                        borderClass = 'border-primary bg-primary/5';
-                                    }
-
-                                    return (
-                                        <label
-                                            key={index}
-                                            className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all active:scale-[0.98] group ${borderClass}`}
-                                            onClick={() => handleOptionSelect(optionId)}
-                                        >
-                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 mr-4 flex items-center justify-center font-bold text-sm uppercase mt-0.5 transition-colors ${isSelected ? 'border-primary bg-primary text-white' : 'border-text-secondary-light/30 text-text-secondary-light'}`}>
-                                                {isSelected ? <span className="material-symbols-outlined text-base">check</span> : optionId}
-                                            </div>
-                                            <div className="flex-1 whitespace-pre-wrap break-words">
-                                                {option.text && <RenderText text={option.text} />}
-                                                {option.image && (
-                                                    <div className="mt-2 text-center flex justify-center">
-                                                        <ImageWithProgress
-                                                            src={option.image}
-                                                            alt={`Option ${optionId}`}
-                                                            className="max-w-full max-h-40 w-auto h-auto inline-block rounded-lg"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </label>
-                                    );
-
-                                })}
-                            </div>
+                            <MCQOptions
+                                options={currentQuestion.options}
+                                selectedId={selectedOption}
+                                onSelect={handleOptionSelect}
+                                disabled={showSolution}
+                                showResult={showSolution}
+                                correctAnswerId={currentQuestion.correctAnswer}
+                                layout="grid"
+                            />
 
                             {/* Solution Display */}
-                            {showSolution && currentSolution && (
-                                <div className="mt-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 overflow-x-auto">
-                                    <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Detailed Solution</h3>
-                                    <div className="prose dark:prose-invert max-w-none text-text-light dark:text-text-dark break-words whitespace-pre-wrap">
-                                        {currentSolution.text && (
-                                            <div>
-                                                <RenderText text={currentSolution.text} />
-                                            </div>
-                                        )}
-
-                                        {currentSolution.image && (
-                                            <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 max-w-full bg-white p-2 w-fit mx-auto flex justify-center">
-                                                <ImageWithProgress
-                                                    src={currentSolution.image}
-                                                    alt="Solution"
-                                                    className="max-w-full md:max-w-lg max-h-[30vh] w-auto h-auto rounded-lg"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+                            <SolutionDisplay
+                                text={currentSolution?.text}
+                                image={currentSolution?.image}
+                                visible={showSolution && !!currentSolution}
+                            />
                         </div>
                     </div>
                 </div>

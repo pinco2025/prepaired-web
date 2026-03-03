@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import Super30Feedback from './Super30Feedback';
-import { supabase } from '../utils/supabaseClient';
+import { auth, db } from '../utils/firebaseClient';
+import { doc, getDoc, addDoc, updateDoc, collection } from 'firebase/firestore';
 import { withTimeout } from '../utils/promiseUtils';
 import JEELoader from './JEELoader';
-import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
+import { RenderMath } from './question';
 
 interface QuestionOption {
     id: string;
@@ -130,24 +131,22 @@ const Super30: React.FC = () => {
 
     // Fetch current user on mount
     useEffect(() => {
-        const fetchUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setUserId(user.id);
-            }
-        };
-        fetchUser();
+        const user = auth.currentUser;
+        if (user) {
+            setUserId(user.uid);
+        }
     }, []);
 
     // Persist time_elapsed on tab close / navigation away
     useEffect(() => {
         const handleBeforeUnload = async () => {
             if (sessionId && timer > 0) {
-                // Use sendBeacon for reliable delivery on page unload
-                const payload = JSON.stringify({ time_elapsed: timer });
-                navigator.sendBeacon?.(`https://eznxtdzsvnfclgcavvhp.supabase.co/rest/v1/student_sets?id=eq.${sessionId}`, payload);
-                // Fallback attempt with supabase client (may not complete)
-                await supabase.from('student_sets').update({ time_elapsed: timer }).eq('id', sessionId);
+                // Use updateDoc for reliable delivery on page unload
+                try {
+                    await updateDoc(doc(db, 'student_sets', sessionId), { time_elapsed: timer });
+                } catch (e) {
+                    console.warn('Failed to save time_elapsed on unload', e);
+                }
             }
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -166,16 +165,13 @@ const Super30: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch the GitHub folder URL from Supabase
-                const { data: setRow, error: dbError } = await withTimeout(
-                    Promise.resolve(supabase
-                        .from('question_set')
-                        .select('url')
-                        .eq('set_id', 'super-30')
-                        .single())
+                // 1. Fetch the GitHub folder URL from Firestore
+                const setDocSnap = await withTimeout(
+                    getDoc(doc(db, 'question_set', 'super-30'))
                 );
 
-                if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);
+                if (!setDocSnap.exists()) throw new Error('No URL found for Super 30 set');
+                const setRow = setDocSnap.data();
                 if (!setRow?.url) throw new Error('No URL found for Super 30 set');
 
                 // 2. Transform the GitHub URL to a Raw Content URL
@@ -375,21 +371,19 @@ const Super30: React.FC = () => {
         // Create session in student_sets
         if (userId) {
             const initialAnswers = { PYQs: {}, IPQs: {} };
-            const { data, error } = await supabase
-                .from('student_sets')
-                .insert({
+            try {
+                const newDocRef = await addDoc(collection(db, 'student_sets'), {
                     user_id: userId,
                     set_id: 'super-30',
                     answers: initialAnswers
-                })
-                .select('id')
-                .single();
+                });
 
-            if (!error && data) {
-                setSessionId(data.id);
-                sessionIdRef.current = data.id;
+                setSessionId(newDocRef.id);
+                sessionIdRef.current = newDocRef.id;
                 setSessionAnswers(initialAnswers);
                 sessionAnswersRef.current = initialAnswers;
+            } catch (e) {
+                console.error('Error creating session:', e);
             }
         }
     };
@@ -431,10 +425,7 @@ const Super30: React.FC = () => {
         setSessionAnswers(updatedAnswers);
         sessionAnswersRef.current = updatedAnswers;
 
-        await supabase
-            .from('student_sets')
-            .update({ answers: updatedAnswers })
-            .eq('id', currentSessionId);
+        await updateDoc(doc(db, 'student_sets', currentSessionId), { answers: updatedAnswers });
     };
 
     // Handlers for answer selection with DB sync
@@ -486,10 +477,7 @@ const Super30: React.FC = () => {
                 // End of session (Last subject completed)
                 // Update time_elapsed in DB
                 if (sessionId) {
-                    await supabase
-                        .from('student_sets')
-                        .update({ time_elapsed: timer })
-                        .eq('id', sessionId);
+                    await updateDoc(doc(db, 'student_sets', sessionId), { time_elapsed: timer });
                 }
                 setShowFeedback(true);
             }
@@ -539,22 +527,8 @@ const Super30: React.FC = () => {
         }
     };
 
-    const renderHtml = (htmlString: string) => {
-        if (!htmlString) return null;
-        const parts = htmlString.split(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g);
-        return (
-            <span className="whitespace-pre-wrap">
-                {parts.map((part, i) => {
-                    if (part.startsWith('$$') && part.endsWith('$$')) {
-                        return <span key={i} dangerouslySetInnerHTML={{ __html: katex.renderToString(part.slice(2, -2), { throwOnError: false, displayMode: true }) }} />;
-                    } else if (part.startsWith('$') && part.endsWith('$')) {
-                        return <span key={i} dangerouslySetInnerHTML={{ __html: katex.renderToString(part.slice(1, -1), { throwOnError: false }) }} />;
-                    }
-                    return <span key={i}>{part}</span>;
-                })}
-            </span>
-        );
-    };
+    // renderHtml now uses shared RenderMath component
+    const renderHtml = (htmlString: string) => <RenderMath text={htmlString} />;
 
     const subjectTabs = [
         { key: 'Physics' as Subject, label: 'Physics' },
@@ -583,108 +557,86 @@ const Super30: React.FC = () => {
 
     if (!sessionStarted) {
         return (
-            <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark overflow-y-auto">
+            <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark overflow-y-auto super30-session-active">
+                <style>{`
+                    aside, .app-sidebar, .app-mobile-header { display: none !important; }
+                    main { margin-left: 0 !important; }
+                    .super30-session-active { z-index: 50; position: relative; }
+                `}</style>
                 <main className="flex-1 flex flex-col items-center justify-center relative px-6 py-12">
+                    <div className="max-w-2xl w-full bg-white dark:bg-surface-dark rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 md:p-10 space-y-8 animate-in fade-in zoom-in-95 duration-500">
 
-                    <div className="max-w-4xl w-full text-center space-y-8 flex flex-col items-center">
-
-                        {/* Free Badge - Centered */}
-                        <div className="animate-in fade-in slide-in-from-top-4 duration-700">
-                            <span className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.15)] dark:shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                <span className="material-symbols-outlined text-base">verified</span>
-                                100% FREE
-                                <span className="material-symbols-outlined text-base">volunteer_activism</span>
-                            </span>
-                        </div>
-
-                        {/* Hero Section */}
-                        <div className="space-y-6">
-                            <h2 className="text-6xl md:text-8xl font-black tracking-tight leading-tight">
-                                <span className="text-blue-600 dark:text-blue-500 drop-shadow-lg filter">Super</span>
-                                <span className="bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-emerald-400 dark:to-teal-500 bg-clip-text text-transparent"> 30</span>
-                                <br />
-                                <span className="text-slate-800 dark:text-white text-3xl md:text-5xl font-extrabold tracking-tight mt-4 block">
-                                    The Ultimate Revision Set
-                                </span>
-                            </h2>
-
-                            <h3 className="text-xl md:text-2xl font-bold text-slate-600 dark:text-slate-300">
-                                30 <span className="text-blue-600 dark:text-blue-500">Handcrafted</span> PYQ-Inspired Problems
-                            </h3>
-
-                            <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
-                                Each question meticulously designed by <span className="text-slate-800 dark:text-white font-bold">IITians</span> with <span className="text-blue-600 dark:text-blue-400 font-bold">200+ hours</span> of combined effort to ensure maximum concept clarity
+                        {/* Header */}
+                        <div className="text-center space-y-2">
+                            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white">
+                                Super 30 <span className="text-primary">Practice</span>
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium">
+                                Read the instructions carefully before starting.
                             </p>
                         </div>
 
-                        {/* CTA Button */}
-                        <div className="pt-4 flex flex-col items-center gap-4 w-full">
-                            <button
-                                onClick={handleStartSession}
-                                disabled={error !== null}
-                                className="group relative bg-blue-600 hover:bg-blue-500 disabled:bg-slate-400 text-white px-20 py-5 rounded-2xl font-black text-xl transition-all shadow-[0_0_40px_rgba(37,99,235,0.25)] hover:shadow-[0_0_60px_rgba(37,99,235,0.4)] flex items-center gap-3 hover:-translate-y-1"
-                            >
-                                {isDataReady ? (
-                                    <>
-                                        <span className="material-symbols-outlined text-2xl">rocket_launch</span>
-                                        Boost My Percentile
-                                        <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1">arrow_forward</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        {error ? (
+                        {/* Instructions List */}
+                        <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-start gap-3">
+                                <span className="material-symbols-outlined text-primary mt-0.5">format_list_numbered</span>
+                                <div>
+                                    <h3 className="font-bold text-slate-800 dark:text-slate-200">30 Questions</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">A mix of Physics, Chemistry, and Maths questions.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="material-symbols-outlined text-green-500 mt-0.5">check_circle</span>
+                                <div>
+                                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Marking Scheme</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">+4 for correct answers, -1 for incorrect answers.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="material-symbols-outlined text-amber-500 mt-0.5">timer</span>
+                                <div>
+                                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Timed Session</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">Track your speed and accuracy in real-time.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="material-symbols-outlined text-purple-500 mt-0.5">fullscreen</span>
+                                <div>
+                                    <h3 className="font-bold text-slate-800 dark:text-slate-200">Full Screen</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">The test will run in full-screen mode for best focus.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Area */}
+                        <div className="flex flex-col items-center gap-4 pt-4">
+                            {!isDataReady ? (
+                                <button disabled className="w-full py-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold flex items-center justify-center gap-2 cursor-wait">
+                                    {error ? (
+                                        <>
+                                            <span className="material-symbols-outlined">error</span>
                                             <span>Error Loading Content</span>
-                                        ) : (
-                                            <>
-                                                <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                                <span>Loading Content...</span>
-                                            </>
-                                        )}
-                                    </>
-                                )}
-                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+                                            <span>Loading Resources...</span>
+                                        </>
+                                    )}
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleStartSession}
+                                    className="w-full group relative bg-primary hover:bg-primary-dark text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                                >
+                                    <span>Start Test</span>
+                                    <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+                                </button>
+                            )}
 
-                            <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
-                                <span className="material-symbols-outlined text-base">schedule</span>
-                                ~120 minutes • Full-screen experience
-                            </div>
+                            {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
                         </div>
 
-                        {/* Feature Cards Preview (Bottom) */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left w-full mt-12 opacity-90">
-                            {/* Card 1: Dual-Screen Mastery */}
-                            <div className="group p-6 rounded-2xl bg-white dark:bg-[#0B1120] border border-blue-200 dark:border-blue-900/50 hover:border-blue-400 dark:hover:border-blue-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-blue-100 dark:hover:shadow-blue-900/20">
-                                <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mb-4 font-bold text-xl">
-                                    26
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">2026 PYQs</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    IPQs created on the latest PYQs, <span className="text-blue-600 dark:text-blue-400 font-bold">maximum relevance for Second Session.</span>
-                                </p>
-                            </div>
-
-                            {/* Card 2: AI-Powered Solutions */}
-                            <div className="group p-6 rounded-2xl bg-white dark:bg-[#0B1120] border border-cyan-200 dark:border-cyan-900/50 hover:border-cyan-400 dark:hover:border-cyan-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-cyan-100 dark:hover:shadow-cyan-900/20">
-                                <div className="w-12 h-12 rounded-xl bg-cyan-500 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30 mb-4">
-                                    <span className="material-symbols-outlined text-2xl">psychology</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Detailed Solutions</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    All the solutions are <span className="text-cyan-600 dark:text-cyan-400 font-bold">detailed, with step-by-step solving.</span> Explanations crafted by AI and reviewed by IITians.
-                                </p>
-                            </div>
-
-                            {/* Card 3: Smart Analytics */}
-                            <div className="group p-6 rounded-2xl bg-white dark:bg-[#0B1120] border border-emerald-200 dark:border-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-emerald-100 dark:hover:shadow-emerald-900/20">
-                                <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 mb-4">
-                                    <span className="material-symbols-outlined text-2xl">align_vertical_bottom</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">FREE of Cost</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    The Super-30 set is completely <span className="text-emerald-600 dark:text-emerald-400 font-bold">FREE of cost</span>, stay tuned for more.
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 </main>
             </div>

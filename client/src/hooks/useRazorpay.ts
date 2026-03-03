@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
 
 declare global {
     interface Window {
@@ -79,14 +80,10 @@ export const useRazorpay = (config: UseRazorpayConfig = {}): UseRazorpayReturn =
             await new Promise(resolve => setTimeout(resolve, delayMs));
 
             try {
-                const { data } = await supabase
-                    .from('users')
-                    .select('subscription_tier')
-                    .eq('id', userId)
-                    .single();
+                const docSnap = await getDoc(doc(db, 'users', userId));
 
                 // Check if subscription is updated to expected plan by webhook
-                if (data?.subscription_tier?.toLowerCase() === expectedPlan.toLowerCase()) {
+                if (docSnap.exists() && docSnap.data().subscription_tier?.toLowerCase() === expectedPlan.toLowerCase()) {
                     return true;
                 }
             } catch (err) {

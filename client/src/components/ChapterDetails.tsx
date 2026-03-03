@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const ChapterDetails: React.FC = () => {
   const { subject, grade, chapter } = useParams<{ subject: string; grade: string; chapter: string }>();
@@ -65,23 +66,22 @@ const ChapterDetails: React.FC = () => {
         // Build the list of types we want from our tiles
         const types = resourceTiles.map(t => t.type);
 
-        // Request only the 'type' and 'link' columns for the relevant chapter and types
-        const { data, error } = await supabase
-          .from('global')
-          .select('type, link')
-          .eq('chapter', chapter)
-          .in('type', types);
+        // Request only docs for the relevant chapter and types
+        const globalSnap = await getDocs(
+          query(
+            collection(db, 'global'),
+            where('chapter', '==', chapter),
+            where('type', 'in', types)
+          )
+        );
 
-        if (error) {
-          console.error('Error fetching links:', error);
-          setError(error.message);
-          setLinksMap({});
-        } else if (!data) {
+        if (globalSnap.empty) {
           setLinksMap({});
         } else {
           // Convert array -> map: { [type]: link }
           const map: Record<string, string> = {};
-          data.forEach(row => {
+          globalSnap.docs.forEach(d => {
+            const row = d.data();
             if (row.type && row.link) map[row.type] = row.link;
           });
           setLinksMap(map);

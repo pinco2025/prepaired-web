@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../utils/supabaseClient';
+import { auth } from '../utils/firebaseClient';
+import { signOut } from 'firebase/auth';
 import { withTimeout } from '../utils/promiseUtils';
 
 interface SidebarContentProps {
@@ -44,8 +45,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 
   const menuItems = [
     { to: "/question-set", icon: "bolt", label: "Question Set", highlight: true },
-    { to: "/super30", icon: "history_edu", label: "Super 30" },
     { to: "/pyq-2026", icon: "calendar_today", label: "2026 PYQ" },
+    { to: "/response-upload", icon: "upload_file", label: "Response Analysis" },
     { to: "/dashboard", icon: "dashboard", label: "Dashboard" },
     { to: "/tests", icon: "quiz", label: "Tests & Analysis" },
   ];
@@ -106,19 +107,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
               }}
               title={isCollapsed && !mobile && item.label !== "Super 30" ? item.label : undefined}
             >
-              {item.label === "Super 30" ? (
-                <span className={`shrink-0 font-black text-xl tracking-tighter transition-all duration-300 w-6 text-center
-                  ${location.pathname === item.to ? 'text-primary' : 'text-text-secondary-light dark:text-text-secondary-dark'}
-                  `}
-                  style={{ fontFamily: 'monospace' }}
-                >
-                  30
-                </span>
-              ) : (
-                <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
-                  {item.icon}
-                </span>
-              )}
+              <span className={`material-symbols-outlined shrink-0 ${item.to !== '/coming-soon' && location.pathname === item.to ? 'filled' : ''}`}>
+                {item.icon}
+              </span>
               <span className={`whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed && !mobile ? 'opacity-0 w-0 ml-0' : 'opacity-100 ml-3'}`}>
                 {item.label}
               </span>
@@ -380,10 +371,7 @@ const Sidebar: React.FC = () => {
 
     try {
       // Wrap signOut in a timeout to prevent hanging (3s max)
-      const { error } = await withTimeout(supabase.auth.signOut(), 3000, 'Sign out timed out');
-      if (error) {
-        console.error('Sign out error:', error);
-      }
+      await withTimeout(signOut(auth), 3000, 'Sign out timed out');
       // Force navigation and reload to ensure clean state
       window.location.href = '/';
     } catch (error) {

@@ -38,8 +38,8 @@ const PricingPlans: React.FC = () => {
 
         const success = await initiateSubscription({
             userId: user.id,
-            userEmail: user.email,
-            userName: user.user_metadata?.full_name || user.user_metadata?.name
+            userEmail: user.email || undefined,
+            userName: (user as any).displayName || (user as any).user_metadata?.full_name || (user as any).user_metadata?.name || ''
         });
 
         if (!success && !paymentError) {

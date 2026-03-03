@@ -34,6 +34,22 @@ body {
   .path-shadow {
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
   }
+
+  .glass-card {
+    @apply bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-2xl shadow-card-light dark:shadow-card-dark;
+  }
+}
+
+/* Hide native select dropdown arrows cross-browser */
+select.appearance-none::-ms-expand {
+  display: none;
+}
+
+select.appearance-none {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
 }
 
 /* Headings use Poppins (font-display) */

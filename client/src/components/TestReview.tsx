@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
 import { Test, Question } from '../data';
 import { usePageTitle } from '../hooks/usePageTitle';
 import katex from 'katex';
@@ -51,26 +52,18 @@ const TestReview: React.FC = () => {
 
             try {
                 // 1. Fetch submission data to get result_url and test_id
-                const { data: submissionData, error: submissionError } = await supabase
-                    .from('student_tests')
-                    .select('result_url, test_id')
-                    .eq('id', submissionId)
-                    .single();
+                const subDocSnap = await getDoc(doc(db, 'student_tests', submissionId));
 
-                if (submissionError) throw new Error(`Failed to fetch submission: ${submissionError.message}`);
-                if (!submissionData) throw new Error('Submission not found.');
+                if (!subDocSnap.exists()) throw new Error('Submission not found.');
+                const submissionData = subDocSnap.data();
 
                 const { result_url, test_id } = submissionData;
 
                 // 2. Fetch test metadata to get the test url and solution_url
-                const { data: testMeta, error: testMetaError } = await supabase
-                    .from('tests')
-                    .select('url, solution_url')
-                    .eq('testID', test_id)
-                    .single();
+                const testDocSnap = await getDoc(doc(db, 'tests', test_id));
 
-                if (testMetaError) throw new Error(`Failed to fetch test metadata: ${testMetaError.message}`);
-                if (!testMeta) throw new Error('Test metadata not found.');
+                if (!testDocSnap.exists()) throw new Error('Test metadata not found.');
+                const testMeta = testDocSnap.data();
 
                 const { url: testUrl, solution_url } = testMeta;
 

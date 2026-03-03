@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { db } from '../utils/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const TestSubmitted: React.FC = () => {
@@ -21,15 +22,13 @@ const TestSubmitted: React.FC = () => {
     setMessage(null);
 
     try {
-      const { data, error } = await supabase
-        .from('student_tests')
-        .select('result_url')
-        .eq('id', submissionId)
-        .single();
+      const docSnap = await getDoc(doc(db, 'student_tests', submissionId));
 
-      if (error) {
-        throw error;
+      if (!docSnap.exists()) {
+        throw new Error('Submission not found');
       }
+
+      const data = docSnap.data();
 
       if (data && data.result_url) {
         navigate(`/results/${submissionId}`);

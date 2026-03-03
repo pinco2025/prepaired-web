@@ -1,139 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
 import ImageWithProgress from './ImageWithProgress';
 import { fetchEncryptedJson } from '../utils/cryptoUtils';
+import {
+    RenderMath,
+    NumericKeypad,
+    MCQOptions,
+    SolutionDisplay,
+    isIntegerTypeQuestion,
+} from './question';
 
-// Enhanced text renderer that mimics TestInterface
-const RenderText: React.FC<{ text: string }> = ({ text }) => {
-    if (!text) return null;
-
-    // Split by both $$ (display) and $ (inline) delimiters
-    const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[\s\S]+?\$)/g);
-
-    return (
-        <span>
-            {parts.map((part, index) => {
-                if (part.startsWith('$$') && part.endsWith('$$')) {
-                    // Display math
-                    return (
-                        <div key={index} className="overflow-x-auto custom-scrollbar">
-                            <BlockMath math={part.slice(2, -2)} />
-                        </div>
-                    );
-                } else if (part.startsWith('$') && part.endsWith('$')) {
-                    // Inline math
-                    return <InlineMath key={index} math={part.slice(1, -1)} />;
-                }
-                // Plain text - render as is, preserving formatting via CSS
-                return <span key={index}>{part}</span>;
-            })}
-        </span>
-    );
-};
-
-// Compact Numeric Keypad Component for Integer Type Questions
-const NumericKeypad: React.FC<{
-    value: string;
-    onChange: (value: string) => void;
-    disabled?: boolean;
-    showResult?: boolean;
-    isCorrect?: boolean;
-    correctAnswer?: string;
-}> = ({ value, onChange, disabled, showResult, isCorrect, correctAnswer }) => {
-    const handleKeyPress = (key: string) => {
-        if (disabled) return;
-
-        if (key === 'backspace') {
-            onChange(value.slice(0, -1));
-        } else if (key === '.' && !value.includes('.')) {
-            onChange(value + key);
-        } else if (key === '-' && value === '') {
-            onChange('-');
-        } else if (key !== '.' && key !== '-') {
-            // Limit to reasonable length
-            if (value.replace('-', '').replace('.', '').length < 10) {
-                onChange(value + key);
-            }
-        }
-    };
-
-    const keys = [
-        ['1', '2', '3'],
-        ['4', '5', '6'],
-        ['7', '8', '9'],
-        ['-', '0', '.'],
-    ];
-
-    return (
-        <div className="w-full max-w-xs mx-auto">
-            {/* Display */}
-            <div className={`mb-3 px-4 py-3 rounded-xl border-2 text-center font-mono text-xl md:text-2xl transition-all ${showResult
-                ? isCorrect
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
-                    : 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
-                : 'border-border-light dark:border-border-dark bg-background-light dark:bg-white/5 text-text-light dark:text-text-dark'
-                }`}>
-                {value || <span className="text-text-secondary-light/50">Enter answer</span>}
-            </div>
-
-            {/* Show correct answer when result is displayed and wrong */}
-            {showResult && !isCorrect && correctAnswer && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-center">
-                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                        Correct: <span className="font-bold font-mono">{correctAnswer}</span>
-                    </span>
-                </div>
-            )}
-
-            {/* Keypad Grid - Compact */}
-            <div className="grid grid-cols-3 gap-1.5 md:gap-2">
-                {keys.map((row, rowIdx) => (
-                    row.map((key, keyIdx) => (
-                        <button
-                            key={`${rowIdx}-${keyIdx}`}
-                            onClick={() => handleKeyPress(key)}
-                            disabled={disabled}
-                            className={`h-11 md:h-12 rounded-lg text-lg md:text-xl font-bold transition-all active:scale-95 ${disabled
-                                ? 'opacity-50 cursor-not-allowed bg-background-light dark:bg-white/5 text-text-secondary-light'
-                                : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:border-primary hover:bg-primary/5 text-text-light dark:text-text-dark shadow-sm'
-                                }`}
-                        >
-                            {key === '-' ? '−' : key}
-                        </button>
-                    ))
-                ))}
-            </div>
-
-            {/* Backspace Button - Compact */}
-            <button
-                onClick={() => handleKeyPress('backspace')}
-                disabled={disabled || !value}
-                className={`w-full mt-1.5 md:mt-2 h-10 md:h-11 rounded-lg flex items-center justify-center gap-1 text-sm transition-all active:scale-[0.98] ${disabled || !value
-                    ? 'opacity-50 cursor-not-allowed bg-background-light dark:bg-white/5 text-text-secondary-light'
-                    : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400'
-                    }`}
-            >
-                <span className="material-symbols-outlined text-lg">backspace</span>
-                <span className="font-medium">Clear</span>
-            </button>
-        </div>
-    );
-};
-
-interface Option {
-    id: string;
-    text: string;
-    image: string | null;
-}
-
-interface Question {
+// Local interfaces for JSON response structures
+interface LocalQuestion {
     id: string;
     uuid: string;
     text: string;
     image: string | null;
-    options: Option[];
+    options: { id: string; text: string; image: string | null }[];
     correctAnswer: string;
     chapterCode?: string;
     topicCode?: string;
@@ -153,7 +37,7 @@ interface QuestionsJsonResponse {
     subject: string;
     totalQuestions: number;
     exportedAt: string;
-    questions: Question[];
+    questions: LocalQuestion[];
 }
 
 interface SolutionsJsonResponse {
@@ -174,31 +58,11 @@ interface ChaptersJson {
     Mathematics: ChapterInfo[];
 }
 
-// Helper to detect if a question is integer type
-const isIntegerTypeQuestion = (question: Question): boolean => {
-    // Check if options are empty or all have empty text
-    const hasValidOptions = question.options &&
-        question.options.length > 0 &&
-        question.options.some(opt => opt.text?.trim() || opt.image);
-
-    if (!hasValidOptions) {
-        return true;
-    }
-
-    // Numeric correct answer (not a single letter like a, b, c, d) = integer type
-    const answer = question.correctAnswer?.trim();
-    if (answer && !['a', 'b', 'c', 'd'].includes(answer.toLowerCase()) && !isNaN(parseFloat(answer))) {
-        return true;
-    }
-
-    return false;
-};
-
 const CondensedPractice: React.FC = () => {
     const { subject } = useParams<{ subject: string }>();
     const navigate = useNavigate();
 
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const [questions, setQuestions] = useState<LocalQuestion[]>([]);
     const [solutions, setSolutions] = useState<{ [key: string]: { text: string; image: string | null } }>({});
     const [chapterMap, setChapterMap] = useState<{ [code: string]: string }>({});
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -544,10 +408,10 @@ const CondensedPractice: React.FC = () => {
                                 </div>
 
                                 <div className="text-lg md:text-xl font-medium leading-relaxed text-text-light dark:text-text-dark mb-2 whitespace-pre-wrap break-words">
-                                    <RenderText text={currentQuestion.text} />
+                                    <RenderMath text={currentQuestion.text} />
                                 </div>
                                 {currentQuestion.image && (
-                                    <div className="p-4 bg-white rounded-xl border border-gray-200 mt-2 w-fit mx-auto flex justify-center max-w-full">
+                                    <div className="mt-2 w-full flex justify-center">
                                         <ImageWithProgress
                                             src={currentQuestion.image}
                                             alt="Question"
@@ -572,71 +436,23 @@ const CondensedPractice: React.FC = () => {
                                 </div>
                             ) : (
                                 /* Options for MCQ */
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {currentQuestion.options && currentQuestion.options.map((option, index) => {
-                                        const optionId = option.id; // 'a', 'b', etc.
-                                        const isSelected = selectedOption === optionId;
-                                        const isCorrect = currentQuestion.correctAnswer && currentQuestion.correctAnswer.toLowerCase() === optionId.toLowerCase();
-
-                                        let borderClass = 'border-border-light dark:border-border-dark hover:border-primary/50 hover:bg-background-light dark:hover:bg-white/5';
-                                        if (showSolution) {
-                                            if (isCorrect) borderClass = 'border-green-500 bg-green-50 dark:bg-green-900/10';
-                                            else if (isSelected) borderClass = 'border-red-500 bg-red-50 dark:bg-red-900/10';
-                                        } else if (isSelected) {
-                                            borderClass = 'border-primary bg-primary/5';
-                                        }
-
-                                        return (
-                                            <label
-                                                key={index}
-                                                className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all active:scale-[0.98] group ${borderClass}`}
-                                                onClick={() => handleOptionSelect(optionId)}
-                                            >
-                                                <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 mr-4 flex items-center justify-center font-bold text-sm uppercase mt-0.5 transition-colors ${isSelected ? 'border-primary bg-primary text-white' : 'border-text-secondary-light/30 text-text-secondary-light'}`}>
-                                                    {isSelected ? <span className="material-symbols-outlined text-base">check</span> : optionId}
-                                                </div>
-                                                <div className="flex-1 whitespace-pre-wrap break-words">
-                                                    {option.text && <RenderText text={option.text} />}
-                                                    {option.image && (
-                                                        <div className="mt-2 text-center flex justify-center">
-                                                            <ImageWithProgress
-                                                                src={option.image}
-                                                                alt={`Option ${optionId}`}
-                                                                className="max-w-full max-h-40 w-auto h-auto inline-block rounded-lg"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </label>
-                                        );
-
-                                    })}
-                                </div>
+                                <MCQOptions
+                                    options={currentQuestion.options}
+                                    selectedId={selectedOption}
+                                    onSelect={handleOptionSelect}
+                                    disabled={showSolution}
+                                    showResult={showSolution}
+                                    correctAnswerId={currentQuestion.correctAnswer}
+                                    layout="grid"
+                                />
                             )}
 
                             {/* Solution Display */}
-                            {showSolution && currentSolution && (
-                                <div className="mt-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 overflow-x-auto">
-                                    <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Detailed Solution</h3>
-                                    <div className="prose dark:prose-invert max-w-none text-text-light dark:text-text-dark break-words whitespace-pre-wrap">
-                                        {currentSolution.text && (
-                                            <div>
-                                                <RenderText text={currentSolution.text} />
-                                            </div>
-                                        )}
-
-                                        {currentSolution.image && (
-                                            <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 max-w-full bg-white p-2 w-fit mx-auto flex justify-center">
-                                                <ImageWithProgress
-                                                    src={currentSolution.image}
-                                                    alt="Solution"
-                                                    className="max-w-full md:max-w-lg max-h-[30vh] w-auto h-auto rounded-lg"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+                            <SolutionDisplay
+                                text={currentSolution?.text}
+                                image={currentSolution?.image}
+                                visible={showSolution && !!currentSolution}
+                            />
                         </div>
                     </div>
                 </div>
@@ -663,7 +479,7 @@ const CondensedPractice: React.FC = () => {
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </h3>
-                        <div className="grid grid-cols-5 gap-2">
+                        <div className="grid grid-cols-5 gap-2 pb-20">
                             {questions.map((_, idx) => {
                                 const isCurrent = currentQuestionIndex === idx;
                                 const isAnswered = !!userAnswers[idx];

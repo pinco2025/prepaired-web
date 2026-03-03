@@ -8,7 +8,6 @@ interface ImageWithProgressProps {
 
 const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, className = '' }) => {
     const [loading, setLoading] = useState(true);
-    const [progress, setProgress] = useState(0);
     const [error, setError] = useState(false);
     const [, setImageLoaded] = useState(false);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -18,32 +17,13 @@ const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, classNa
     useEffect(() => {
         // Reset state when src changes
         setLoading(true);
-        setProgress(0);
         setError(false);
         setImageLoaded(false);
     }, [src]);
 
-    useEffect(() => {
-        // Simulate progress with smooth animation (fills to ~90% while loading)
-        let interval: ReturnType<typeof setInterval> | null = null;
-        if (loading && !error) {
-            interval = setInterval(() => {
-                setProgress(prev => {
-                    // Slow down as we approach 90%
-                    const increment = prev < 50 ? 8 : prev < 75 ? 4 : prev < 85 ? 2 : 1;
-                    return Math.min(prev + increment, 90);
-                });
-            }, 150);
-        }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [loading, error]);
-
     const handleLoad = () => {
-        setProgress(100);
         setImageLoaded(true);
-        // Small delay to show 100% before hiding skeleton
+        // Small delay to ensure smooth transition
         setTimeout(() => setLoading(false), 200);
     };
 
@@ -71,7 +51,6 @@ const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, classNa
     const retryLoad = () => {
         setError(false);
         setLoading(true);
-        setProgress(0);
         setRetryCount(prev => prev + 1); // Bust browser cache
     };
 
@@ -104,103 +83,15 @@ const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, classNa
 
     return (
         <>
-            <div className="relative">
-                {/* Modern Loading Skeleton with Glassmorphism */}
+            <div className={`relative overflow-hidden ${className} ${loading ? 'min-h-[220px]' : ''}`}>
+                {/* Skeleton Loader */}
                 {loading && (
-                    <div
-                        className={`relative flex flex-col items-center justify-center rounded-2xl overflow-hidden p-4 min-h-[220px] min-w-[200px] bg-gradient-to-br from-blue-500/5 via-sky-400/5 to-cyan-400/5 ${className}`}
-                    >
-                        {/* Animated shimmer overlay */}
-                        <div
-                            className="absolute inset-0 opacity-30"
-                            style={{
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(56, 182, 255, 0.3) 50%, transparent 100%)',
-                                animation: 'shimmer 2s infinite',
-                            }}
-                        />
-                        <style>{`
-              @keyframes shimmer {
-                0% { transform: translateX(-100%); }
-                100% { transform: translateX(100%); }
-              }
-              @keyframes pulse-ring {
-                0% { transform: scale(0.95); opacity: 0.5; }
-                50% { transform: scale(1); opacity: 0.8; }
-                100% { transform: scale(0.95); opacity: 0.5; }
-              }
-            `}</style>
-
-                        {/* Glassmorphism card */}
-                        <div
-                            className="relative z-10 px-8 py-6 rounded-2xl backdrop-blur-sm bg-blue-500/5 shadow-2xl border border-sky-400/15"
-                            style={{
-                                boxShadow: '0 8px 32px rgba(0, 102, 255, 0.1)',
-                            }}
-                        >
-                            {/* Circular Progress Indicator with gradient */}
-                            <div className="relative w-20 h-20 mb-4 mx-auto">
-                                {/* Pulsing background ring */}
-                                <div
-                                    className="absolute inset-0 rounded-full"
-                                    style={{
-                                        background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.15) 0%, rgba(56, 182, 255, 0.15) 100%)',
-                                        animation: 'pulse-ring 2s ease-in-out infinite',
-                                    }}
-                                />
-
-                                {/* SVG Progress Ring */}
-                                <svg className="w-20 h-20 transform -rotate-90 relative z-10" viewBox="0 0 36 36">
-                                    {/* Track */}
-                                    <circle
-                                        cx="18"
-                                        cy="18"
-                                        r="14"
-                                        fill="none"
-                                        className="stroke-border-light dark:stroke-border-dark"
-                                        strokeWidth="2.5"
-                                        strokeOpacity="0.3"
-                                    />
-                                    {/* Progress with gradient effect */}
-                                    <defs>
-                                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#0066ff" />
-                                            <stop offset="50%" stopColor="#35b2ff" />
-                                            <stop offset="100%" stopColor="#38b6ff" />
-                                        </linearGradient>
-                                    </defs>
-                                    <circle
-                                        cx="18"
-                                        cy="18"
-                                        r="14"
-                                        fill="none"
-                                        stroke="url(#progressGradient)"
-                                        strokeWidth="2.5"
-                                        strokeLinecap="round"
-                                        strokeDasharray={`${progress * 0.88} 88`}
-                                        style={{ transition: 'stroke-dasharray 0.2s ease-out' }}
-                                    />
-                                </svg>
-
-                                {/* Percentage text */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span
-                                        className="text-lg font-bold"
-                                        style={{
-                                            background: 'linear-gradient(135deg, #0066ff 0%, #35b2ff 50%, #38b6ff 100%)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                            backgroundClip: 'text',
-                                        }}
-                                    >
-                                        {Math.round(progress)}%
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Loading text */}
-                            <p className="text-sm text-center text-text-secondary-light dark:text-text-secondary-dark font-medium whitespace-nowrap">
-                                Loading image...
-                            </p>
+                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 animate-pulse z-10 flex items-center justify-center">
+                        <span className="sr-only">Loading image...</span>
+                        <div className="w-12 h-12 text-gray-300 dark:text-gray-700">
+                            <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                            </svg>
                         </div>
                     </div>
                 )}
@@ -209,8 +100,7 @@ const ImageWithProgress: React.FC<ImageWithProgressProps> = ({ src, alt, classNa
                 <img
                     src={imageSrc}
                     alt={alt}
-                    className={`${className} transition-opacity duration-300 cursor-zoom-in hover:opacity-90 ${loading ? 'opacity-0 absolute top-0 left-0' : 'opacity-100'}`}
-                    style={{ backgroundColor: 'white' }}
+                    className={`block max-w-full max-h-full w-auto h-auto mx-auto object-contain transition-opacity duration-500 ease-in-out cursor-zoom-in ${loading ? 'opacity-0' : 'opacity-100'}`}
                     onLoad={handleLoad}
                     onError={handleError}
                     onClick={openLightbox}

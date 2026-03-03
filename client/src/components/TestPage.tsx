@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Test } from '../data';
-import { supabase } from '../utils/supabaseClient';
+import { auth, db } from '../utils/firebaseClient';
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import TestInstructions from './TestInstructions';
 import TestInterface from './TestInterface';
 import TestSubmitted from './TestSubmitted';
@@ -25,36 +26,33 @@ const TestPage: React.FC = () => {
 
       try {
         // 1. Check for existing attempt
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = auth.currentUser;
 
         if (user) {
-          const { data: attempts } = await supabase
-            .from('student_tests')
-            .select('id, submitted_at')
-            .eq('test_id', testId)
-            .eq('user_id', user.id)
-            .not('submitted_at', 'is', null)
-            .limit(1);
+          const attemptsSnap = await getDocs(
+            query(
+              collection(db, 'student_tests'),
+              where('test_id', '==', testId),
+              where('user_id', '==', user.uid),
+              where('submitted_at', '!=', null)
+            )
+          );
 
-          if (attempts && attempts.length > 0) {
+          if (attemptsSnap.docs.length > 0) {
             // Redirect to results if already attempted (submitted)
-            navigate(`/results/${attempts[0].id}`, { replace: true });
+            navigate(`/results/${attemptsSnap.docs[0].id}`, { replace: true });
             return;
           }
         }
 
         // 2. If no completed attempt, fetch test details
-        const { data, error } = await supabase
-          .from('tests')
-          .select('*')
-          .eq('testID', testId)
-          .single();
+        const testDoc = await getDoc(doc(db, 'tests', testId));
 
-        if (error) {
-          console.error('Error fetching test:', error);
+        if (!testDoc.exists()) {
+          console.error('Test not found');
           setTest(null);
         } else {
-          setTest(data as Test);
+          setTest(testDoc.data() as Test);
         }
       } catch (error) {
         console.error('Error initializing test page:', error);
