@@ -20,8 +20,8 @@ const RegisterSuccess: React.FC = () => {
                 </div>
             </header>
 
-            <main className="flex-grow flex items-center justify-center p-6 mt-16 relative">
-                <div className="w-full bg-white dark:bg-[#141414] rounded-xl shadow-xl shadow-black/5 dark:shadow-black/40 p-8 md:p-12 text-center border border-primary/10 dark:border-white/10 max-w-4xl z-10 relative">
+            <main className="flex-grow flex items-center justify-center p-4 sm:p-6 mt-16 relative">
+                <div className="w-full bg-white dark:bg-[#141414] rounded-xl shadow-xl shadow-black/5 dark:shadow-black/40 p-5 sm:p-8 md:p-12 text-center border border-primary/10 dark:border-white/10 max-w-4xl z-10 relative mx-1 sm:mx-0">
                     {/* Success Header — compact */}
                     <div className="mb-2 flex justify-center text-5xl">🎉</div>
                     <h1 className="text-2xl md:text-3xl font-extrabold text-secondary dark:text-slate-100 mb-3 leading-tight">
@@ -47,10 +47,10 @@ const RegisterSuccess: React.FC = () => {
                         <div className="relative flex justify-center"><span className="bg-white dark:bg-[#141414] px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Explore Question Sets</span></div>
                     </div>
 
-                    {/* Question Set Cards — prominent and visual-first */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    {/* Question Set Cards — swipeable on mobile, grid on desktop */}
+                    <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:grid sm:grid-cols-3 sm:overflow-visible scrollbar-hide pb-2 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0" style={{ WebkitOverflowScrolling: 'touch' }}>
                         <div
-                            className="bg-white dark:bg-slate-800/50 rounded-2xl border border-primary/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group overflow-hidden"
+                            className="min-w-[75vw] snap-center sm:min-w-0 bg-white dark:bg-slate-800/50 rounded-2xl border border-primary/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group overflow-hidden flex-shrink-0 sm:flex-shrink"
                             onClick={() => navigate('/pyq-2026')}
                         >
                             <div className="w-full aspect-[4/3] bg-black flex items-center justify-center overflow-hidden relative">
@@ -59,14 +59,14 @@ const RegisterSuccess: React.FC = () => {
                                     style={{ backgroundImage: `url("${lvl2PyqImg}")` }}
                                 ></div>
                             </div>
-                            <div className="p-4">
+                            <div className="p-3 sm:p-4">
                                 <h3 className="text-base font-bold text-secondary dark:text-primary mb-1 group-hover:text-primary transition-colors">26-PYQ Set</h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">Curated previous-year questions.</p>
                             </div>
                         </div>
 
                         <div
-                            className="bg-white dark:bg-slate-800/50 rounded-2xl border border-primary/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group overflow-hidden"
+                            className="min-w-[75vw] snap-center sm:min-w-0 bg-white dark:bg-slate-800/50 rounded-2xl border border-primary/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group overflow-hidden flex-shrink-0 sm:flex-shrink"
                             onClick={() => navigate('/super30')}
                         >
                             <div className="w-full aspect-[4/3] bg-black flex items-center justify-center overflow-hidden relative">
@@ -75,14 +75,14 @@ const RegisterSuccess: React.FC = () => {
                                     style={{ backgroundImage: `url("${super30Img}")` }}
                                 ></div>
                             </div>
-                            <div className="p-4">
+                            <div className="p-3 sm:p-4">
                                 <h3 className="text-base font-bold text-secondary dark:text-primary mb-1 group-hover:text-primary transition-colors">Super 30 Set</h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">30 essential concept-sharpening questions.</p>
                             </div>
                         </div>
 
                         <div
-                            className="bg-white dark:bg-slate-800/50 rounded-2xl border border-primary/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group overflow-hidden"
+                            className="min-w-[75vw] snap-center sm:min-w-0 bg-white dark:bg-slate-800/50 rounded-2xl border border-primary/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group overflow-hidden flex-shrink-0 sm:flex-shrink"
                             onClick={() => navigate('/question-set')}
                         >
                             <div className="w-full aspect-[4/3] bg-black flex items-center justify-center overflow-hidden relative">
@@ -91,21 +91,21 @@ const RegisterSuccess: React.FC = () => {
                                     style={{ backgroundImage: `url("${condensedImg}")` }}
                                 ></div>
                             </div>
-                            <div className="p-4">
+                            <div className="p-3 sm:p-4">
                                 <h3 className="text-base font-bold text-secondary dark:text-primary mb-1 group-hover:text-primary transition-colors">Condensed PYQ Set</h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">Quick-review past papers for efficient revision.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-                        <div className="flex flex-col items-center gap-4 text-slate-400 dark:text-slate-500">
-                            <p className="text-sm">Need a hand? We're here for you.</p>
-                            <div className="flex gap-6">
-                                <a className="flex items-center gap-1 hover:text-primary transition-colors" href="mailto:support@prepaired.in">
+                    <div className="mt-8 pt-6 sm:mt-12 sm:pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex flex-col items-center gap-3 sm:gap-4 text-slate-400 dark:text-slate-500">
+                            <p className="text-xs sm:text-sm">Need a hand? We're here for you.</p>
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 items-center">
+                                <a className="flex items-center gap-1 hover:text-primary transition-colors text-xs sm:text-sm" href="mailto:support@prepaired.in">
                                     <span className="material-symbols-outlined text-base">mail</span> support@prepaired.in
                                 </a>
-                                <a className="flex items-center gap-1 hover:text-primary transition-colors" href="/">
+                                <a className="flex items-center gap-1 hover:text-primary transition-colors text-xs sm:text-sm" href="/">
                                     <span className="material-symbols-outlined text-base">help_center</span> Help Center
                                 </a>
                             </div>
@@ -114,7 +114,7 @@ const RegisterSuccess: React.FC = () => {
                 </div>
             </main>
 
-            <footer className="w-full py-6 text-center text-slate-400 dark:text-slate-500 text-sm relative z-10">
+            <footer className="w-full py-4 sm:py-6 text-center text-slate-400 dark:text-slate-500 text-xs sm:text-sm relative z-10">
                 &copy; 2024 prepAIred All India Test Platform. All rights reserved.
             </footer>
         </div>
