@@ -28,6 +28,9 @@ import CondensedPractice from './components/CondensedPractice';
 import PricingPlans from './components/PricingPlans';
 import ResponseUpload from './components/ResponseUpload';
 import ResponseResult from './components/ResponseResult';
+import Waitlist from './components/Waitlist';
+import WaitlistSuccess from './components/WaitlistSuccess';
+import RegisterSuccess from './components/RegisterSuccess';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -77,10 +80,12 @@ export const AppContent: React.FC = () => {
 
   // Determine if we should show the sidebar
   // Show sidebar for all authenticated users on protected routes OR on specific public routes for everyone
-  // Hide sidebar when user is taking a test or on submission page
+  // Hide sidebar when user is taking a test or on submission page or waitlist pages
   const isCondensedPracticeRoute = /^\/question-set\/[^/]+\/practice$/.test(location.pathname);
-  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing', '/response-upload', '/response-result'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute;
-  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute;
+  const isWaitlistRoute = location.pathname.startsWith('/waitlist');
+  const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing', '/response-upload', '/response-result'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
+  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -171,6 +176,15 @@ export const AppContent: React.FC = () => {
             } />
             <Route path="/pricing" element={
               <PricingPlans />
+            } />
+            <Route path="/waitlist" element={
+              <Waitlist />
+            } />
+            <Route path="/waitlist-success" element={
+              <WaitlistSuccess />
+            } />
+            <Route path="/register-success" element={
+              <RegisterSuccess />
             } />
 
             <Route path="/tests" element={

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#38b6ff",
+                        "secondary": "#18356b",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#0f1c23",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .grid-bg {
+            background-image: radial-gradient(circle at 1px 1px, #38b6ff20 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col">
+<header class="w-full bg-white dark:bg-background-dark border-b border-primary/10 px-6 py-4 fixed top-0 z-50">
+<div class="max-w-6xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="prepAIred logo" class="h-8 w-auto" data-alt="prepAIred official logo minimalist design" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQAST9iODfghIFKJgYcYT1SeZA7KAv2ItZyTHcVSoqtHQVTpV0iTiN8gZ6LA7i25EHU0T3NuaPc2pkON-Z54RWgRQ3fwxFxyMKyXO-CltISE-EpCdCK9-BxzJwHbqkQgV1eUAOwYzl6qwdlG1XWFeeknXdnrqNupotS0pysmG-ycnT6AVAg8F07eTsOt6M4r2-zWOluGOesE9mh6DZ4fP0iceDgqPmEfN95uE_1-ibYoKOiyPZUzzuXbwhp7Kcp1D3IWcKtqfO1Ktc"/>
+<span class="text-secondary dark:text-primary font-bold text-xl tracking-tight">prepAIred</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center p-6 mt-16 grid-bg">
+<div class="max-w-xl w-full bg-white dark:bg-slate-900 rounded-xl shadow-xl shadow-primary/5 p-8 md:p-12 text-center border border-primary/10">
+<div class="mb-8 flex justify-center">
+<div class="size-24 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-lg ring-8 ring-green-500/10">
+<span class="material-symbols-outlined text-green-500 !text-6xl font-bold">check_circle</span>
+</div>
+</div>
+<h1 class="text-3xl md:text-4xl font-extrabold text-secondary dark:text-slate-100 mb-6 leading-tight">
+                Registration Successful!
+            </h1>
+<div class="space-y-4 mb-10">
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+                    Thank you for registering for <span class="text-secondary dark:text-primary font-semibold">AIPT</span>. 
+                </p>
+<p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-6 rounded-lg border border-slate-100 dark:border-slate-700 italic">
+                    Your login credentials and instructions for selecting your preferred time slot will be sent to your registered email/mobile number 24 hours before the test.
+                </p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-4 px-10 rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">dashboard</span>
+                    Back to Dashboard
+                </button>
+</div>
+<div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
+<div class="flex justify-center gap-8 text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-1 text-sm">
+<span class="material-symbols-outlined text-sm">mail</span>
+                        support@prepaired.in
+                    </div>
+<div class="flex items-center gap-1 text-sm">
+<span class="material-symbols-outlined text-sm">help</span>
+                        FAQ Center
+                    </div>
+</div>
+</div>
+</div>
+</main>
+<footer class="w-full py-6 text-center text-slate-400 dark:text-slate-500 text-sm">
+        © 2024 prepAIred All India Test Platform. All rights reserved.
+    </footer>
+</body></html>

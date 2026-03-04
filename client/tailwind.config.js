@@ -26,6 +26,13 @@ module.exports = {
         "error-dark": "#f87171",
         "electric-blue": "#00f0ff",
         "neon-purple": "#b026ff",
+        "brand-dark": "#252627",
+        "brand-light": "#f9f9f9",
+        "brand-blue": "#0066ff",
+        "deep-blue": "#004aad",
+        "accent-blue": "#3291ca",
+        "border-grey": "#dee1e7",
+        "secondary": "#18356b",
       },
       fontFamily: {
         display: ["Poppins", "sans-serif"],

@@ -47,7 +47,7 @@ const SignUp: React.FC = () => {
         created_at: new Date().toISOString(),
       });
 
-      navigate('/question-set');
+      navigate('/register-success');
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         alert('An account with this email already exists. Please log in instead.');
@@ -73,7 +73,7 @@ const SignUp: React.FC = () => {
         created_at: new Date().toISOString(),
       }, { merge: true });
 
-      navigate('/question-set');
+      navigate('/register-success');
     } catch (error: any) {
       alert(error.message);
     }
