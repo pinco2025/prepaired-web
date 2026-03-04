@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Existing set images (used in QuestionSet.tsx)
-import phyImg from '../assets/cards/phy.png';
 import lvl2PyqImg from '../assets/cards/lvl-2-pyq.png';
 import super30Img from '../assets/cards/super30.png';
 import condensedImg from '../assets/cards/condensed-pyq.png';
@@ -106,7 +105,7 @@ const RegisterSuccess: React.FC = () => {
                                 <a className="flex items-center gap-1 hover:text-primary transition-colors" href="mailto:support@prepaired.in">
                                     <span className="material-symbols-outlined text-base">mail</span> support@prepaired.in
                                 </a>
-                                <a className="flex items-center gap-1 hover:text-primary transition-colors" href="#">
+                                <a className="flex items-center gap-1 hover:text-primary transition-colors" href="/">
                                     <span className="material-symbols-outlined text-base">help_center</span> Help Center
                                 </a>
                             </div>
