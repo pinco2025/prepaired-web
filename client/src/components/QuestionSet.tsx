@@ -100,6 +100,20 @@ const QuestionSet: React.FC = () => {
             image: super30Img
         },
         {
+            id: 'organic',
+            title: 'Organic Questions',
+            description: 'Curated chemistry questions from JEE & NEET — haloalkanes, haloarenes, and reaction mechanisms. Each with detailed solutions. Freely accessible and individually linkable.',
+            stats: { questions: '10 Qs', time: '1 Hr', type: 'Free Access', difficulty: 'Medium' },
+            tags: ['Free', 'SEO Optimized'],
+            action: () => navigate('/questions/organic'),
+            classes: {
+                badgeBg: 'bg-lime-500',
+                tagMain: 'bg-lime-100 dark:bg-lime-900/30 text-lime-700 dark:text-lime-400',
+                titleHover: 'group-hover:text-lime-600 dark:group-hover:text-lime-400'
+            },
+            image: condensedImg
+        },
+        {
             id: 'accuracy',
             title: 'Accuracy Boosters',
             description: 'Speed-focused drills to minimize silly mistakes and improve exam temperament.',

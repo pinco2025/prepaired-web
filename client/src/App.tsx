@@ -31,6 +31,8 @@ import ResponseResult from './components/ResponseResult';
 import Waitlist from './components/Waitlist';
 import WaitlistSuccess from './components/WaitlistSuccess';
 import RegisterSuccess from './components/RegisterSuccess';
+import OrganicQuestion from './components/OrganicQuestion';
+import OrganicQuestionList from './components/OrganicQuestionList';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -84,7 +86,7 @@ export const AppContent: React.FC = () => {
   const isCondensedPracticeRoute = /^\/question-set\/[^/]+\/practice$/.test(location.pathname);
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
-  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing', '/response-upload', '/response-result'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
   const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
 
   return (
@@ -185,6 +187,14 @@ export const AppContent: React.FC = () => {
             } />
             <Route path="/register-success" element={
               <RegisterSuccess />
+            } />
+
+            {/* Organic Questions - Public, SEO-optimized */}
+            <Route path="/question/:slug" element={
+              <OrganicQuestion />
+            } />
+            <Route path="/questions/organic" element={
+              <OrganicQuestionList />
             } />
 
             <Route path="/tests" element={
