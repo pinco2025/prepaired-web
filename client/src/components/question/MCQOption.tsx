@@ -64,7 +64,7 @@ const MCQOption: React.FC<MCQOptionProps> = ({
             </div>
 
             {/* Option content */}
-            <div className="flex-1 whitespace-pre-wrap break-words">
+            <div className="flex-1 min-w-0 whitespace-pre-wrap break-words overflow-x-auto">
                 {text && <RenderMath text={text} />}
                 {image && (
                     <div className="mt-2 text-center flex justify-center">
