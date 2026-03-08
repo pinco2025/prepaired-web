@@ -433,7 +433,7 @@ const ShiftPractice: React.FC = () => {
                         </h3>
 
                         {/* Switchable Subject Tabs */}
-                        <div className="flex gap-1 mb-4 bg-background-light dark:bg-white/5 rounded-xl p-1">
+                        <div className="flex gap-1 mb-5 bg-background-light dark:bg-white/5 rounded-xl p-1">
                             {subjectGroups.map((group) => {
                                 const colors = colorMap[group.color] || colorMap.gray;
                                 const isActive = activePaletteSubject === group.subject;
@@ -441,20 +441,19 @@ const ShiftPractice: React.FC = () => {
                                     <button
                                         key={group.subject}
                                         onClick={() => setActivePaletteSubject(group.subject)}
-                                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${isActive
+                                        className={`flex-1 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${isActive
                                             ? `${colors.bg} ${colors.text} shadow-sm`
                                             : 'text-text-secondary-light/60 hover:text-text-secondary-light'
                                             }`}
                                     >
-                                        <span className="material-symbols-outlined text-sm">{group.icon}</span>
-                                        <span className="hidden sm:inline">{group.subject.slice(0, 4)}</span>
+                                        {group.subject.slice(0, 4)}
                                     </button>
                                 );
                             })}
                         </div>
 
                         {/* Filtered subject content */}
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-5">
                             {subjectGroups
                                 .filter(g => activePaletteSubject === null || g.subject === activePaletteSubject)
                                 .map((group) => {
@@ -472,14 +471,14 @@ const ShiftPractice: React.FC = () => {
                                     });
 
                                     const renderGrid = (indices: number[]) => (
-                                        <div className="grid grid-cols-5 gap-1.5">
+                                        <div className="grid grid-cols-5 gap-2">
                                             {indices.map((localIdx) => {
                                                 const globalIdx = group.startIndex + localIdx;
                                                 const isCurrent = currentQuestionIndex === globalIdx;
                                                 const isAnswered = isIntegerTypeQuestion(group.questions[localIdx])
                                                     ? !!(numericAnswers[globalIdx]?.trim())
                                                     : !!userAnswers[globalIdx];
-                                                let btnClass = "w-9 h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-all ";
+                                                let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
 
                                                 if (isCurrent) {
                                                     btnClass += "bg-primary text-white shadow-md shadow-primary/30 scale-105";
@@ -495,7 +494,7 @@ const ShiftPractice: React.FC = () => {
                                                         onClick={() => handlePaletteSelect(globalIdx)}
                                                         className={btnClass}
                                                     >
-                                                        {localIdx + 1}
+                                                        {globalIdx + 1}
                                                     </button>
                                                 );
                                             })}
@@ -504,23 +503,10 @@ const ShiftPractice: React.FC = () => {
 
                                     return (
                                         <div key={group.subject}>
-                                            {/* Subject Header */}
-                                            <div className="flex items-center gap-2 mb-2.5 px-1">
-                                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${colors.bg} ${colors.text}`}>
-                                                    <span className="material-symbols-outlined text-base">{group.icon}</span>
-                                                </div>
-                                                <span className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
-                                                    {group.subject}
-                                                </span>
-                                                <span className="text-[10px] text-text-secondary-light ml-auto font-medium">
-                                                    {group.questions.length}
-                                                </span>
-                                            </div>
-
                                             {/* MCQ Section */}
                                             {mcqIndices.length > 0 && (
                                                 <>
-                                                    <div className="flex items-center gap-2 mb-2 mt-1">
+                                                    <div className="flex items-center gap-2 mb-2.5">
                                                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
                                                         <span className="text-[9px] font-bold uppercase tracking-widest text-text-secondary-light/50 px-1">MCQ</span>
                                                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
