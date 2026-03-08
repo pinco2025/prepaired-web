@@ -92,9 +92,9 @@ const QuestionPractice: React.FC = () => {
                 if (!questionsRes.ok) throw new Error(`Failed to load questions from local data`);
                 const allData: Question[] = await questionsRes.json();
 
-                // Filter by subject and chapter code (tag2)
+                // Filter by chapter code (tag2) — chapter codes are unique across subjects
                 const chapterQuestions = allData.filter(
-                    q => q.subject === subject && q.tags?.tag2 === chapterCode
+                    q => q.tags?.tag2 === chapterCode
                 );
 
                 setQuestions(chapterQuestions);
@@ -270,25 +270,25 @@ const QuestionPractice: React.FC = () => {
     return (
         <div className="flex flex-col h-[100dvh] md:h-[calc(100vh-2rem)] md:my-4 md:mr-4 md:ml-4 rounded-none md:rounded-3xl overflow-hidden relative border-0 md:border border-border-light dark:border-border-dark shadow-none md:shadow-xl bg-surface-light dark:bg-surface-dark">
             <style>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                    height: 6px;
+                .themed-scrollbar::-webkit-scrollbar {
+                    width: 5px;
+                    height: 5px;
                 }
-                .custom-scrollbar::-webkit-scrollbar-track {
+                .themed-scrollbar::-webkit-scrollbar-track {
                     background: transparent;
                 }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: rgba(156, 163, 175, 0.5);
+                .themed-scrollbar::-webkit-scrollbar-thumb {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.4), rgba(139,92,246,0.4));
                     border-radius: 20px;
                 }
-                .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: rgba(75, 85, 99, 0.5);
+                .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7));
                 }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background-color: rgba(156, 163, 175, 0.8);
+                .dark .themed-scrollbar::-webkit-scrollbar-thumb {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3));
                 }
-                .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background-color: rgba(75, 85, 99, 0.8);
+                .dark .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.5), rgba(139,92,246,0.5));
                 }
             `}</style>
             <div className="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10 bg-fixed pointer-events-none opacity-60"></div>
@@ -328,7 +328,7 @@ const QuestionPractice: React.FC = () => {
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Main Content */}
-                <div className="flex-1 overflow-y-auto p-2 md:p-4 pb-24 md:pb-4 scroll-smooth custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-2 md:p-4 pb-24 md:pb-4 scroll-smooth themed-scrollbar">
                     <div className="max-w-4xl mx-auto min-h-full flex flex-col justify-center pb-8">
                         <div className="bg-surface-light dark:bg-surface-dark rounded-3xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-4 md:p-6 mb-3">
 

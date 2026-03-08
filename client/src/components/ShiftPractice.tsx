@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
@@ -22,11 +22,9 @@ interface Question {
     image: string | null;
     options: Option[];
     correctAnswer: string;
-    examDate?: string;
-    examShift?: string;
-    subject?: string;
     tags?: {
         tag1?: string | null;
+        tag2?: string | null;
         [key: string]: any;
     };
     metadata?: {
@@ -37,6 +35,24 @@ interface Question {
         text: string;
         image: string | null;
     };
+}
+
+interface ChapterEntry {
+    code: string;
+    name: string;
+    level: number;
+}
+
+interface ChaptersData {
+    [subject: string]: ChapterEntry[];
+}
+
+interface SubjectGroup {
+    subject: string;
+    icon: string;
+    color: string;
+    questions: Question[];
+    startIndex: number; // global index offset for this group
 }
 
 const ShiftPractice: React.FC = () => {
@@ -51,6 +67,7 @@ const ShiftPractice: React.FC = () => {
     const [showSolution, setShowSolution] = useState(false);
     const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
     const [isPaletteOpen, setIsPaletteOpen] = useState(() => window.innerWidth >= 1024);
+    const [chaptersData, setChaptersData] = useState<ChaptersData>({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,19 +76,25 @@ const ShiftPractice: React.FC = () => {
             try {
                 setLoading(true);
 
-                // Fetch from Local JSON Data
-                const questionsRes = await withTimeout(fetch('/data/jee_2026_pyqs.json'), 15000, `Questions fetch timed out`);
-                if (!questionsRes.ok) throw new Error(`Failed to load questions from local data`);
+                // Fetch questions and chapters in parallel
+                const [questionsRes, chaptersRes] = await Promise.all([
+                    withTimeout(fetch('/data/jee_2026_pyqs.json'), 15000, 'Questions fetch timed out'),
+                    withTimeout(fetch('/chapters.json'), 10000, 'Chapters fetch timed out')
+                ]);
+
+                if (!questionsRes.ok) throw new Error('Failed to load questions from local data');
                 const allData: Question[] = await questionsRes.json();
 
-                // Filter by shift ID (tag1)
-                const shiftQuestions = allData.filter(
-                    q => q.tags?.tag1 === shiftId
-                );
+                if (chaptersRes.ok) {
+                    const chData: ChaptersData = await chaptersRes.json();
+                    setChaptersData(chData);
+                }
 
+                // Filter by shift ID (tag1)
+                const shiftQuestions = allData.filter(q => q.tags?.tag1 === shiftId);
                 setQuestions(shiftQuestions);
 
-                // Reset state for new shift
+                // Reset state
                 setCurrentQuestionIndex(0);
                 setSelectedOption(null);
                 setShowSolution(false);
@@ -87,27 +110,84 @@ const ShiftPractice: React.FC = () => {
         fetchData();
     }, [shiftId]);
 
+    // Build a lookup: tag2 code -> subject
+    const tag2ToSubject = useMemo(() => {
+        const map: { [code: string]: string } = {};
+        Object.entries(chaptersData).forEach(([subject, chapters]) => {
+            chapters.forEach(ch => {
+                map[ch.code] = subject;
+            });
+        });
+        return map;
+    }, [chaptersData]);
+
+    // Group questions by subject, maintaining order
+    const subjectGroups: SubjectGroup[] = useMemo(() => {
+        const subjectConfig: { key: string; icon: string; color: string }[] = [
+            { key: 'Physics', icon: 'bolt', color: 'blue' },
+            { key: 'Chemistry', icon: 'science', color: 'green' },
+            { key: 'Mathematics', icon: 'calculate', color: 'orange' },
+        ];
+
+        const grouped: { [key: string]: Question[] } = {};
+        questions.forEach(q => {
+            const sub = tag2ToSubject[q.tags?.tag2 || ''] || 'Other';
+            if (!grouped[sub]) grouped[sub] = [];
+            grouped[sub].push(q);
+        });
+
+        let runningIndex = 0;
+        const groups: SubjectGroup[] = [];
+        subjectConfig.forEach(cfg => {
+            const qs = grouped[cfg.key] || [];
+            if (qs.length > 0) {
+                groups.push({
+                    subject: cfg.key,
+                    icon: cfg.icon,
+                    color: cfg.color,
+                    questions: qs,
+                    startIndex: runningIndex,
+                });
+                runningIndex += qs.length;
+            }
+        });
+
+        // Handle any "Other" questions
+        const other = grouped['Other'] || [];
+        if (other.length > 0) {
+            groups.push({
+                subject: 'Other',
+                icon: 'help',
+                color: 'gray',
+                questions: other,
+                startIndex: runningIndex,
+            });
+        }
+
+        return groups;
+    }, [questions, tag2ToSubject]);
+
+    // Flatten for consistent indexing (ordered by subject groups)
+    const orderedQuestions = useMemo(() => {
+        return subjectGroups.flatMap(g => g.questions);
+    }, [subjectGroups]);
+
     const handleOptionSelect = (optionId: string) => {
         if (showSolution) return;
-
         const newSelection = selectedOption === optionId ? null : optionId;
         setSelectedOption(newSelection);
-
         setUserAnswers(prev => {
             const next = { ...prev };
-            if (newSelection) {
-                next[currentQuestionIndex] = newSelection;
-            } else {
-                delete next[currentQuestionIndex];
-            }
+            if (newSelection) next[currentQuestionIndex] = newSelection;
+            else delete next[currentQuestionIndex];
             return next;
         });
     };
 
     const handleNext = () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
+        if (currentQuestionIndex < orderedQuestions.length - 1) {
             const nextIdx = currentQuestionIndex + 1;
+            setCurrentQuestionIndex(nextIdx);
             setSelectedOption(userAnswers[nextIdx] || null);
             setShowSolution(false);
         }
@@ -115,8 +195,8 @@ const ShiftPractice: React.FC = () => {
 
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
             const prevIdx = currentQuestionIndex - 1;
+            setCurrentQuestionIndex(prevIdx);
             setSelectedOption(userAnswers[prevIdx] || null);
             setShowSolution(false);
         }
@@ -137,53 +217,60 @@ const ShiftPractice: React.FC = () => {
                 console.warn("Fullscreen request denied:", err);
             }
         };
-
         enterFullScreen();
     }, []);
 
-    // Close palette automatically on mobile selection
     const handlePaletteSelect = (idx: number) => {
         setCurrentQuestionIndex(idx);
         setSelectedOption(userAnswers[idx] || null);
         setShowSolution(false);
         if (window.innerWidth < 1024) setIsPaletteOpen(false);
-    }
+    };
 
-    const currentQuestion = questions[currentQuestionIndex];
+    const currentQuestion = orderedQuestions[currentQuestionIndex];
     if (loading) return <div className="flex h-full items-center justify-center"><div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div></div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
     if (!currentQuestion) return <div className="p-8 text-center text-text-secondary-light">No questions found for this shift.</div>;
 
     const currentSolution = currentQuestion.solution;
-
     const isFirstQuestion = currentQuestionIndex === 0;
-    const isLastQuestion = currentQuestionIndex === questions.length - 1;
-
-    // Decode the shift name for display
+    const isLastQuestion = currentQuestionIndex === orderedQuestions.length - 1;
     const displayShiftName = shiftId ? decodeURIComponent(shiftId) : 'Shift Practice';
+
+    // Find which subject group the current question belongs to
+    const currentSubjectGroup = subjectGroups.find(g =>
+        currentQuestionIndex >= g.startIndex && currentQuestionIndex < g.startIndex + g.questions.length
+    );
+
+    const colorMap: { [key: string]: { bg: string; text: string; border: string } } = {
+        blue: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20' },
+        green: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20' },
+        orange: { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-500/20' },
+        gray: { bg: 'bg-gray-500/10', text: 'text-gray-600 dark:text-gray-400', border: 'border-gray-500/20' },
+    };
 
     return (
         <div className="flex flex-col h-[100dvh] md:h-[calc(100vh-2rem)] md:my-4 md:mr-4 md:ml-4 rounded-none md:rounded-3xl overflow-hidden relative border-0 md:border border-border-light dark:border-border-dark shadow-none md:shadow-xl bg-surface-light dark:bg-surface-dark">
             <style>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                    height: 6px;
+                .themed-scrollbar::-webkit-scrollbar {
+                    width: 5px;
+                    height: 5px;
                 }
-                .custom-scrollbar::-webkit-scrollbar-track {
+                .themed-scrollbar::-webkit-scrollbar-track {
                     background: transparent;
                 }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: rgba(156, 163, 175, 0.5);
+                .themed-scrollbar::-webkit-scrollbar-thumb {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.4), rgba(139,92,246,0.4));
                     border-radius: 20px;
                 }
-                .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: rgba(75, 85, 99, 0.5);
+                .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7));
                 }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background-color: rgba(156, 163, 175, 0.8);
+                .dark .themed-scrollbar::-webkit-scrollbar-thumb {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3));
                 }
-                .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background-color: rgba(75, 85, 99, 0.8);
+                .dark .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(180deg, rgba(99,102,241,0.5), rgba(139,92,246,0.5));
                 }
             `}</style>
             <div className="absolute inset-0 grid-bg-light dark:grid-bg-dark -z-10 bg-fixed pointer-events-none opacity-60"></div>
@@ -202,14 +289,17 @@ const ShiftPractice: React.FC = () => {
                             {displayShiftName}
                         </h2>
                         <div className="flex items-center gap-2 text-xs text-text-secondary-light font-medium uppercase tracking-wider">
-                            <span className="text-primary">Shift-wise</span>
+                            {currentSubjectGroup && (
+                                <span className={colorMap[currentSubjectGroup.color]?.text || 'text-primary'}>
+                                    {currentSubjectGroup.subject}
+                                </span>
+                            )}
                             <span>•</span>
-                            <span>Q{currentQuestionIndex + 1} of {questions.length}</span>
+                            <span>Q{currentQuestionIndex + 1} of {orderedQuestions.length}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Actions */}
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setIsPaletteOpen(!isPaletteOpen)}
@@ -223,7 +313,7 @@ const ShiftPractice: React.FC = () => {
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Main Content */}
-                <div className="flex-1 overflow-y-auto p-2 md:p-4 pb-24 md:pb-4 scroll-smooth custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-2 md:p-4 pb-24 md:pb-4 scroll-smooth themed-scrollbar">
                     <div className="max-w-4xl mx-auto min-h-full flex flex-col justify-center pb-8">
                         <div className="bg-surface-light dark:bg-surface-dark rounded-3xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-4 md:p-6 mb-3">
 
@@ -263,14 +353,7 @@ const ShiftPractice: React.FC = () => {
                                         />
                                     </div>
                                 )}
-
-                                <div className="mt-4 flex pb-2 border-b border-border-light dark:border-border-dark justify-end">
-                                    <Link to={`/pyq/${currentQuestion.uuid}`} target="_blank" className="text-xs text-primary hover:underline flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[14px]">open_in_new</span> Provide Feedback / Share
-                                    </Link>
-                                </div>
                             </div>
-
 
                             {/* Options */}
                             <MCQOptions
@@ -301,38 +384,68 @@ const ShiftPractice: React.FC = () => {
                     />
                 )}
 
-                {/* Question Palette Sidebar (Responsive Overlay) */}
+                {/* Question Palette Sidebar */}
                 <aside className={`
                     absolute lg:relative right-0 top-0 bottom-0 z-20
                     transition-all duration-300 ease-in-out overflow-hidden
                     bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark
                     ${isPaletteOpen ? 'w-72 shadow-2xl lg:shadow-none translate-x-0' : 'w-0 translate-x-full lg:translate-x-0 lg:w-0'}
                 `}>
-                    <div className="h-full overflow-y-auto p-4 md:p-6 w-full">
-                        <h3 className="font-bold text-text-light dark:text-text-dark mb-4 flex items-center justify-between">
+                    <div className="h-full overflow-y-auto p-4 md:p-5 w-full themed-scrollbar">
+                        <h3 className="font-bold text-text-light dark:text-text-dark mb-4 flex items-center justify-between text-sm">
                             <span>Question Palette</span>
                             <button onClick={() => setIsPaletteOpen(false)} className="lg:hidden p-1 rounded hover:bg-background-light dark:hover:bg-white/5">
-                                <span className="material-symbols-outlined">close</span>
+                                <span className="material-symbols-outlined text-lg">close</span>
                             </button>
                         </h3>
-                        <div className="grid grid-cols-5 gap-2">
-                            {questions.map((_, idx) => {
-                                const isCurrent = currentQuestionIndex === idx;
-                                const isAnswered = !!userAnswers[idx];
-                                let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
 
-                                if (isCurrent) btnClass += "bg-primary text-white shadow-md shadow-primary/30";
-                                else if (isAnswered) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
-                                else btnClass += "border border-border-light dark:border-border-dark text-text-secondary-light hover:border-primary/50";
-
+                        {/* Subject-grouped sections */}
+                        <div className="flex flex-col gap-4">
+                            {subjectGroups.map((group) => {
+                                const colors = colorMap[group.color] || colorMap.gray;
                                 return (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handlePaletteSelect(idx)}
-                                        className={btnClass}
-                                    >
-                                        {idx + 1}
-                                    </button>
+                                    <div key={group.subject}>
+                                        {/* Subject Header */}
+                                        <div className={`flex items-center gap-2 mb-2.5 px-1`}>
+                                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${colors.bg} ${colors.text}`}>
+                                                <span className="material-symbols-outlined text-base">{group.icon}</span>
+                                            </div>
+                                            <span className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
+                                                {group.subject}
+                                            </span>
+                                            <span className="text-[10px] text-text-secondary-light ml-auto font-medium">
+                                                {group.questions.length}
+                                            </span>
+                                        </div>
+
+                                        {/* Question Grid */}
+                                        <div className="grid grid-cols-5 gap-1.5">
+                                            {group.questions.map((_, localIdx) => {
+                                                const globalIdx = group.startIndex + localIdx;
+                                                const isCurrent = currentQuestionIndex === globalIdx;
+                                                const isAnswered = !!userAnswers[globalIdx];
+                                                let btnClass = "w-9 h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-all ";
+
+                                                if (isCurrent) {
+                                                    btnClass += "bg-primary text-white shadow-md shadow-primary/30 scale-105";
+                                                } else if (isAnswered) {
+                                                    btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
+                                                } else {
+                                                    btnClass += `border ${colors.border} text-text-secondary-light hover:border-primary/50 hover:bg-background-light dark:hover:bg-white/5`;
+                                                }
+
+                                                return (
+                                                    <button
+                                                        key={globalIdx}
+                                                        onClick={() => handlePaletteSelect(globalIdx)}
+                                                        className={btnClass}
+                                                    >
+                                                        {localIdx + 1}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 );
                             })}
                         </div>
@@ -344,7 +457,6 @@ const ShiftPractice: React.FC = () => {
             <footer className="fixed bottom-0 left-0 right-0 md:static h-16 md:h-auto md:min-h-[5rem] bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark flex items-center px-6 md:px-8 z-40 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] md:shadow-none">
                 <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4 md:gap-2 relative">
 
-                    {/* Previous Button */}
                     <button
                         onClick={handlePrevious}
                         disabled={isFirstQuestion}
@@ -355,7 +467,6 @@ const ShiftPractice: React.FC = () => {
                         <span className="hidden md:inline ml-2">Previous</span>
                     </button>
 
-                    {/* Check Answer (Center on Mobile & Desktop) */}
                     <div className="flex-1 flex justify-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto">
                         <button
                             onClick={() => setShowSolution(!showSolution)}
@@ -370,7 +481,6 @@ const ShiftPractice: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Next Button */}
                     <button
                         onClick={handleNext}
                         disabled={isLastQuestion}
@@ -382,7 +492,7 @@ const ShiftPractice: React.FC = () => {
                     </button>
                 </div>
             </footer>
-        </div >
+        </div>
     );
 };
 

@@ -70,7 +70,7 @@ const ChapterSelection: React.FC = () => {
                         const allQuestions: any[] = await pyqRes.json();
                         const available = new Set<string>();
                         allQuestions.forEach(q => {
-                            if (q.subject === subject && q.tags?.tag2) {
+                            if (q.tags?.tag2) {
                                 available.add(q.tags.tag2);
                             }
                         });
