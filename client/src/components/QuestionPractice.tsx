@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
