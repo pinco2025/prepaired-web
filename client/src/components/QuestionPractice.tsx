@@ -6,7 +6,9 @@ import ImageWithProgress from './ImageWithProgress';
 import {
     RenderMath,
     MCQOptions,
+    NumericKeypad,
     SolutionDisplay,
+    isIntegerTypeQuestion,
 } from './question';
 
 interface Option {
@@ -53,6 +55,7 @@ const QuestionPractice: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showSolution, setShowSolution] = useState(false);
     const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
+    const [numericAnswers, setNumericAnswers] = useState<{ [key: number]: string }>({});
     const [isPaletteOpen, setIsPaletteOpen] = useState(() => window.innerWidth >= 1024);
 
     // Chapter Navigation State
@@ -104,6 +107,7 @@ const QuestionPractice: React.FC = () => {
                 setSelectedOption(null);
                 setShowSolution(false);
                 setUserAnswers({});
+                setNumericAnswers({});
 
             } catch (err: any) {
                 console.error(err);
@@ -197,6 +201,10 @@ const QuestionPractice: React.FC = () => {
         });
     };
 
+    const handleNumericChange = (value: string) => {
+        setNumericAnswers(prev => ({ ...prev, [currentQuestionIndex]: value }));
+    };
+
     const handleNext = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
@@ -254,6 +262,7 @@ const QuestionPractice: React.FC = () => {
     }
 
     const currentQuestion = questions[currentQuestionIndex];
+    const isCurrentInteger = currentQuestion ? isIntegerTypeQuestion(currentQuestion) : false;
     if (loading) return <div className="flex h-full items-center justify-center"><div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div></div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
     if (!currentQuestion) return <div className="p-8 text-center text-text-secondary-light">No questions found for this chapter.</div>;
@@ -334,8 +343,11 @@ const QuestionPractice: React.FC = () => {
 
                             {/* Question Content */}
                             <div className="mb-4">
-                                <div className="inline-block px-3 py-1 bg-background-light dark:bg-white/5 rounded-lg text-xs font-bold text-text-secondary-light uppercase tracking-widest mb-4">
-                                    Single Correct Type
+                                <div className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest mb-4 ${isCurrentInteger
+                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                        : 'bg-background-light dark:bg-white/5 text-text-secondary-light'
+                                    }`}>
+                                    {isCurrentInteger ? 'Integer Type' : 'Single Correct Type'}
                                 </div>
 
                                 {/* analytical metadata */}
@@ -383,16 +395,29 @@ const QuestionPractice: React.FC = () => {
                             </div>
 
 
-                            {/* Options */}
-                            <MCQOptions
-                                options={currentQuestion.options}
-                                selectedId={selectedOption}
-                                onSelect={handleOptionSelect}
-                                disabled={showSolution}
-                                showResult={showSolution}
-                                correctAnswerId={currentQuestion.correctAnswer}
-                                layout="grid"
-                            />
+                            {/* Options / Keypad */}
+                            {isCurrentInteger ? (
+                                <div className="py-4">
+                                    <NumericKeypad
+                                        value={numericAnswers[currentQuestionIndex] || ''}
+                                        onChange={handleNumericChange}
+                                        disabled={showSolution}
+                                        showResult={showSolution}
+                                        isCorrect={showSolution && (numericAnswers[currentQuestionIndex] || '').trim() === currentQuestion.correctAnswer?.trim()}
+                                        correctAnswer={currentQuestion.correctAnswer}
+                                    />
+                                </div>
+                            ) : (
+                                <MCQOptions
+                                    options={currentQuestion.options}
+                                    selectedId={selectedOption}
+                                    onSelect={handleOptionSelect}
+                                    disabled={showSolution}
+                                    showResult={showSolution}
+                                    correctAnswerId={currentQuestion.correctAnswer}
+                                    layout="grid"
+                                />
+                            )}
 
                             {/* Solution Display */}
                             <SolutionDisplay
@@ -419,34 +444,80 @@ const QuestionPractice: React.FC = () => {
                     bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark
                     ${isPaletteOpen ? 'w-72 shadow-2xl lg:shadow-none translate-x-0' : 'w-0 translate-x-full lg:translate-x-0 lg:w-0'}
                 `}>
-                    <div className="h-full overflow-y-auto p-4 md:p-6 w-full">
+                    <div className="h-full overflow-y-auto p-4 md:p-6 w-full themed-scrollbar">
                         <h3 className="font-bold text-text-light dark:text-text-dark mb-4 flex items-center justify-between">
                             <span>Question Palette</span>
                             <button onClick={() => setIsPaletteOpen(false)} className="lg:hidden p-1 rounded hover:bg-background-light dark:hover:bg-white/5">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </h3>
-                        <div className="grid grid-cols-5 gap-2">
-                            {questions.map((_, idx) => {
-                                const isCurrent = currentQuestionIndex === idx;
-                                const isAnswered = !!userAnswers[idx];
-                                let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
 
-                                if (isCurrent) btnClass += "bg-primary text-white shadow-md shadow-primary/30";
-                                else if (isAnswered) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
-                                else btnClass += "border border-border-light dark:border-border-dark text-text-secondary-light hover:border-primary/50";
+                        {/* Split questions into MCQ and Integer */}
+                        {(() => {
+                            const mcqIndices: number[] = [];
+                            const intIndices: number[] = [];
+                            questions.forEach((q, idx) => {
+                                if (isIntegerTypeQuestion(q)) {
+                                    intIndices.push(idx);
+                                } else {
+                                    mcqIndices.push(idx);
+                                }
+                            });
 
-                                return (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handlePaletteSelect(idx)}
-                                        className={btnClass}
-                                    >
-                                        {idx + 1}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                            const renderGrid = (indices: number[]) => (
+                                <div className="grid grid-cols-5 gap-2">
+                                    {indices.map((idx) => {
+                                        const isCurrent = currentQuestionIndex === idx;
+                                        const isAnswered = isIntegerTypeQuestion(questions[idx])
+                                            ? !!(numericAnswers[idx]?.trim())
+                                            : !!userAnswers[idx];
+                                        let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
+
+                                        if (isCurrent) btnClass += "bg-primary text-white shadow-md shadow-primary/30";
+                                        else if (isAnswered) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
+                                        else btnClass += "border border-border-light dark:border-border-dark text-text-secondary-light hover:border-primary/50";
+
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handlePaletteSelect(idx)}
+                                                className={btnClass}
+                                            >
+                                                {idx + 1}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            );
+
+                            return (
+                                <>
+                                    {/* MCQ Section */}
+                                    {mcqIndices.length > 0 && (
+                                        <>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-text-secondary-light/50 px-1">MCQ</span>
+                                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
+                                            </div>
+                                            {renderGrid(mcqIndices)}
+                                        </>
+                                    )}
+
+                                    {/* Integer Section */}
+                                    {intIndices.length > 0 && (
+                                        <>
+                                            <div className="flex items-center gap-2 mb-2 mt-4">
+                                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-amber-500/70 dark:text-amber-400/60 px-1">Integer</span>
+                                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+                                            </div>
+                                            {renderGrid(intIndices)}
+                                        </>
+                                    )}
+                                </>
+                            );
+                        })()}
                     </div>
                 </aside>
             </div>

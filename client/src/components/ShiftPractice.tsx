@@ -6,7 +6,9 @@ import ImageWithProgress from './ImageWithProgress';
 import {
     RenderMath,
     MCQOptions,
+    NumericKeypad,
     SolutionDisplay,
+    isIntegerTypeQuestion,
 } from './question';
 
 interface Option {
@@ -66,8 +68,10 @@ const ShiftPractice: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showSolution, setShowSolution] = useState(false);
     const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
+    const [numericAnswers, setNumericAnswers] = useState<{ [key: number]: string }>({});
     const [isPaletteOpen, setIsPaletteOpen] = useState(() => window.innerWidth >= 1024);
     const [chaptersData, setChaptersData] = useState<ChaptersData>({});
+    const [activePaletteSubject, setActivePaletteSubject] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -99,6 +103,7 @@ const ShiftPractice: React.FC = () => {
                 setSelectedOption(null);
                 setShowSolution(false);
                 setUserAnswers({});
+                setNumericAnswers({});
             } catch (err: any) {
                 console.error(err);
                 setError(`Failed to load practice data: ${err.message}`);
@@ -184,6 +189,10 @@ const ShiftPractice: React.FC = () => {
         });
     };
 
+    const handleNumericChange = (value: string) => {
+        setNumericAnswers(prev => ({ ...prev, [currentQuestionIndex]: value }));
+    };
+
     const handleNext = () => {
         if (currentQuestionIndex < orderedQuestions.length - 1) {
             const nextIdx = currentQuestionIndex + 1;
@@ -227,7 +236,20 @@ const ShiftPractice: React.FC = () => {
         if (window.innerWidth < 1024) setIsPaletteOpen(false);
     };
 
+    // Find which subject group the current question belongs to
+    const currentSubjectGroup = subjectGroups.find(g =>
+        currentQuestionIndex >= g.startIndex && currentQuestionIndex < g.startIndex + g.questions.length
+    );
+
+    // Auto-select the palette tab for the current question's subject
+    useEffect(() => {
+        if (currentSubjectGroup) {
+            setActivePaletteSubject(currentSubjectGroup.subject);
+        }
+    }, [currentSubjectGroup]);
+
     const currentQuestion = orderedQuestions[currentQuestionIndex];
+    const isCurrentInteger = currentQuestion ? isIntegerTypeQuestion(currentQuestion) : false;
     if (loading) return <div className="flex h-full items-center justify-center"><div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div></div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
     if (!currentQuestion) return <div className="p-8 text-center text-text-secondary-light">No questions found for this shift.</div>;
@@ -236,11 +258,6 @@ const ShiftPractice: React.FC = () => {
     const isFirstQuestion = currentQuestionIndex === 0;
     const isLastQuestion = currentQuestionIndex === orderedQuestions.length - 1;
     const displayShiftName = shiftId ? decodeURIComponent(shiftId) : 'Shift Practice';
-
-    // Find which subject group the current question belongs to
-    const currentSubjectGroup = subjectGroups.find(g =>
-        currentQuestionIndex >= g.startIndex && currentQuestionIndex < g.startIndex + g.questions.length
-    );
 
     const colorMap: { [key: string]: { bg: string; text: string; border: string } } = {
         blue: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20' },
@@ -319,8 +336,11 @@ const ShiftPractice: React.FC = () => {
 
                             {/* Question Content */}
                             <div className="mb-4">
-                                <div className="inline-block px-3 py-1 bg-background-light dark:bg-white/5 rounded-lg text-xs font-bold text-text-secondary-light uppercase tracking-widest mb-4">
-                                    Single Correct Type
+                                <div className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest mb-4 ${isCurrentInteger
+                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                    : 'bg-background-light dark:bg-white/5 text-text-secondary-light'
+                                    }`}>
+                                    {isCurrentInteger ? 'Integer Type' : 'Single Correct Type'}
                                 </div>
 
                                 {/* analytical metadata */}
@@ -355,16 +375,29 @@ const ShiftPractice: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* Options */}
-                            <MCQOptions
-                                options={currentQuestion.options}
-                                selectedId={selectedOption}
-                                onSelect={handleOptionSelect}
-                                disabled={showSolution}
-                                showResult={showSolution}
-                                correctAnswerId={currentQuestion.correctAnswer}
-                                layout="grid"
-                            />
+                            {/* Options / Keypad */}
+                            {isCurrentInteger ? (
+                                <div className="py-4">
+                                    <NumericKeypad
+                                        value={numericAnswers[currentQuestionIndex] || ''}
+                                        onChange={handleNumericChange}
+                                        disabled={showSolution}
+                                        showResult={showSolution}
+                                        isCorrect={showSolution && (numericAnswers[currentQuestionIndex] || '').trim() === currentQuestion.correctAnswer?.trim()}
+                                        correctAnswer={currentQuestion.correctAnswer}
+                                    />
+                                </div>
+                            ) : (
+                                <MCQOptions
+                                    options={currentQuestion.options}
+                                    selectedId={selectedOption}
+                                    onSelect={handleOptionSelect}
+                                    disabled={showSolution}
+                                    showResult={showSolution}
+                                    correctAnswerId={currentQuestion.correctAnswer}
+                                    layout="grid"
+                                />
+                            )}
 
                             {/* Solution Display */}
                             <SolutionDisplay
@@ -392,38 +425,60 @@ const ShiftPractice: React.FC = () => {
                     ${isPaletteOpen ? 'w-72 shadow-2xl lg:shadow-none translate-x-0' : 'w-0 translate-x-full lg:translate-x-0 lg:w-0'}
                 `}>
                     <div className="h-full overflow-y-auto p-4 md:p-5 w-full themed-scrollbar">
-                        <h3 className="font-bold text-text-light dark:text-text-dark mb-4 flex items-center justify-between text-sm">
+                        <h3 className="font-bold text-text-light dark:text-text-dark mb-3 flex items-center justify-between text-sm">
                             <span>Question Palette</span>
                             <button onClick={() => setIsPaletteOpen(false)} className="lg:hidden p-1 rounded hover:bg-background-light dark:hover:bg-white/5">
                                 <span className="material-symbols-outlined text-lg">close</span>
                             </button>
                         </h3>
 
-                        {/* Subject-grouped sections */}
-                        <div className="flex flex-col gap-4">
+                        {/* Switchable Subject Tabs */}
+                        <div className="flex gap-1 mb-4 bg-background-light dark:bg-white/5 rounded-xl p-1">
                             {subjectGroups.map((group) => {
                                 const colors = colorMap[group.color] || colorMap.gray;
+                                const isActive = activePaletteSubject === group.subject;
                                 return (
-                                    <div key={group.subject}>
-                                        {/* Subject Header */}
-                                        <div className={`flex items-center gap-2 mb-2.5 px-1`}>
-                                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${colors.bg} ${colors.text}`}>
-                                                <span className="material-symbols-outlined text-base">{group.icon}</span>
-                                            </div>
-                                            <span className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
-                                                {group.subject}
-                                            </span>
-                                            <span className="text-[10px] text-text-secondary-light ml-auto font-medium">
-                                                {group.questions.length}
-                                            </span>
-                                        </div>
+                                    <button
+                                        key={group.subject}
+                                        onClick={() => setActivePaletteSubject(group.subject)}
+                                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${isActive
+                                            ? `${colors.bg} ${colors.text} shadow-sm`
+                                            : 'text-text-secondary-light/60 hover:text-text-secondary-light'
+                                            }`}
+                                    >
+                                        <span className="material-symbols-outlined text-sm">{group.icon}</span>
+                                        <span className="hidden sm:inline">{group.subject.slice(0, 4)}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
 
-                                        {/* Question Grid */}
+                        {/* Filtered subject content */}
+                        <div className="flex flex-col gap-4">
+                            {subjectGroups
+                                .filter(g => activePaletteSubject === null || g.subject === activePaletteSubject)
+                                .map((group) => {
+                                    const colors = colorMap[group.color] || colorMap.gray;
+
+                                    // Split into MCQ and Integer sub-groups
+                                    const mcqIndices: number[] = [];
+                                    const intIndices: number[] = [];
+                                    group.questions.forEach((q, localIdx) => {
+                                        if (isIntegerTypeQuestion(q)) {
+                                            intIndices.push(localIdx);
+                                        } else {
+                                            mcqIndices.push(localIdx);
+                                        }
+                                    });
+
+                                    const renderGrid = (indices: number[]) => (
                                         <div className="grid grid-cols-5 gap-1.5">
-                                            {group.questions.map((_, localIdx) => {
+                                            {indices.map((localIdx) => {
                                                 const globalIdx = group.startIndex + localIdx;
                                                 const isCurrent = currentQuestionIndex === globalIdx;
-                                                const isAnswered = !!userAnswers[globalIdx];
+                                                const isAnswered = isIntegerTypeQuestion(group.questions[localIdx])
+                                                    ? !!(numericAnswers[globalIdx]?.trim())
+                                                    : !!userAnswers[globalIdx];
                                                 let btnClass = "w-9 h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-all ";
 
                                                 if (isCurrent) {
@@ -445,9 +500,49 @@ const ShiftPractice: React.FC = () => {
                                                 );
                                             })}
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+
+                                    return (
+                                        <div key={group.subject}>
+                                            {/* Subject Header */}
+                                            <div className="flex items-center gap-2 mb-2.5 px-1">
+                                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${colors.bg} ${colors.text}`}>
+                                                    <span className="material-symbols-outlined text-base">{group.icon}</span>
+                                                </div>
+                                                <span className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
+                                                    {group.subject}
+                                                </span>
+                                                <span className="text-[10px] text-text-secondary-light ml-auto font-medium">
+                                                    {group.questions.length}
+                                                </span>
+                                            </div>
+
+                                            {/* MCQ Section */}
+                                            {mcqIndices.length > 0 && (
+                                                <>
+                                                    <div className="flex items-center gap-2 mb-2 mt-1">
+                                                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-text-secondary-light/50 px-1">MCQ</span>
+                                                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
+                                                    </div>
+                                                    {renderGrid(mcqIndices)}
+                                                </>
+                                            )}
+
+                                            {/* Integer Section */}
+                                            {intIndices.length > 0 && (
+                                                <>
+                                                    <div className="flex items-center gap-2 mb-2 mt-3">
+                                                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-500/70 dark:text-amber-400/60 px-1">Integer</span>
+                                                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+                                                    </div>
+                                                    {renderGrid(intIndices)}
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                         </div>
                     </div>
                 </aside>
