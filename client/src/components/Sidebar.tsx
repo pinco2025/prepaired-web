@@ -101,7 +101,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                         ${isActuallyActive
                     ? 'bg-primary/10 text-primary'
                     : isHighlighted
-                      ? 'text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 sidebar-question-set-glow'
+                      ? 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
                       : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark'
                   }`
               }}

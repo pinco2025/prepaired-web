@@ -344,8 +344,8 @@ const QuestionPractice: React.FC = () => {
                             {/* Question Content */}
                             <div className="mb-4">
                                 <div className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest mb-4 ${isCurrentInteger
-                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                                        : 'bg-background-light dark:bg-white/5 text-text-secondary-light'
+                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                    : 'bg-background-light dark:bg-white/5 text-text-secondary-light'
                                     }`}>
                                     {isCurrentInteger ? 'Integer Type' : 'Single Correct Type'}
                                 </div>
@@ -387,11 +387,6 @@ const QuestionPractice: React.FC = () => {
                                     </div>
                                 )}
 
-                                <div className="mt-4 flex pb-2 border-b border-border-light dark:border-border-dark justify-end">
-                                    <Link to={`/pyq/${currentQuestion.uuid}`} target="_blank" className="text-xs text-primary hover:underline flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[14px]">open_in_new</span> Provide Feedback / Share Note
-                                    </Link>
-                                </div>
                             </div>
 
 

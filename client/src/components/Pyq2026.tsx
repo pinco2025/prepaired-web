@@ -51,27 +51,18 @@ const Pyq2026: React.FC = () => {
                                 </div>
 
                                 {/* Chemistry */}
-                                <div className="bg-surface-light dark:bg-surface-dark p-4 md:p-6 rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark relative overflow-hidden cursor-not-allowed group">
-                                    <div className="absolute inset-0 z-20 bg-background-light/60 dark:bg-background-dark/60 flex items-center justify-center backdrop-blur-[2px] transition-opacity duration-300">
-                                        <div className="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transform group-hover:scale-105 transition-transform duration-300">
-                                            <span className="material-symbols-outlined text-sm">schedule</span>
-                                            Coming Soon
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 md:gap-5 relative z-10 opacity-40 grayscale filter">
+                                <div className="bg-surface-light dark:bg-surface-dark p-4 md:p-6 rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark hover:border-green-500 dark:hover:border-green-500 transition-all cursor-pointer group relative overflow-hidden"
+                                    onClick={() => navigate('/pyq-2026/Chemistry')}>
+                                    <div className="flex items-center gap-3 md:gap-5 relative z-10">
                                         <div className="w-14 h-14 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-500">
                                             <span className="material-symbols-outlined text-3xl">science</span>
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex justify-between items-end mb-2">
-                                                <h3 className="text-lg font-bold text-text-light dark:text-text-dark">Chemistry</h3>
-                                                <span className="text-sm font-medium text-text-secondary-light">78/120 Solved</span>
-                                            </div>
-                                            <div className="w-full bg-border-light dark:bg-border-dark h-2 rounded-full overflow-hidden">
-                                                <div className="bg-green-500 h-full rounded-full" style={{ width: '65%' }}></div>
+                                                <h3 className="text-lg font-bold text-text-light dark:text-text-dark group-hover:text-green-500 transition-colors">Chemistry</h3>
                                             </div>
                                         </div>
-                                        <span className="material-symbols-outlined text-text-secondary-light">chevron_right</span>
+                                        <span className="material-symbols-outlined text-text-secondary-light group-hover:translate-x-1 transition-transform">chevron_right</span>
                                     </div>
                                 </div>
 
