@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
@@ -39,12 +39,9 @@ interface Question {
     };
 }
 
-
-
-const QuestionPractice: React.FC = () => {
-    const { subject, chapterCode } = useParams<{ subject: string; chapterCode: string }>();
+const ShiftPractice: React.FC = () => {
+    const { shiftId } = useParams<{ shiftId: string }>();
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -55,133 +52,43 @@ const QuestionPractice: React.FC = () => {
     const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
     const [isPaletteOpen, setIsPaletteOpen] = useState(() => window.innerWidth >= 1024);
 
-    // Chapter Navigation State
-    const [nextChapter, setNextChapter] = useState<string | null>(null);
-    const [prevChapter, setPrevChapter] = useState<string | null>(null);
-
     useEffect(() => {
         const fetchData = async () => {
-            if (!subject || !chapterCode) return;
+            if (!shiftId) return;
 
             try {
                 setLoading(true);
 
-                // 0. Fetch Chapters
-                const chaptersRes = await withTimeout(fetch('/chapters.json'), 15000, 'Chapters fetch timed out');
-                let chaptersData: any = {};
-                if (chaptersRes.ok) {
-                    chaptersData = await chaptersRes.json();
-                    if (chaptersData[subject]) {
-                        const list = chaptersData[subject];
-
-                        // Find current index
-                        const currentIndex = list.findIndex((c: any) => c.code === chapterCode);
-                        if (currentIndex !== -1) {
-                            if (currentIndex < list.length - 1) setNextChapter(list[currentIndex + 1].code);
-                            else setNextChapter(null);
-
-                            if (currentIndex > 0) setPrevChapter(list[currentIndex - 1].code);
-                            else setPrevChapter(null);
-                        }
-                    }
-                }
-
                 // Fetch from Local JSON Data
-                console.log('Fetching questions from local data...');
                 const questionsRes = await withTimeout(fetch('/data/jee_2026_pyqs.json'), 15000, `Questions fetch timed out`);
                 if (!questionsRes.ok) throw new Error(`Failed to load questions from local data`);
                 const allData: Question[] = await questionsRes.json();
 
-                // Filter by subject and chapter code (tag2)
-                const chapterQuestions = allData.filter(
-                    q => q.subject === subject && q.tags?.tag2 === chapterCode
+                // Filter by shift ID (tag1)
+                const shiftQuestions = allData.filter(
+                    q => q.tags?.tag1 === shiftId
                 );
 
-                setQuestions(chapterQuestions);
+                setQuestions(shiftQuestions);
 
-                // Reset state for new chapter
+                // Reset state for new shift
                 setCurrentQuestionIndex(0);
                 setSelectedOption(null);
                 setShowSolution(false);
                 setUserAnswers({});
-
             } catch (err: any) {
                 console.error(err);
-
-                // Smart Navigation Logic: If fetching fails (likely 404 or empty), try to skip to next/prev
-                const direction = location.state?.direction;
-
-                if (direction && (err.message === 'Failed to load questions' || err.message.includes('404'))) {
-                    console.log(`Failed to load ${chapterCode}, skipping (${direction})...`);
-
-                    // We need chapters list to find next
-                    // Since we fetched it in step 0, we can try to use state or re-fetch (but re-fetch inside catch is messy)
-                    // Better approach: ensure we have chaptersData available here.
-                    // Actually, let's just refetch strictly for navigation calculation if needed, 
-                    // OR leverage the setNextChapter/setPrevChapter logic if we can.
-
-                    // But nextChapter/prevChapter state setters might not have run or finished if we failed early?
-                    // Actually, step 0 runs before step 1/2. So we *likely* have cached locally in `chaptersData` var if we scope it out.
-
-                    // Re-fetching chapters strictly for the skip logic (safest to avoid scope issues)
-                    try {
-                        const chRes = await fetch('/chapters.json');
-                        if (chRes.ok) {
-                            const chData = await chRes.json();
-                            const list = chData[subject!] || [];
-                            const currentIndex = list.findIndex((c: any) => c.code === chapterCode);
-
-                            if (currentIndex !== -1) {
-                                let newTarget = null;
-                                if (direction === 'next' && currentIndex < list.length - 1) {
-                                    newTarget = list[currentIndex + 1].code;
-                                } else if (direction === 'prev' && currentIndex > 0) {
-                                    newTarget = list[currentIndex - 1].code;
-                                }
-
-                                if (newTarget) {
-                                    // Replace current history entry so user doesn't get stuck in back-button loop of empty pages
-                                    navigate(`/pyq-2026/${subject}/practice/${newTarget}`, {
-                                        replace: true,
-                                        state: { direction }
-                                    });
-                                    return; // Stop processing, we are navigating away
-                                }
-                            }
-                        }
-                    } catch (navErr) {
-                        console.error("Navigation skip failed", navErr);
-                    }
-                }
-
                 setError(`Failed to load practice data: ${err.message}`);
-                setLoading(false); // Only unset loading if we actually error out and don't navigate
             } finally {
-                // strict mode double set protection?
-                // If we navigated away, the component unmounts/remounts, so this finally block runs on unmounted component?
-                // It's mostly fine, React handles it.
-                // But if we navigated, we want loading to stay true potentially?
-                // use 'return' in catch block avoids finally? No.
-                // We should only setLoading(false) if we didn't navigate.
-                // But we can't easily know if navigate happened synchronous enough.
-                // Actually, if we navigate, this component dies.
-                // So setLoading(false) might trigger warning "update on unmounted component".
-                // We can use a ref to track mounted state.
-
-                // For now, simple check:
-                // If we errored and didn't redirect, we set loading false.
-                // If we redirected, we effectively don't care.
-                if (!location.state?.skipping) {
-                    setLoading(false);
-                }
+                setLoading(false);
             }
         };
 
         fetchData();
-    }, [subject, chapterCode, navigate, location.state]);
+    }, [shiftId]);
 
     const handleOptionSelect = (optionId: string) => {
-        if (showSolution) return; // Prevent changing answer after proper check
+        if (showSolution) return;
 
         const newSelection = selectedOption === optionId ? null : optionId;
         setSelectedOption(newSelection);
@@ -203,9 +110,6 @@ const QuestionPractice: React.FC = () => {
             const nextIdx = currentQuestionIndex + 1;
             setSelectedOption(userAnswers[nextIdx] || null);
             setShowSolution(false);
-        } else if (nextChapter) {
-            // Navigate to Next Chapter
-            navigate(`/pyq-2026/${subject}/practice/${nextChapter}`, { state: { direction: 'next' } });
         }
     };
 
@@ -215,13 +119,8 @@ const QuestionPractice: React.FC = () => {
             const prevIdx = currentQuestionIndex - 1;
             setSelectedOption(userAnswers[prevIdx] || null);
             setShowSolution(false);
-        } else if (prevChapter) {
-            // Navigate to Previous Chapter
-            navigate(`/pyq-2026/${subject}/practice/${prevChapter}`, { state: { direction: 'prev' } });
         }
     };
-
-
 
     // Fullscreen on Mount
     useEffect(() => {
@@ -230,9 +129,9 @@ const QuestionPractice: React.FC = () => {
                 if (document.documentElement.requestFullscreen) {
                     await document.documentElement.requestFullscreen();
                 } else if ((document.documentElement as any).webkitRequestFullscreen) {
-                    await (document.documentElement as any).webkitRequestFullscreen(); // Safari
+                    await (document.documentElement as any).webkitRequestFullscreen();
                 } else if ((document.documentElement as any).msRequestFullscreen) {
-                    await (document.documentElement as any).msRequestFullscreen(); // IE11
+                    await (document.documentElement as any).msRequestFullscreen();
                 }
             } catch (err) {
                 console.warn("Fullscreen request denied:", err);
@@ -240,9 +139,6 @@ const QuestionPractice: React.FC = () => {
         };
 
         enterFullScreen();
-
-        // Optional: Exit on unmount? 
-        // return () => { if (document.exitFullscreen) document.exitFullscreen(); };
     }, []);
 
     // Close palette automatically on mobile selection
@@ -256,16 +152,15 @@ const QuestionPractice: React.FC = () => {
     const currentQuestion = questions[currentQuestionIndex];
     if (loading) return <div className="flex h-full items-center justify-center"><div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div></div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-    if (!currentQuestion) return <div className="p-8 text-center text-text-secondary-light">No questions found for this chapter.</div>;
+    if (!currentQuestion) return <div className="p-8 text-center text-text-secondary-light">No questions found for this shift.</div>;
 
     const currentSolution = currentQuestion.solution;
 
-    // Navigation Button States
     const isFirstQuestion = currentQuestionIndex === 0;
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-    const showPrevChapterParams = isFirstQuestion && prevChapter;
-    const showNextChapterParams = isLastQuestion && nextChapter;
+    // Decode the shift name for display
+    const displayShiftName = shiftId ? decodeURIComponent(shiftId) : 'Shift Practice';
 
     return (
         <div className="flex flex-col h-[100dvh] md:h-[calc(100vh-2rem)] md:my-4 md:mr-4 md:ml-4 rounded-none md:rounded-3xl overflow-hidden relative border-0 md:border border-border-light dark:border-border-dark shadow-none md:shadow-xl bg-surface-light dark:bg-surface-dark">
@@ -297,17 +192,17 @@ const QuestionPractice: React.FC = () => {
             <header className="h-14 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark flex items-center justify-between px-4 md:px-8 z-30 shrink-0">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate(`/pyq-2026/${subject}`)}
+                        onClick={() => navigate(`/pyq-2026`)}
                         className="p-2 hover:bg-background-light dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                         <span className="material-symbols-outlined text-text-secondary-light">arrow_back</span>
                     </button>
                     <div className="flex flex-col">
                         <h2 className="font-bold text-text-light dark:text-text-dark text-sm md:text-base line-clamp-1">
-                            {chapterCode} Practice
+                            {displayShiftName}
                         </h2>
                         <div className="flex items-center gap-2 text-xs text-text-secondary-light font-medium uppercase tracking-wider">
-                            <span className="text-primary">{subject}</span>
+                            <span className="text-primary">Shift-wise</span>
                             <span>•</span>
                             <span>Q{currentQuestionIndex + 1} of {questions.length}</span>
                         </div>
@@ -350,13 +245,7 @@ const QuestionPractice: React.FC = () => {
                                         <>
                                             {currentQuestion.metadata?.importance_level && <span className="opacity-30">|</span>}
                                             <span className="text-sm font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent filter drop-shadow-sm tracking-wider">
-                                                {(() => {
-                                                    const match = currentQuestion.tags.tag1?.match(/^(\d+)-S(\d+)$/);
-                                                    if (match) {
-                                                        return `${match[1]} January Shift ${match[2]}`;
-                                                    }
-                                                    return currentQuestion.tags.tag1;
-                                                })()}
+                                                {currentQuestion.tags.tag1}
                                             </span>
                                         </>
                                     )}
@@ -377,7 +266,7 @@ const QuestionPractice: React.FC = () => {
 
                                 <div className="mt-4 flex pb-2 border-b border-border-light dark:border-border-dark justify-end">
                                     <Link to={`/pyq/${currentQuestion.uuid}`} target="_blank" className="text-xs text-primary hover:underline flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[14px]">open_in_new</span> Provide Feedback / Share Note
+                                        <span className="material-symbols-outlined text-[14px]">open_in_new</span> Provide Feedback / Share
                                     </Link>
                                 </div>
                             </div>
@@ -458,14 +347,12 @@ const QuestionPractice: React.FC = () => {
                     {/* Previous Button */}
                     <button
                         onClick={handlePrevious}
-                        disabled={!showPrevChapterParams && currentQuestionIndex === 0}
+                        disabled={isFirstQuestion}
                         className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl bg-surface-light dark:bg-surface-dark md:bg-transparent text-text-secondary-light font-bold hover:bg-background-light dark:hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-border-light dark:border-border-dark md:border-transparent md:hover:border-border-light md:dark:hover:border-border-dark shadow-sm md:shadow-none"
-                        title={showPrevChapterParams ? "Previous Chapter" : "Previous Question"}
+                        title="Previous Question"
                     >
-                        <span className="material-symbols-outlined text-2xl md:text-xl">
-                            {showPrevChapterParams ? 'fast_rewind' : 'chevron_left'}
-                        </span>
-                        <span className="hidden md:inline ml-2">{showPrevChapterParams ? 'Previous Chapter' : 'Previous'}</span>
+                        <span className="material-symbols-outlined text-2xl md:text-xl">chevron_left</span>
+                        <span className="hidden md:inline ml-2">Previous</span>
                     </button>
 
                     {/* Check Answer (Center on Mobile & Desktop) */}
@@ -486,14 +373,12 @@ const QuestionPractice: React.FC = () => {
                     {/* Next Button */}
                     <button
                         onClick={handleNext}
-                        disabled={!showNextChapterParams && currentQuestionIndex === questions.length - 1}
+                        disabled={isLastQuestion}
                         className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl bg-primary md:bg-primary text-white font-bold shadow-md shadow-primary/20 hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        title={showNextChapterParams ? "Next Chapter" : "Next Question"}
+                        title="Next Question"
                     >
-                        <span className="hidden md:inline mr-1">{showNextChapterParams ? 'Next Chapter' : 'Next'}</span>
-                        <span className="material-symbols-outlined text-2xl md:text-xl">
-                            {showNextChapterParams ? 'fast_forward' : 'chevron_right'}
-                        </span>
+                        <span className="hidden md:inline mr-1">Next</span>
+                        <span className="material-symbols-outlined text-2xl md:text-xl">chevron_right</span>
                     </button>
                 </div>
             </footer>
@@ -501,4 +386,4 @@ const QuestionPractice: React.FC = () => {
     );
 };
 
-export default QuestionPractice;
+export default ShiftPractice;

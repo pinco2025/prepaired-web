@@ -22,6 +22,7 @@ import Pyq2026 from './components/Pyq2026';
 import AppLayout from "./components/AppLayout";
 import ChapterSelection from './components/ChapterSelection';
 import QuestionPractice from './components/QuestionPractice';
+import ShiftPractice from './components/ShiftPractice';
 import PageSkeleton from './components/PageSkeleton';
 import QuestionSet from './components/QuestionSet';
 import CondensedPractice from './components/CondensedPractice';
@@ -33,6 +34,7 @@ import WaitlistSuccess from './components/WaitlistSuccess';
 import RegisterSuccess from './components/RegisterSuccess';
 import OrganicQuestion from './components/OrganicQuestion';
 import OrganicQuestionList from './components/OrganicQuestionList';
+import SingleQuestion from './components/SingleQuestion';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -86,7 +88,7 @@ export const AppContent: React.FC = () => {
   const isCondensedPracticeRoute = /^\/question-set\/[^/]+\/practice$/.test(location.pathname);
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
-  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
   const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
 
   return (
@@ -158,6 +160,9 @@ export const AppContent: React.FC = () => {
             <Route path="/pyq-2026/:subject/practice/:chapterCode" element={
               <QuestionPractice />
             } />
+            <Route path="/pyq-2026/shift/practice/:shiftId" element={
+              <ShiftPractice />
+            } />
             <Route path="/pyq-2026" element={
               <Pyq2026 />
             } />
@@ -195,6 +200,11 @@ export const AppContent: React.FC = () => {
             } />
             <Route path="/questions/organic" element={
               <OrganicQuestionList />
+            } />
+
+            {/* PYQ Individual Questions - SEO-optimized */}
+            <Route path="/pyq/:uuid" element={
+              <SingleQuestion />
             } />
 
             <Route path="/tests" element={

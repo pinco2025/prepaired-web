@@ -4,6 +4,14 @@ import { useNavigate } from 'react-router-dom';
 const Pyq2026: React.FC = () => {
     const navigate = useNavigate();
 
+    const availableShifts = [
+        '21st January Morning Shift', '21st January Evening Shift',
+        '22nd January Morning Shift', '22nd January Evening Shift',
+        '23rd January Morning Shift', '23rd January Evening Shift',
+        '24th January Morning Shift', '24th January Evening Shift',
+        '28th January Morning Shift', '28th January Evening Shift'
+    ];
+
     return (
         <div className="flex-1 flex flex-col overflow-hidden relative h-full">
             {/* Mobile header is handled by Sidebar component's mobile header or AppLayout, 
@@ -91,17 +99,20 @@ const Pyq2026: React.FC = () => {
                                 <span className="material-symbols-outlined text-primary">event_repeat</span>
                                 <h2 className="text-xl font-semibold text-text-light dark:text-text-dark">Shift-wise Attempt</h2>
                             </div>
-                            <div className="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden flex flex-col h-full min-h-[400px] items-center justify-center relative p-6">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 pointer-events-none"></div>
-                                <div className="z-10 flex flex-col items-center text-center max-w-sm mx-auto">
-                                    <div className="w-20 h-20 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-lg flex items-center justify-center mb-6 text-primary border border-border-light dark:border-border-dark transform rotate-3 hover:rotate-6 transition-transform duration-300">
-                                        <span className="material-symbols-outlined text-4xl">event_upcoming</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {availableShifts.map((shift, idx) => (
+                                    <div key={idx}
+                                        onClick={() => navigate(`/pyq-2026/shift/practice/${encodeURIComponent(shift)}`)}
+                                        className="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary transition-all cursor-pointer group flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined">event</span>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-sm font-bold text-text-light dark:text-text-dark group-hover:text-primary transition-colors line-clamp-2">{shift}</h3>
+                                        </div>
+                                        <span className="material-symbols-outlined text-text-secondary-light group-hover:translate-x-1 transition-transform">chevron_right</span>
                                     </div>
-                                    <h3 className="text-2xl font-bold text-text-light dark:text-text-dark mb-3">Shift-Wise Papers Coming Soon</h3>
-                                    <p className="text-text-secondary-light dark:text-text-secondary-dark leading-relaxed">
-                                        We are currently compiling and verifying the 2026 shift-wise papers. They will be available for practice very soon.
-                                    </p>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>

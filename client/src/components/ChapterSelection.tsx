@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { db } from '../utils/firebaseClient';
-import { doc, getDoc } from 'firebase/firestore';
 import { withTimeout } from '../utils/promiseUtils';
 
 interface Chapter {
@@ -22,9 +20,10 @@ const ChapterSelection: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [zoom, setZoom] = useState(() => window.innerWidth < 768 ? 0.6 : 1);
 
+    // Chapter availability set (populated from local JSON)
+    const [availableChapters, setAvailableChapters] = useState<Set<string>>(new Set());
+
     // Check State
-    const [baseUrl, setBaseUrl] = useState<string | null>(null);
-    const [checkingChapter, setCheckingChapter] = useState<string | null>(null);
     const [showComingSoon, setShowComingSoon] = useState(false);
     const [comingSoonChapterName, setComingSoonChapterName] = useState<string>('');
 
@@ -37,20 +36,16 @@ const ChapterSelection: React.FC = () => {
 
     // Fail-safe timeout duration
     const FETCH_TIMEOUT = 5000; // 5 seconds for initial load
-    const CHECK_TIMEOUT = 3000; // 3 seconds for chapter check
 
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Parallelize fetching Chapters and Firestore URL
-                const [chaptersResult, firestoreResult] = await Promise.allSettled([
+                // Fetch Chapters list and PYQ data in parallel
+                const [chaptersResult, pyqResult] = await Promise.allSettled([
                     withTimeout(fetch('/chapters.json'), FETCH_TIMEOUT),
-                    withTimeout(
-                        getDoc(doc(db, 'question_set', '26-pyq')),
-                        FETCH_TIMEOUT
-                    )
+                    withTimeout(fetch('/data/jee_2026_pyqs.json'), FETCH_TIMEOUT)
                 ]);
 
                 // 1. Handle Chapters
@@ -68,24 +63,19 @@ const ChapterSelection: React.FC = () => {
                     throw new Error('Failed to load chapters data (Timeout)');
                 }
 
-                // 2. Handle Base URL (Non-blocking failure)
-                if (firestoreResult.status === 'fulfilled') {
-                    const docSnap = firestoreResult.value as any;
-                    if (docSnap.exists && docSnap.exists()) {
-                        const setRow = docSnap.data();
-                        if (setRow?.url) {
-                            let rawBaseUrl = setRow.url
-                                .replace('github.com', 'raw.githubusercontent.com')
-                                .replace('/tree/', '/');
-                            if (rawBaseUrl.endsWith('/')) {
-                                rawBaseUrl = rawBaseUrl.slice(0, -1);
+                // 2. Build available chapters set from PYQ data
+                if (pyqResult.status === 'fulfilled') {
+                    const pyqRes = pyqResult.value as Response;
+                    if (pyqRes.ok) {
+                        const allQuestions: any[] = await pyqRes.json();
+                        const available = new Set<string>();
+                        allQuestions.forEach(q => {
+                            if (q.subject === subject && q.tags?.tag2) {
+                                available.add(q.tags.tag2);
                             }
-                            setBaseUrl(rawBaseUrl);
-                        }
-                    } else {
-                        console.warn('Failed to fetch base URL or timed out. Availability check will be skipped.');
+                        });
+                        setAvailableChapters(available);
                     }
-
                 }
             } catch (err) {
                 setError('Error loading data. Please check your connection.');
@@ -96,52 +86,23 @@ const ChapterSelection: React.FC = () => {
         };
 
         fetchData();
-
-        // Initial Zoom Update on Resize logic if needed? 
-        // Currently only setting initial state.
-
     }, [subject]);
 
-    const handleChapterClick = async (chapterCode: string) => {
+    const handleChapterClick = (chapterCode: string) => {
         // Prevent click if dragging
         if (isDragging) return;
 
-        // If already checking, prevent double-click
-        if (checkingChapter) return;
-
-        // If no base URL, just navigate (Fail Open)
-        if (!baseUrl) {
-            navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);
+        // Check local availability
+        if (availableChapters.size > 0 && !availableChapters.has(chapterCode)) {
+            // Chapter not found in local JSON
+            const ch = chapters.find(c => c.code === chapterCode);
+            setComingSoonChapterName(ch?.name || chapterCode);
+            setShowComingSoon(true);
             return;
         }
 
-        try {
-            setCheckingChapter(chapterCode);
-            const checkUrl = `${baseUrl}/${subject}/${chapterCode}_questions.json`;
-
-            // Use short timeout for check
-            const response = await withTimeout(fetch(checkUrl, { method: 'HEAD' }), CHECK_TIMEOUT);
-
-            if (response.ok) {
-                navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);
-            } else if (response.status === 404) {
-                // Find chapter name for the popup
-                const ch = chapters.find(c => c.code === chapterCode);
-                setComingSoonChapterName(ch?.name || chapterCode);
-                setShowComingSoon(true);
-            } else {
-                // Other error (500 etc) -> Fail Open
-                console.warn(`Check failed with status ${response.status}. Failing open.`);
-                navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);
-            }
-        } catch (err) {
-            console.error("Error checking chapter (Timeout or Network):", err);
-            // FAIL OPEN: If network fails or times out, let them through.
-            // It's better to show a potential error on the next page than to block here.
-            navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);
-        } finally {
-            setCheckingChapter(null);
-        }
+        // Navigate directly
+        navigate(`/pyq-2026/${subject}/practice/${chapterCode}`);
     };
 
     // Memoize nodes calculation
@@ -400,8 +361,6 @@ const ChapterSelection: React.FC = () => {
                                 const isZoomedIn = zoom > (window.innerWidth < 768 ? 0.8 : 1.2);
                                 const shouldShowCode = isLongName && !isZoomedIn;
 
-                                // Check State
-                                const isThisChecking = checkingChapter === node.code;
 
                                 return (
                                     <div
@@ -425,32 +384,28 @@ const ChapterSelection: React.FC = () => {
                                         }}
                                     >
                                         <div className="pointer-events-none flex flex-col h-full justify-center items-center w-full overflow-hidden relative">
-                                            {isThisChecking ? (
-                                                <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full opacity-70"></div>
-                                            ) : (
-                                                <>
-                                                    {isLongName ? (
-                                                        <>
-                                                            {/* Code View - Zoomed Out */}
-                                                            <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ease-in-out ${shouldShowCode ? 'opacity-100' : 'opacity-0'}`}>
-                                                                <h3 className="text-xl md:text-2xl font-black tracking-tight opacity-90">
-                                                                    {node.code}
-                                                                </h3>
-                                                            </div>
-                                                            {/* Full Name View - Zoomed In */}
-                                                            <div className={`absolute inset-0 flex items-center justify-center p-2 text-center transition-opacity duration-500 ease-in-out ${shouldShowCode ? 'opacity-0' : 'opacity-100'}`}>
-                                                                <h3 className="text-[8px] md:text-[10px] font-medium leading-[1.1] break-words w-full font-sans tracking-wide">
-                                                                    {node.name}
-                                                                </h3>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <h3 className="text-[9px] md:text-[10px] font-bold leading-tight line-clamp-3 px-1 transition-all duration-300 break-words hyphens-auto">
-                                                            {node.name}
-                                                        </h3>
-                                                    )}
-                                                </>
-                                            )}
+                                            <>
+                                                {isLongName ? (
+                                                    <>
+                                                        {/* Code View - Zoomed Out */}
+                                                        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ease-in-out ${shouldShowCode ? 'opacity-100' : 'opacity-0'}`}>
+                                                            <h3 className="text-xl md:text-2xl font-black tracking-tight opacity-90">
+                                                                {node.code}
+                                                            </h3>
+                                                        </div>
+                                                        {/* Full Name View - Zoomed In */}
+                                                        <div className={`absolute inset-0 flex items-center justify-center p-2 text-center transition-opacity duration-500 ease-in-out ${shouldShowCode ? 'opacity-0' : 'opacity-100'}`}>
+                                                            <h3 className="text-[8px] md:text-[10px] font-medium leading-[1.1] break-words w-full font-sans tracking-wide">
+                                                                {node.name}
+                                                            </h3>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <h3 className="text-[9px] md:text-[10px] font-bold leading-tight line-clamp-3 px-1 transition-all duration-300 break-words hyphens-auto">
+                                                        {node.name}
+                                                    </h3>
+                                                )}
+                                            </>
                                         </div>
                                     </div>
                                 );
