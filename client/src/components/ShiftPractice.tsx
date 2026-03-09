@@ -470,10 +470,11 @@ const ShiftPractice: React.FC = () => {
                                         }
                                     });
 
-                                    const renderGrid = (indices: number[]) => (
+                                    const renderGrid = (indices: number[], displayOffset: number) => (
                                         <div className="grid grid-cols-5 gap-2">
-                                            {indices.map((localIdx) => {
+                                            {indices.map((localIdx, positionInGrid) => {
                                                 const globalIdx = group.startIndex + localIdx;
+                                                const displayNumber = displayOffset + positionInGrid + 1;
                                                 const isCurrent = currentQuestionIndex === globalIdx;
                                                 const isAnswered = isIntegerTypeQuestion(group.questions[localIdx])
                                                     ? !!(numericAnswers[globalIdx]?.trim())
@@ -494,7 +495,7 @@ const ShiftPractice: React.FC = () => {
                                                         onClick={() => handlePaletteSelect(globalIdx)}
                                                         className={btnClass}
                                                     >
-                                                        {globalIdx + 1}
+                                                        {displayNumber}
                                                     </button>
                                                 );
                                             })}
@@ -511,7 +512,7 @@ const ShiftPractice: React.FC = () => {
                                                         <span className="text-[9px] font-bold uppercase tracking-widest text-text-secondary-light/50 px-1">MCQ</span>
                                                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent" />
                                                     </div>
-                                                    {renderGrid(mcqIndices)}
+                                                    {renderGrid(mcqIndices, 0)}
                                                 </>
                                             )}
 
@@ -523,7 +524,7 @@ const ShiftPractice: React.FC = () => {
                                                         <span className="text-[9px] font-bold uppercase tracking-widest text-amber-500/70 dark:text-amber-400/60 px-1">Integer</span>
                                                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
                                                     </div>
-                                                    {renderGrid(intIndices)}
+                                                    {renderGrid(intIndices, 0)}
                                                 </>
                                             )}
                                         </div>
