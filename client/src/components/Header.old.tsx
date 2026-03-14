@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { auth } from '../utils/firebaseClient';
-import { signOut } from 'firebase/auth';
+import { supabase } from '../utils/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -43,7 +42,7 @@ const Header: React.FC = () => {
   }, []);
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     navigate('/');
   };
 

@@ -75,23 +75,12 @@ const CondensedPractice: React.FC = () => {
     // Mobile: closed by default, Desktop (>=1024px): open by default
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
-    // Handle window resize for palette default state
+    // Set initial palette state based on window width (run once on mount)
     useEffect(() => {
-        const handleResize = () => {
-            // Only auto-open on desktop if currently closed and resizing to desktop
-            if (window.innerWidth >= 1024 && !isPaletteOpen) {
-                setIsPaletteOpen(true);
-            }
-        };
-
-        // Set initial state based on window width
         if (window.innerWidth >= 1024) {
             setIsPaletteOpen(true);
         }
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [isPaletteOpen]);
+    }, []);
 
     // Fetch chapters.json for chapter name expansion
     useEffect(() => {

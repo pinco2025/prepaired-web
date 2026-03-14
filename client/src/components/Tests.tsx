@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { db } from '../utils/firebaseClient';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 import './Tests.css';
 import { Test } from '../data';
 import { useAuth } from '../contexts/AuthContext';
@@ -37,30 +36,27 @@ const Tests: React.FC = () => {
 
             try {
                 // Fetch all tests
-                const testsSnap = await getDocs(
-                    query(collection(db, 'tests'), orderBy('testID'))
-                );
-                const testsData = testsSnap.docs.map(d => d.data() as Test);
+                const { data: testsData } = await supabase
+                    .from('tests')
+                    .select('*')
+                    .order('testID');
 
                 if (!mounted) return;
 
                 // Fetch user's submitted tests with result info
-                const subsSnap = await getDocs(
-                    query(
-                        collection(db, 'student_tests'),
-                        where('user_id', '==', user.id),
-                        where('submitted_at', '!=', null)
-                    )
-                );
-                const submissionsData = subsSnap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+                const { data: submissionsData } = await supabase
+                    .from('student_tests')
+                    .select('id, test_id, result_url, submitted_at')
+                    .eq('user_id', user.id)
+                    .not('submitted_at', 'is', null);
 
                 if (!mounted) return;
 
                 // Create a map of test_id to submission info
                 const submissionsMap = new Map<string, { id: string; hasResult: boolean }>();
-                submissionsData.forEach((s: any) => {
+                (submissionsData || []).forEach((s: any) => {
                     submissionsMap.set(s.test_id, {
-                        id: s._docId,
+                        id: s.id,
                         hasResult: !!s.result_url
                     });
                 });

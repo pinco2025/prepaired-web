@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { db } from '../utils/firebaseClient';
-import { doc, updateDoc } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 
 interface FeedbackData {
     rating: number; // Overall Session Quality (1-5)
@@ -30,12 +29,15 @@ const Super30Feedback: React.FC<Super30FeedbackProps> = ({ sessionId, onClose })
         setIsSubmitting(true);
 
         if (sessionId) {
-            await updateDoc(doc(db, 'student_sets', sessionId), {
-                feedback_rating: feedback.rating,
-                feedback_helpfulness: feedback.helpfulness,
-                feedback_difficulty: feedback.difficulty,
-                feedback_comments: feedback.comments || null
-            });
+            await supabase
+                .from('student_sets')
+                .update({
+                    feedback_rating: feedback.rating,
+                    feedback_helpfulness: feedback.helpfulness,
+                    feedback_difficulty: feedback.difficulty,
+                    feedback_comments: feedback.comments || null
+                })
+                .eq('id', sessionId);
         }
 
         setSubmitted(true);

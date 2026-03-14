@@ -1,48 +1,12 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { auth, db } from '../utils/firebaseClient';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 // Define subscription tiers
 export const PAID_SUBSCRIPTION = 'ipft-01-2026';
 
-/**
- * Normalized user object that keeps a compatible shape across the app.
- * - `id` / `uid` → Firebase UID
- * - `email` → user email
- * - `user_metadata` → mirrors Supabase shape for backward compat with
- *   Sidebar, Dashboard, PricingPlans etc. that reference
- *   `user.user_metadata.full_name` / `user.user_metadata.avatar_url`.
- */
-export interface AppUser {
-  id: string;
-  uid: string;
-  email: string | null;
-  user_metadata: {
-    full_name: string | null;
-    avatar_url: string | null;
-    name?: string | null;
-  };
-  /** Raw Firebase User if needed */
-  _fb: FirebaseUser;
-}
-
-function toAppUser(fb: FirebaseUser): AppUser {
-  return {
-    id: fb.uid,
-    uid: fb.uid,
-    email: fb.email,
-    user_metadata: {
-      full_name: fb.displayName,
-      avatar_url: fb.photoURL,
-      name: fb.displayName,
-    },
-    _fb: fb,
-  };
-}
-
 type AuthContextValue = {
-  user: AppUser | null;
+  user: User | null;
   subscriptionType: string | null;
   loading: boolean; // True while initial auth check is happening
   isAuthenticated: boolean; // True if user is logged in
@@ -64,7 +28,7 @@ const AuthContext = createContext<AuthContextValue>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AppUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [examType, setExamType] = useState<string | null>(null);
@@ -72,31 +36,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Track if initial load is done
   const initialLoadDone = useRef(false);
 
-  // Fetch subscription data from Firestore
+  // Fetch subscription data from database
   const fetchSubscription = useCallback(async (userId: string): Promise<string | null> => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (!userDoc.exists()) return null;
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', userId)
+        .single();
 
-      const tier = userDoc.data()?.subscription_tier ?? null;
+      if (error) {
+        console.error('Error fetching subscription:', error);
+        return null;
+      }
+
+      const tier = profile?.subscription_tier ?? null;
       // Normalize to lowercase for consistent comparison
       return typeof tier === 'string' ? tier.trim().toLowerCase() : null;
     } catch (err) {
-      console.error('Error fetching subscription:', err);
+      console.error('Error in fetchSubscription:', err);
       return null;
     }
   }, []);
 
-  // Fetch exam type from Firestore
+  // Fetch exam type from database
   const fetchExamType = useCallback(async (userId: string): Promise<string | null> => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (!userDoc.exists()) return null;
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('exam_type')
+        .eq('id', userId)
+        .single();
 
-      const exam = userDoc.data()?.exam_type ?? null;
+      if (error) {
+        console.error('Error fetching exam type:', error);
+        return null;
+      }
+
+      const exam = profile?.exam_type ?? null;
       return typeof exam === 'string' ? exam.trim() : null;
     } catch (err) {
-      console.error('Error fetching exam type:', err);
+      console.error('Error in fetchExamType:', err);
       return null;
     }
   }, []);
@@ -109,42 +89,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, fetchSubscription]);
 
-  // Listen for auth state changes
+  // Initial auth check
   useEffect(() => {
     let mounted = true;
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!mounted) return;
+    const initializeAuth = async () => {
+      try {
+        // Get current session
+        const { data: { session } } = await supabase.auth.getSession();
 
-      if (firebaseUser) {
-        const appUser = toAppUser(firebaseUser);
-        setUser(appUser);
+        if (!mounted) return;
 
-        // Fetch subscription and exam type in parallel
-        const [subscription, exam] = await Promise.all([
-          fetchSubscription(firebaseUser.uid),
-          fetchExamType(firebaseUser.uid),
-        ]);
+        if (session?.user) {
+          setUser(session.user);
 
-        if (mounted) {
-          setSubscriptionType(subscription);
-          setExamType(exam);
+          // Fetch subscription and exam type in parallel
+          const [subscription, exam] = await Promise.all([
+            fetchSubscription(session.user.id),
+            fetchExamType(session.user.id),
+          ]);
+
+          if (mounted) {
+            setSubscriptionType(subscription);
+            setExamType(exam);
+          }
+        } else {
+          setUser(null);
+          setSubscriptionType(null);
+          setExamType(null);
         }
-      } else {
-        setUser(null);
-        setSubscriptionType(null);
-        setExamType(null);
+      } catch (err) {
+        console.error('Error initializing auth:', err);
+        if (mounted) {
+          setUser(null);
+          setSubscriptionType(null);
+          setExamType(null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          initialLoadDone.current = true;
+        }
       }
+    };
 
-      if (mounted) {
-        setLoading(false);
-        initialLoadDone.current = true;
+    initializeAuth();
+
+    // Listen for auth state changes
+    const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+
+        // Skip if initial load hasn't completed yet - initializeAuth handles it
+        if (!initialLoadDone.current) return;
+
+        if (session?.user) {
+          setUser(session.user);
+
+          // Fetch subscription data
+          const [subscription, exam] = await Promise.all([
+            fetchSubscription(session.user.id),
+            fetchExamType(session.user.id),
+          ]);
+
+          if (mounted) {
+            setSubscriptionType(subscription);
+            setExamType(exam);
+          }
+        } else {
+          setUser(null);
+          setSubscriptionType(null);
+          setExamType(null);
+        }
       }
-    });
+    );
 
     return () => {
       mounted = false;
-      unsubscribe();
+      authListener.unsubscribe();
     };
   }, [fetchSubscription, fetchExamType]); // These are stable due to useCallback with empty deps
 

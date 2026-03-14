@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { db } from '../utils/firebaseClient';
-import { doc, getDoc } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 import { Test, Question } from '../data';
 import { usePageTitle } from '../hooks/usePageTitle';
 import katex from 'katex';
@@ -52,18 +51,24 @@ const TestReview: React.FC = () => {
 
             try {
                 // 1. Fetch submission data to get result_url and test_id
-                const subDocSnap = await getDoc(doc(db, 'student_tests', submissionId));
+                const { data: submissionData, error: subError } = await supabase
+                    .from('student_tests')
+                    .select('result_url, test_id')
+                    .eq('id', submissionId)
+                    .single();
 
-                if (!subDocSnap.exists()) throw new Error('Submission not found.');
-                const submissionData = subDocSnap.data();
+                if (subError || !submissionData) throw new Error('Submission not found.');
 
                 const { result_url, test_id } = submissionData;
 
                 // 2. Fetch test metadata to get the test url and solution_url
-                const testDocSnap = await getDoc(doc(db, 'tests', test_id));
+                const { data: testMeta, error: testError } = await supabase
+                    .from('tests')
+                    .select('url, solution_url')
+                    .eq('testID', test_id)
+                    .single();
 
-                if (!testDocSnap.exists()) throw new Error('Test metadata not found.');
-                const testMeta = testDocSnap.data();
+                if (testError || !testMeta) throw new Error('Test metadata not found.');
 
                 const { url: testUrl, solution_url } = testMeta;
 

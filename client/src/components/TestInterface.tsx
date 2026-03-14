@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTestData } from '../utils/testData';
 import { Test } from '../data';
-import { auth, db } from '../utils/firebaseClient';
-import { collection, getDocs, query, where, orderBy, limit as firestoreLimit, doc, updateDoc, addDoc } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
@@ -126,7 +125,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     }
 
     try {
-      const user = auth.currentUser;
+      const { data } = await supabase.auth.getUser();
+      const user = (data as any)?.user;
 
       if (!user) {
         console.error('User not logged in');
@@ -139,28 +139,35 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         submitted_at: new Date().toISOString()
       };
 
-      let error: any = null;
+      let error;
       let finalSubmissionId = currentStudentTestId;
 
-      try {
-        if (currentStudentTestId) {
-          await updateDoc(doc(db, 'student_tests', currentStudentTestId), submissionData);
-        } else {
-          // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
-          const newDocRef = await addDoc(collection(db, 'student_tests'), {
-            test_id: currentTestData.testId,
-            user_id: user.uid,
-            answers: currentAnswers,
-            started_at: new Date().toISOString(),
-            submitted_at: new Date().toISOString()
-          });
+      if (currentStudentTestId) {
+        const { error: updateError } = await supabase
+          .from('student_tests')
+          .update(submissionData)
+          .eq('id', currentStudentTestId)
+          .select();
 
-          finalSubmissionId = newDocRef.id;
+        error = updateError;
+      } else {
+        // Fallback to insert if for some reason ID is missing (should not happen in normal flow)
+        const { data: insertData, error: insertError } = await supabase.from('student_tests').insert([{
+          test_id: currentTestData.testId,
+          user_id: user.id,
+          answers: currentAnswers,
+          started_at: new Date().toISOString(),
+          submitted_at: new Date().toISOString()
+        }])
+          .select('id')
+          .single();
+
+        if (insertData) {
+          finalSubmissionId = insertData.id;
           // Update state so subsequent retries use this ID (prevent duplicate inserts)
-          setStudentTestId(newDocRef.id);
+          setStudentTestId(insertData.id);
         }
-      } catch (e) {
-        error = e;
+        error = insertError;
       }
 
       if (error || !finalSubmissionId) {
@@ -170,7 +177,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       } else {
         // Trigger Score Calculation
         try {
-          const token = await user.getIdToken();
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData?.session?.access_token;
 
           await fetch(`https://prepaired-backend.onrender.com/api/v1/scores/${finalSubmissionId}/calculate`, {
             method: 'POST',
@@ -264,7 +272,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         const qCount = adaptedTestData.questions?.length ?? 0;
         setQuestionStatuses(Array(qCount).fill('notVisited' as QuestionStatus));
 
-        const user = auth.currentUser;
+        const { data: authData } = await supabase.auth.getUser();
+        const user = (authData as any)?.user;
         if (!user) {
           console.error('User not logged in. Cannot fetch test start time.');
           return;
@@ -273,37 +282,48 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         let testStartTimeISO: string | null = null;
         try {
           // First, try to find existing entry that hasn't been submitted
-          const existingSnap = await getDocs(
-            query(
-              collection(db, 'student_tests'),
-              where('user_id', '==', user.uid),
-              where('test_id', '==', data.testId),
-              where('submitted_at', '==', null),
-              orderBy('started_at', 'desc'),
-              firestoreLimit(1)
-            )
-          );
+          const { data: existingTests, error: fetchError } = await supabase
+            .from('student_tests')
+            .select('id, started_at, answers, submitted_at')
+            .eq('user_id', user.id)
+            .eq('test_id', data.testId)
+            .is('submitted_at', null) // Only get tests that haven't been submitted
+            .order('started_at', { ascending: false })
+            .limit(1);
 
-          const existingDoc = existingSnap.docs.length > 0 ? existingSnap.docs[0] : null;
+          if (fetchError) {
+            console.error('Error fetching student test:', fetchError);
+          }
 
-          if (existingDoc) {
-            const existingData = existingDoc.data();
-            testStartTimeISO = existingData.started_at ?? new Date().toISOString();
-            setStudentTestId(existingDoc.id);
+          const existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
+
+          if (existingTest) {
+            testStartTimeISO = (existingTest as any).started_at ?? new Date().toISOString();
+            setStudentTestId((existingTest as any).id);
             // Load answers from DB if available
-            if (existingData.answers) {
-              setAnswers(existingData.answers);
+            if ((existingTest as any).answers) {
+              setAnswers((existingTest as any).answers);
             }
           } else {
-            const startedAt = new Date().toISOString();
-            const newDocRef = await addDoc(collection(db, 'student_tests'), {
-              test_id: data.testId,
-              user_id: user.uid,
-              started_at: startedAt
-            });
+            const { data: newStudentTest, error: insertError } = await supabase
+              .from('student_tests')
+              .insert({
+                test_id: data.testId,
+                user_id: user.id,
+                started_at: new Date().toISOString()
+              })
+              .select('id, started_at')
+              .single();
 
-            testStartTimeISO = startedAt;
-            setStudentTestId(newDocRef.id);
+            if (insertError) {
+              console.error('Failed to create a new student test entry.', insertError);
+              testStartTimeISO = new Date().toISOString();
+            } else if (newStudentTest) {
+              testStartTimeISO = (newStudentTest as any).started_at ?? new Date().toISOString();
+              setStudentTestId((newStudentTest as any).id);
+            } else {
+              testStartTimeISO = new Date().toISOString();
+            }
           }
         } catch (e) {
           console.error('Error while fetching/creating student_tests entry', e);
@@ -390,9 +410,12 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
     // Save to Database (debounced to avoid too many requests)
     const timeoutId = setTimeout(() => {
-      updateDoc(doc(db, 'student_tests', studentTestId), { answers: answers })
-        .catch((error) => {
-          console.error('Error auto-saving answers to DB:', error);
+      supabase
+        .from('student_tests')
+        .update({ answers: answers })
+        .eq('id', studentTestId)
+        .then(({ error }) => {
+          if (error) console.error('Error auto-saving answers to DB:', error);
         });
     }, 500);
 

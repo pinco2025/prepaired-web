@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, db } from '../utils/firebaseClient';
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-} from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
-
-const googleProvider = new GoogleAuthProvider();
 
 const SignUp: React.FC = () => {
   usePageTitle('Sign Up');
@@ -21,59 +11,41 @@ const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
         navigate('/question-set', { replace: true });
       }
-    });
-    return () => unsubscribe();
+    };
+    checkSession();
   }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
-      // Set display name
-      await updateProfile(user, { displayName: fullName });
-
-      // Create user document in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        id: user.uid,
-        email: user.email,
-        full_name: fullName,
-        subscription_tier: null,
-        exam_type: null,
-        created_at: new Date().toISOString(),
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } }
       });
-
+      if (error) {
+        if (error.message?.includes('already registered')) {
+          alert('An account with this email already exists. Please log in instead.');
+          navigate('/login');
+          return;
+        }
+        throw error;
+      }
       navigate('/register-success');
     } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        alert('An account with this email already exists. Please log in instead.');
-        navigate('/login');
-        return;
-      }
       alert(error.message);
     }
   };
 
   const handleGoogleSignUp = async () => {
     try {
-      const { user } = await signInWithPopup(auth, googleProvider);
-
-      // Create user document in Firestore if it doesn't exist
-      await setDoc(doc(db, 'users', user.uid), {
-        id: user.uid,
-        email: user.email,
-        full_name: user.displayName,
-        avatar_url: user.photoURL,
-        subscription_tier: null,
-        exam_type: null,
-        created_at: new Date().toISOString(),
-      }, { merge: true });
-
-      navigate('/register-success');
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      if (error) throw error;
     } catch (error: any) {
       alert(error.message);
     }

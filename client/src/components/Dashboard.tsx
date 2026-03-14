@@ -6,8 +6,7 @@ import WeakAreasCard from './WeakAreasCard';
 import AccuracyCard from './AccuracyCard';
 import AverageScoreCard from './AverageScoreCard';
 import DashboardSkeleton from './DashboardSkeleton';
-import { db } from '../utils/firebaseClient';
-import { collection, query, where, getDocs, limit as firestoreLimit, documentId } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useDataCache } from '../contexts/DataCacheContext';
 import { UserAnalytics } from '../data';
@@ -37,16 +36,14 @@ const Dashboard: React.FC = () => {
       if (mounted) setLoading(true);
 
       try {
-        const q = query(
-          collection(db, 'user_analytics'),
-          where('user_id', '==', user.id),
-          firestoreLimit(1)
-        );
+        const { data, error } = await supabase
+          .from('user_analytics')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-        const qSnap = await getDocs(q);
-
-        if (mounted && !qSnap.empty) {
-          setAnalytics(qSnap.docs[0].data() as UserAnalytics);
+        if (mounted && data && !error) {
+          setAnalytics(data as UserAnalytics);
         }
       } catch (error) {
         console.error('Error fetching analytics:', error);
@@ -88,18 +85,14 @@ const Dashboard: React.FC = () => {
         let testIdMap: Record<string, string> = {};
 
         if (attemptIds.length > 0) {
-          // chunk attemptIds into groups of 10 due to firestore limit
-          for (let i = 0; i < attemptIds.length; i += 10) {
-            const chunk = attemptIds.slice(i, i + 10);
-            const q = query(
-              collection(db, 'student_tests'),
-              where(documentId(), 'in', chunk)
-            );
-            const qSnap = await getDocs(q);
-            qSnap.forEach(doc => {
-              testIdMap[doc.id] = doc.data().test_id;
-            });
-          }
+          const { data: testData } = await supabase
+            .from('student_tests')
+            .select('id, test_id')
+            .in('id', attemptIds);
+
+          (testData || []).forEach((row: any) => {
+            testIdMap[row.id] = row.test_id;
+          });
         }
 
         const formattedData = sortedData.map((item: any, index: number) => {

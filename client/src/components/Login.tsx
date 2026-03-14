@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../utils/firebaseClient';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
-
-const googleProvider = new GoogleAuthProvider();
 
 const Login: React.FC = () => {
   usePageTitle('Login');
@@ -15,7 +12,8 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       navigate('/question-set');
     } catch (error: any) {
       alert(error.message);
@@ -24,8 +22,11 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      navigate('/question-set');
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin + '/question-set' }
+      });
+      if (error) throw error;
     } catch (err: any) {
       alert(err.message || String(err));
     }

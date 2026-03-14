@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import SubscriptionModal from './SubscriptionModal';
 
 // Subject Images
 import phyImg from '../assets/cards/phy.png';
@@ -17,9 +16,7 @@ import lvl2PyqImg from '../assets/cards/lvl-2-pyq.png';
 
 const QuestionSet: React.FC = () => {
     const navigate = useNavigate();
-    const { isPaidUser, isAuthenticated, subscriptionType } = useAuth();
-    const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-    const [, setSelectedSubject] = useState<string | null>(null);
+    const { isAuthenticated } = useAuth();
     const [viewState, setViewState] = useState<'dashboard' | 'condensed_selection' | 'statement_parts' | 'statement_subjects'>('dashboard');
     const [statementPart, setStatementPart] = useState<'part1' | 'part2' | null>(null);
 
@@ -219,16 +216,7 @@ const QuestionSet: React.FC = () => {
         const routeId = `statement-${statementPart}-${subjectId}`;
         // Example: statement-part1-physics
 
-        if (subscriptionType?.toLowerCase() === 'lite') {
-            // For now redirecting to same condensed practice component, but with new ID
-            // The component will fail to load if files don't exist, but routing is correct.
-            navigate(`/question-set/${routeId}/practice`);
-        } else if (isPaidUser) {
-            navigate(`/question-set/${routeId}`);
-        } else {
-            setSelectedSubject(routeId);
-            setShowSubscriptionModal(true);
-        }
+        navigate(`/question-set/${routeId}/practice`);
     };
 
     return (
@@ -602,13 +590,8 @@ const QuestionSet: React.FC = () => {
                                                     // Let's just define a quick handler here for Condensed since the original one was replaced/modified
                                                     if (!isAuthenticated) {
                                                         navigate('/login');
-                                                    } else if (subscriptionType?.toLowerCase() === 'lite') {
-                                                        navigate(`/question-set/${subject.id}/practice`);
-                                                    } else if (isPaidUser) {
-                                                        navigate(`/question-set/${subject.id}`);
                                                     } else {
-                                                        setSelectedSubject(subject.id);
-                                                        setShowSubscriptionModal(true);
+                                                        navigate(`/question-set/${subject.id}/practice`);
                                                     }
                                                 }}
                                                 className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-[0.98] bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30"
@@ -625,18 +608,6 @@ const QuestionSet: React.FC = () => {
                 </div>
             </div>
 
-            {/* Subscription Modal */}
-            <SubscriptionModal
-                isOpen={showSubscriptionModal}
-                onClose={() => {
-                    setShowSubscriptionModal(false);
-                    setSelectedSubject(null);
-                }}
-                onSubscribe={() => {
-                    setShowSubscriptionModal(false);
-                    navigate('/pricing');
-                }}
-            />
         </div>
     );
 };

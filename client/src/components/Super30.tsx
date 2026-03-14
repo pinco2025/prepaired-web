@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import Super30Feedback from './Super30Feedback';
-import { auth, db } from '../utils/firebaseClient';
-import { doc, getDoc, addDoc, updateDoc, collection } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 import { withTimeout } from '../utils/promiseUtils';
 import JEELoader from './JEELoader';
 import 'katex/dist/katex.min.css';
@@ -131,19 +130,22 @@ const Super30: React.FC = () => {
 
     // Fetch current user on mount
     useEffect(() => {
-        const user = auth.currentUser;
-        if (user) {
-            setUserId(user.uid);
-        }
+        const fetchUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            if (data?.user) {
+                setUserId(data.user.id);
+            }
+        };
+        fetchUser();
     }, []);
 
     // Persist time_elapsed on tab close / navigation away
     useEffect(() => {
         const handleBeforeUnload = async () => {
             if (sessionId && timer > 0) {
-                // Use updateDoc for reliable delivery on page unload
+                // Use supabase update for reliable delivery on page unload
                 try {
-                    await updateDoc(doc(db, 'student_sets', sessionId), { time_elapsed: timer });
+                    await supabase.from('student_sets').update({ time_elapsed: timer }).eq('id', sessionId);
                 } catch (e) {
                     console.warn('Failed to save time_elapsed on unload', e);
                 }
@@ -165,13 +167,14 @@ const Super30: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch the GitHub folder URL from Firestore
-                const setDocSnap = await withTimeout(
-                    getDoc(doc(db, 'question_set', 'super-30'))
-                );
+                // 1. Fetch the GitHub folder URL from Supabase
+                const { data: setRow, error: setFetchError } = await supabase
+                    .from('question_set')
+                    .select('url')
+                    .eq('set_id', 'super-30')
+                    .single();
 
-                if (!setDocSnap.exists()) throw new Error('No URL found for Super 30 set');
-                const setRow = setDocSnap.data();
+                if (setFetchError || !setRow) throw new Error('No URL found for Super 30 set');
                 if (!setRow?.url) throw new Error('No URL found for Super 30 set');
 
                 // 2. Transform the GitHub URL to a Raw Content URL
@@ -372,16 +375,23 @@ const Super30: React.FC = () => {
         if (userId) {
             const initialAnswers = { PYQs: {}, IPQs: {} };
             try {
-                const newDocRef = await addDoc(collection(db, 'student_sets'), {
-                    user_id: userId,
-                    set_id: 'super-30',
-                    answers: initialAnswers
-                });
+                const { data: newSession, error } = await supabase
+                    .from('student_sets')
+                    .insert({
+                        user_id: userId,
+                        set_id: 'super-30',
+                        answers: initialAnswers
+                    })
+                    .select('id')
+                    .single();
 
-                setSessionId(newDocRef.id);
-                sessionIdRef.current = newDocRef.id;
-                setSessionAnswers(initialAnswers);
-                sessionAnswersRef.current = initialAnswers;
+                if (error) throw error;
+                if (newSession) {
+                    setSessionId(newSession.id);
+                    sessionIdRef.current = newSession.id;
+                    setSessionAnswers(initialAnswers);
+                    sessionAnswersRef.current = initialAnswers;
+                }
             } catch (e) {
                 console.error('Error creating session:', e);
             }
@@ -425,7 +435,7 @@ const Super30: React.FC = () => {
         setSessionAnswers(updatedAnswers);
         sessionAnswersRef.current = updatedAnswers;
 
-        await updateDoc(doc(db, 'student_sets', currentSessionId), { answers: updatedAnswers });
+        await supabase.from('student_sets').update({ answers: updatedAnswers }).eq('id', currentSessionId);
     };
 
     // Handlers for answer selection with DB sync
@@ -477,7 +487,7 @@ const Super30: React.FC = () => {
                 // End of session (Last subject completed)
                 // Update time_elapsed in DB
                 if (sessionId) {
-                    await updateDoc(doc(db, 'student_sets', sessionId), { time_elapsed: timer });
+                    await supabase.from('student_sets').update({ time_elapsed: timer }).eq('id', sessionId);
                 }
                 setShowFeedback(true);
             }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../utils/supabaseClient';
 
 const Waitlist: React.FC = () => {
     const { isAuthenticated, user } = useAuth();
@@ -45,13 +45,14 @@ const Waitlist: React.FC = () => {
         setLoading(true);
 
         try {
-            const db = getFirestore();
-
             // Check if email already exists
             if (email.trim()) {
-                const emailQuery = query(collection(db, 'waitlist'), where('email', '==', email.trim()));
-                const emailSnapshot = await getDocs(emailQuery);
-                if (!emailSnapshot.empty) {
+                const { data: emailData } = await supabase
+                    .from('waitlist')
+                    .select('id')
+                    .eq('email', email.trim())
+                    .limit(1);
+                if (emailData && emailData.length > 0) {
                     setError("This email address is already registered on the waitlist.");
                     setLoading(false);
                     return;
@@ -60,20 +61,23 @@ const Waitlist: React.FC = () => {
 
             // Check if mobile already exists
             if (mobile.trim()) {
-                const mobileQuery = query(collection(db, 'waitlist'), where('mobile', '==', mobile.trim()));
-                const mobileSnapshot = await getDocs(mobileQuery);
-                if (!mobileSnapshot.empty) {
+                const { data: mobileData } = await supabase
+                    .from('waitlist')
+                    .select('id')
+                    .eq('mobile', mobile.trim())
+                    .limit(1);
+                if (mobileData && mobileData.length > 0) {
                     setError("This mobile number is already registered on the waitlist.");
                     setLoading(false);
                     return;
                 }
             }
 
-            await addDoc(collection(db, 'waitlist'), {
+            await supabase.from('waitlist').insert({
                 email,
                 mobile,
                 testDate,
-                createdAt: serverTimestamp(),
+                created_at: new Date().toISOString(),
             });
 
             navigate('/waitlist-success');

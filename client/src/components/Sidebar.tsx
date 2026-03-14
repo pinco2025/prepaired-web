@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { auth } from '../utils/firebaseClient';
-import { signOut } from 'firebase/auth';
+import { supabase } from '../utils/supabaseClient';
 import { withTimeout } from '../utils/promiseUtils';
 
 interface SidebarContentProps {
@@ -371,7 +370,7 @@ const Sidebar: React.FC = () => {
 
     try {
       // Wrap signOut in a timeout to prevent hanging (3s max)
-      await withTimeout(signOut(auth), 3000, 'Sign out timed out');
+      await withTimeout(supabase.auth.signOut(), 3000, 'Sign out timed out');
       // Force navigation and reload to ensure clean state
       window.location.href = '/';
     } catch (error) {
