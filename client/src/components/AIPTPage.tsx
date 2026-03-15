@@ -13,7 +13,9 @@ import TestSubmitted from './TestSubmitted';
 type TestStatus = 'instructions' | 'inProgress' | 'submitted';
 
 // AIPT-01 unlock time: 15 March 2026, 3:00 PM IST (UTC+5:30 = 9:30 AM UTC)
-const AIPT_UNLOCK_TIME = new Date('2026-03-15T09:30:00Z');
+// TODO: Re-enable time lock before production launch
+// const AIPT_UNLOCK_TIME = new Date('2026-03-15T09:30:00Z');
+const AIPT_UNLOCK_TIME = new Date('2020-01-01T00:00:00Z'); // Disabled for testing
 
 const AIPTPage: React.FC = () => {
   usePageTitle('AIPT');
@@ -24,8 +26,6 @@ const AIPTPage: React.FC = () => {
   const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [alreadyAttempted, setAlreadyAttempted] = useState(false);
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [now, setNow] = useState(new Date());
   const isUnlocked = now >= AIPT_UNLOCK_TIME;
 
@@ -90,8 +90,9 @@ const AIPTPage: React.FC = () => {
           if (!mounted) return;
 
           if (submissions && submissions.length > 0) {
-            setAlreadyAttempted(true);
-            setSubmissionId(submissions[0].id);
+            // Redirect to results directly (same pattern as TestPage)
+            navigate(`/results/${submissions[0].id}`, { replace: true });
+            return;
           }
         }
       } catch (err: any) {
@@ -106,7 +107,7 @@ const AIPTPage: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [user?.id]);
+  }, [user?.id, navigate]);
 
   // Handle back button during test
   useEffect(() => {
@@ -149,37 +150,6 @@ const AIPTPage: React.FC = () => {
             >
               Retry
             </button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // If user already attempted, show a results link
-  if (alreadyAttempted && submissionId) {
-    return (
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center">
-          <div className="max-w-4xl w-full mx-auto bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 md:p-12">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark tracking-tight">{test.title}</h1>
-            </div>
-            <div className="flex flex-col items-center gap-6">
-              <div className="flex items-center gap-3 text-green-500">
-                <span className="material-symbols-outlined text-5xl">check_circle</span>
-                <p className="text-xl font-semibold">Test Already Attempted</p>
-              </div>
-              <p className="text-text-secondary-light dark:text-text-secondary-dark text-center">
-                You have already completed this test. View your results below.
-              </p>
-              <button
-                onClick={() => navigate(`/results/${submissionId}`)}
-                className="inline-flex items-center justify-center px-12 py-4 border border-transparent text-base font-semibold rounded-lg shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-300"
-              >
-                View Results
-                <span className="material-symbols-outlined ml-2">arrow_forward</span>
-              </button>
-            </div>
           </div>
         </div>
       </main>

@@ -37,10 +37,15 @@ const SolutionDisplay: React.FC<SolutionDisplayProps> = ({
         inline: 'font-bold text-indigo-900 dark:text-indigo-300 mb-2 text-sm',
     };
 
+    const hideScrollbarStyle = {
+        msOverflowStyle: 'none' as const,
+        scrollbarWidth: 'none' as const,
+    };
+
     return (
-        <div className={`${containerClasses[variant]} overflow-x-auto`}>
+        <div className={`${containerClasses[variant]} overflow-x-auto [&::-webkit-scrollbar]:hidden`} style={hideScrollbarStyle}>
             <h3 className={titleClasses[variant]}>{title}</h3>
-            <div className="prose dark:prose-invert max-w-none text-text-light dark:text-text-dark break-words whitespace-pre-wrap">
+            <div className="prose dark:prose-invert max-w-none text-sm md:text-base text-text-light dark:text-text-dark break-words whitespace-pre-wrap overflow-x-auto [&::-webkit-scrollbar]:hidden" style={hideScrollbarStyle}>
                 {text && (
                     <div>
                         <RenderMath text={text} />

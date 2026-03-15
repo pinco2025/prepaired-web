@@ -113,10 +113,11 @@ export const AppContent: React.FC = () => {
   // Show sidebar for all authenticated users on protected routes OR on specific public routes for everyone
   // Hide sidebar when user is taking a test or on submission page or waitlist pages
   const isCondensedPracticeRoute = /^\/question-set\/[^/]+\/practice$/.test(location.pathname);
+  const isReviewRoute = /^\/review\/[^/]+$/.test(location.pathname);
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
   const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
-  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isAIPTRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
+  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isAIPTRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute && !isReviewRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -282,17 +283,17 @@ export const AppContent: React.FC = () => {
               </RequireAuth>
             } />
             <Route path="/test-submitted" element={
-              <RequireAuth>
+              <RequireAuth allowFree>
                 <TestSubmitted />
               </RequireAuth>
             } />
             <Route path="/results/:submissionId" element={
-              <RequireAuth>
+              <RequireAuth allowFree>
                 <TestResult />
               </RequireAuth>
             } />
             <Route path="/review/:submissionId" element={
-              <RequireAuth>
+              <RequireAuth allowFree>
                 <TestReview />
               </RequireAuth>
             } />
