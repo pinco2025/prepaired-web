@@ -5,7 +5,7 @@ const AppLayout = () => {
     <div
       id="app-layout-container"
       className="
-        h-screen
+        h-[calc(100dvh-65px)] md:h-screen
         w-full
         overflow-y-auto
         overflow-x-hidden

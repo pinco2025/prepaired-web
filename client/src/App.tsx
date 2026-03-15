@@ -126,7 +126,7 @@ export const AppContent: React.FC = () => {
       {/* AIPT Announcement Modal */}
       <AIPTAnnouncementModal isOpen={showAIPTModal} onClose={handleCloseAIPTModal} />
       {showSidebar && <Sidebar />}
-      <main className="flex-1 w-full relative">
+      <main className="flex-1 w-full relative flex flex-col min-h-0">
         <Routes>
           <Route element={<AppLayout />}>
             {/* Public routes */}

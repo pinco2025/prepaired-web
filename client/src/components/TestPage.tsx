@@ -68,7 +68,13 @@ const TestPage: React.FC = () => {
 
   useEffect(() => {
     const handlePopState = () => {
-      // When the user navigates back, always return to the instructions
+      // Ignore popstate events triggered by fullscreen exit — re-push the state
+      // and keep the test running
+      if (document.fullscreenElement === null && testStatus === 'inProgress') {
+        window.history.pushState({ status: testStatus }, '');
+        return;
+      }
+      // When the user actually navigates back, return to the instructions
       setTestStatus('instructions');
     };
 
@@ -97,11 +103,16 @@ const TestPage: React.FC = () => {
 
   const handleStartTest = () => {
     setTestStatus('inProgress');
-    const element = document.documentElement;
-    if (element.requestFullscreen) {
-      element.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-      });
+    // Only request fullscreen on desktop — mobile browsers handle it poorly
+    // and exiting fullscreen can interfere with navigation/submission
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+    if (isDesktop) {
+      const element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen().catch((err) => {
+          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+      }
     }
   };
 
@@ -126,9 +137,9 @@ const TestPage: React.FC = () => {
   const isTestInProgress = testStatus === 'inProgress';
 
   return (
-    <main className={`flex-grow ${isTestInProgress ? 'h-screen overflow-hidden' : ''}`}>
+    <main className={`flex-grow ${isTestInProgress ? 'h-[100dvh] overflow-hidden' : ''}`}>
       <div className={isTestInProgress
-        ? "w-full h-full p-4 bg-background-light dark:bg-background-dark"
+        ? "w-full h-full p-2 sm:p-4 bg-background-light dark:bg-background-dark"
         : "container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center"
       }>
         {renderContent()}

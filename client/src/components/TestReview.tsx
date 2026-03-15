@@ -70,6 +70,8 @@ const TestReview: React.FC = () => {
 
                 const { result_url, test_id } = submissionData;
 
+                if (!result_url) throw new Error('Results are still being calculated. Please go back and try again in a moment.');
+
                 // 2. Fetch test metadata to get the test url and solution_url
                 const { data: testMeta, error: testError } = await supabase
                     .from('tests')
@@ -81,23 +83,33 @@ const TestReview: React.FC = () => {
 
                 const { url: testUrl, solution_url } = testMeta;
 
-                // 3. Fetch all data concurrently
-                const [resultResponse, solutionResponse, testResponse] = await Promise.all([
+                // 3. Fetch data concurrently — solution_url is optional
+                const fetches: Promise<Response>[] = [
                     fetch(result_url),
-                    fetch(solution_url),
-                    fetch(testUrl)
-                ]);
+                    fetch(testUrl),
+                ];
+                if (solution_url) {
+                    fetches.push(fetch(solution_url));
+                }
 
-                if (!resultResponse.ok) throw new Error(`Failed to fetch result data from ${result_url}`);
-                if (!solutionResponse.ok) throw new Error(`Failed to fetch solution data from ${solution_url}`);
-                if (!testResponse.ok) throw new Error(`Failed to fetch test content from ${testUrl}`);
+                const responses = await Promise.all(fetches);
+                const [resultResponse, testResponse] = responses;
+                const solutionResponse = solution_url ? responses[2] : null;
+
+                if (!resultResponse.ok) throw new Error('Failed to fetch result data.');
+                if (!testResponse.ok) throw new Error('Failed to fetch test content.');
 
                 const resultJson = await resultResponse.json();
-                const solutionJson = await solutionResponse.json();
                 const testJson = await testResponse.json();
 
+                let solutionQuestions: Solution[] = [];
+                if (solutionResponse?.ok) {
+                    const solutionJson = await solutionResponse.json();
+                    solutionQuestions = solutionJson.questions || [];
+                }
+
                 setUserAnswers(resultJson.attempt_comparison || []);
-                setSolutions(solutionJson.questions || []);
+                setSolutions(solutionQuestions);
                 setTestData(testJson as Test);
                 setAllQuestions(testJson.questions || []);
 
@@ -172,8 +184,32 @@ const TestReview: React.FC = () => {
     };
 
     if (loading) return <JEELoader message="Loading review..." />;
-    if (error) return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
-    if (!testData || !currentQuestion || !currentAnswer) return <div className="flex justify-center items-center h-screen">Data not available.</div>;
+    if (error) return (
+        <div className="flex flex-col justify-center items-center h-screen text-center px-4">
+            <span className="material-icons-outlined text-5xl text-red-500 mb-4">error_outline</span>
+            <h2 className="text-xl font-semibold mb-2 text-text-light dark:text-text-dark">{error}</h2>
+            <button
+                onClick={() => navigate(`/results/${submissionId}`)}
+                className="mt-4 flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
+            >
+                <span className="material-icons-outlined">arrow_back</span>
+                Back to Result
+            </button>
+        </div>
+    );
+    if (!testData || !currentQuestion || !currentAnswer) return (
+        <div className="flex flex-col justify-center items-center h-screen text-center px-4">
+            <span className="material-icons-outlined text-5xl text-text-secondary-light mb-4">info</span>
+            <h2 className="text-xl font-semibold mb-2 text-text-light dark:text-text-dark">Data not available</h2>
+            <button
+                onClick={() => navigate(`/results/${submissionId}`)}
+                className="mt-4 flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
+            >
+                <span className="material-icons-outlined">arrow_back</span>
+                Back to Result
+            </button>
+        </div>
+    );
 
     const getOptionStyle = (optionId: string) => {
         const isCorrect = optionId.toLowerCase() === currentAnswer.correct_response.toLowerCase();

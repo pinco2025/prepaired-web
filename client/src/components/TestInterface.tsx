@@ -65,6 +65,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
+  const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -175,22 +176,21 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         isSubmittingRef.current = false;
         setIsSubmitting(false);
       } else {
-        // Trigger Score Calculation
-        try {
-          const { data: sessionData } = await supabase.auth.getSession();
+        // Trigger Score Calculation (fire-and-forget, don't block navigation)
+        supabase.auth.getSession().then(({ data: sessionData }) => {
           const token = sessionData?.session?.access_token;
-
-          await fetch(`https://prepaired-backend.onrender.com/api/v1/scores/${finalSubmissionId}/calculate`, {
+          fetch(`https://prepaired-backend.onrender.com/api/v1/scores/${finalSubmissionId}/calculate`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               ...(token ? { 'Authorization': `Bearer ${token}` } : {})
             }
+          }).catch(error => {
+            console.error('Failed to trigger score calculation', error);
           });
-        } catch (error) {
-          console.error('Failed to trigger score calculation', error);
-          // Proceed to navigation even if triggering calculation fails
-        }
+        }).catch(error => {
+          console.error('Failed to get session for score calculation', error);
+        });
 
         try {
           localStorage.removeItem(`test-answers-${currentTestData.testId}`);
@@ -624,21 +624,108 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     );
   }
 
+  // Shared question palette content used in both desktop sidebar and mobile drawer
+  const questionPaletteContent = (
+    <>
+      <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+        {testData?.sections?.map((section, index) => (
+          <button
+            key={index}
+            onClick={() => handleSectionSwitch(index)}
+            className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
+              }`}
+          >
+            {section.name}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-5 gap-2">
+        {filteredQuestions.map((question, index) => (
+          <button
+            key={question.id}
+            onClick={() => {
+              handlePaletteClick(question.originalIndex);
+              setIsMobilePaletteOpen(false);
+            }}
+            className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${questionStatuses[question.originalIndex] === 'answered'
+              ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
+              : questionStatuses[question.originalIndex] === 'notAnswered'
+                ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500'
+                : questionStatuses[question.originalIndex] === 'markedForReview'
+                  ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
+                  : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
+              } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 pt-6 border-t border-border-light dark:border-border-dark space-y-3 text-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-green-500/20 border border-green-500" />
+          <span className="text-text-light dark:text-text-dark">Answered</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-red-500/20 border border-red-500" />
+          <span className="text-text-light dark:text-text-dark">Not Answered</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-purple-500/20 border border-purple-500" />
+          <span className="text-text-light dark:text-text-dark">Marked for Review</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark" />
+          <span className="text-text-light dark:text-text-dark">Not Visited</span>
+        </div>
+      </div>
+    </>
+  );
+
   return (
-    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-0">
-      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 h-full">
+    <div className="w-full h-full flex flex-col lg:grid lg:grid-cols-3 lg:gap-8 min-h-0">
+      {/* Mobile top bar: timer + submit + palette toggle */}
+      <div className="lg:hidden flex items-center justify-between bg-surface-light dark:bg-surface-dark px-3 py-2 rounded-xl shadow-card-light dark:shadow-card-dark mb-2 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="material-icons-outlined text-primary text-xl">timer</span>
+          <span className="text-sm font-semibold text-text-light dark:text-text-dark">
+            {timeLeft !== null ? formatTime(timeLeft) : '--:--:--'}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsMobilePaletteOpen(true)}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
+          >
+            <span className="material-icons-outlined text-lg">grid_view</span>
+            Q{currentQuestionIndex + 1}
+          </button>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            disabled={isSubmittingRef.current}
+            className="px-3 py-1.5 rounded-lg text-sm font-bold bg-primary text-white disabled:opacity-50"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+
+      {/* Question area — pb-16 on mobile to clear the fixed bottom nav */}
+      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-3 pb-16 sm:p-6 md:p-8 lg:pb-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 flex-1 lg:h-full">
         <div className="flex-grow overflow-y-auto min-h-0 no-scrollbar p-1">
           {currentQuestion && (
             <>
-              <div className="flex items-start justify-between mb-6">
-                <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">
+              <div className="flex items-start justify-between mb-4 sm:mb-6">
+                <h2 className="text-base sm:text-lg font-semibold text-text-light dark:text-text-dark">
                   Question {currentQuestionIndex + 1} of {testData?.questions?.length}
                 </h2>
-                <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-3 py-1 rounded-full">
+                <span className="text-xs sm:text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-2 sm:px-3 py-1 rounded-full ml-2 flex-shrink-0">
                   {currentQuestion.section}
                 </span>
               </div>
-              <p className="math-text-scope text-xl text-text-light dark:text-text-dark leading-relaxed mb-8 break-words whitespace-pre-wrap">
+              <p className="math-text-scope text-base sm:text-xl text-text-light dark:text-text-dark leading-relaxed mb-5 sm:mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}
               </p>
               {currentQuestion.image && (
@@ -689,30 +776,30 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {currentQuestion.options.map((option) => (
                     <button
                       key={option.id}
                       onClick={() => handleSelectOption(option.id)}
-                      className={`w-full flex items-start text-left p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
+                      className={`w-full flex items-center text-left p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${selectedOption === option.id
                         ? 'border-primary dark:border-primary bg-primary/10 ring-2 ring-primary'
                         : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary'
                         }`}
                     >
                       <span
-                        className={`w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold rounded-full mr-4 border-2 ${selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
+                        className={`w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 flex items-center justify-center font-bold text-sm sm:text-base rounded-full mr-3 sm:mr-4 border-2 ${selectedOption === option.id ? 'text-white bg-primary border-primary' : 'text-primary border-primary'
                           }`}
                       >
                         {option.id.toUpperCase()}
                       </span>
-                      <div className="flex flex-col w-full gap-3">
-                        <span className="text-xl text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
+                      <div className="flex flex-col flex-1 min-w-0 gap-2 sm:gap-3">
+                        <span className="text-base sm:text-xl text-text-light dark:text-text-dark break-words">{renderMixedMath(option.text)}</span>
                         {option.image && (
-                          <div className="mt-2 text-center flex justify-center">
+                          <div className="mt-1 sm:mt-2 flex justify-center">
                             <ImageWithProgress
                               src={option.image}
                               alt={`Option ${option.id} Illustration`}
-                              className="max-w-full max-h-40 w-auto h-auto inline-block rounded-lg"
+                              className="max-w-full max-h-32 sm:max-h-40 w-auto h-auto inline-block rounded-lg"
                             />
                           </div>
                         )}
@@ -725,7 +812,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
           )}
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border-light dark:border-border-dark flex items-center justify-between">
+        {/* Desktop navigation buttons (inline) */}
+        <div className="hidden lg:flex mt-8 pt-6 border-t border-border-light dark:border-border-dark items-center justify-between flex-shrink-0">
           <button
             onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
@@ -756,7 +844,39 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 h-full">
+      {/* Mobile fixed bottom navigation bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark px-3 py-2 flex items-center justify-between safe-bottom">
+        <button
+          onClick={handlePrevious}
+          disabled={currentQuestionIndex === 0}
+          className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg font-medium text-xs text-text-secondary-light dark:text-text-secondary-dark active:bg-background-light dark:active:bg-background-dark transition-colors disabled:opacity-40"
+        >
+          <span className="material-icons-outlined text-xl">arrow_back</span>
+          Previous
+        </button>
+
+        <button
+          onClick={handleMarkForReview}
+          className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg font-medium text-xs transition-colors ${questionStatuses[currentQuestionIndex] === 'markedForReview' ? 'text-orange-500 bg-orange-500/10' : 'text-orange-500 active:bg-orange-500/10'}`}
+        >
+          <span className="material-icons-outlined text-xl">
+            {questionStatuses[currentQuestionIndex] === 'markedForReview' ? 'bookmark' : 'bookmark_border'}
+          </span>
+          Review
+        </button>
+
+        <button
+          onClick={handleNext}
+          disabled={!testData || !testData.questions || currentQuestionIndex === testData.questions.length - 1}
+          className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg font-medium text-xs text-primary active:bg-primary/10 transition-colors disabled:opacity-40"
+        >
+          <span className="material-icons-outlined text-xl">arrow_forward</span>
+          Next
+        </button>
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:flex flex-col gap-4 h-full">
         <aside className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-card-light dark:shadow-card-dark h-full overflow-y-auto flex flex-col">
           <button
             onClick={() => setIsModalOpen(true)}
@@ -772,59 +892,28 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
             </span>
           </div>
 
-          <h3 className="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Question Palette</h3>
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-            {testData?.sections?.map((section, index) => (
-              <button
-                key={index}
-                onClick={() => handleSectionSwitch(index)}
-                className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${currentSectionIndex === index ? 'bg-primary text-white' : 'bg-background-light dark:bg-background-dark text-text-secondary-light dark:text-text-secondary-dark'
-                  }`}
-              >
-                {section.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-5 gap-2">
-            {filteredQuestions.map((question, index) => (
-              <button
-                key={question.id}
-                onClick={() => handlePaletteClick(question.originalIndex)}
-                className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-colors ${questionStatuses[question.originalIndex] === 'answered'
-                  ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500'
-                  : questionStatuses[question.originalIndex] === 'notAnswered'
-                    ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500'
-                    : questionStatuses[question.originalIndex] === 'markedForReview'
-                      ? 'bg-purple-500/20 text-purple-500 dark:text-purple-400 border border-purple-500'
-                      : 'bg-background-light dark:bg-background-dark hover:border-primary dark:hover:text-primary border border-border-light dark:border-border-dark'
-                  } ${currentQuestionIndex === question.originalIndex ? 'ring-2 ring-primary' : ''}`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-border-light dark:border-border-dark space-y-3 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-green-500/20 border border-green-500" />
-              <span>Answered</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-red-500/20 border border-red-500" />
-              <span>Not Answered</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-purple-500/20 border border-purple-500" />
-              <span>Marked for Review</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark" />
-              <span>Not Visited</span>
-            </div>
-          </div>
+          {questionPaletteContent}
         </aside>
       </div>
+
+      {/* Mobile question palette drawer */}
+      {isMobilePaletteOpen && (
+        <div className="lg:hidden fixed inset-0 z-[90] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-background-dark/60 backdrop-blur-sm" onClick={() => setIsMobilePaletteOpen(false)} />
+          <div className="relative bg-surface-light dark:bg-surface-dark rounded-t-2xl p-5 max-h-[75vh] overflow-y-auto shadow-2xl border-t border-border-light dark:border-border-dark">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">Questions</h3>
+              <button
+                onClick={() => setIsMobilePaletteOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-background-light dark:bg-background-dark"
+              >
+                <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark">close</span>
+              </button>
+            </div>
+            {questionPaletteContent}
+          </div>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-6">
