@@ -140,7 +140,7 @@ const TestPage: React.FC = () => {
     <main className={`flex-grow ${isTestInProgress ? 'h-[100dvh] overflow-hidden' : ''}`}>
       <div className={isTestInProgress
         ? "w-full h-full p-2 sm:p-4 bg-background-light dark:bg-background-dark"
-        : "container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center"
+        : "container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 flex justify-center"
       }>
         {renderContent()}
       </div>

@@ -16,31 +16,31 @@ const TestInstructions: React.FC<TestInstructionsProps> = ({ test, onStartTest }
 
   // Fallback to the original instructions format if no template matches
   return (
-    <div className="max-w-4xl mx-auto bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 md:p-12">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark tracking-tight">{test.title}</h1>
+    <div className="max-w-4xl mx-auto bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-4 sm:p-8 md:p-12">
+      <div className="text-center mb-5 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark tracking-tight">{test.title}</h1>
       </div>
-      <div className="mb-8 border-b border-border-light dark:border-border-dark pb-8">
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12 text-center">
-          <div className="flex items-center gap-3">
-            <span className="material-icons-outlined text-primary text-3xl">timer</span>
+      <div className="mb-5 sm:mb-8 border-b border-border-light dark:border-border-dark pb-5 sm:pb-8">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-12 text-center">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="material-icons-outlined text-primary text-2xl sm:text-3xl">timer</span>
             <div>
-              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Duration</p>
-              <p className="font-semibold text-text-light dark:text-text-dark">{formatDuration(test.duration)}</p>
+              <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">Duration</p>
+              <p className="font-semibold text-sm sm:text-base text-text-light dark:text-text-dark">{formatDuration(test.duration)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="material-icons-outlined text-primary text-3xl">quiz</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="material-icons-outlined text-primary text-2xl sm:text-3xl">quiz</span>
             <div>
-              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Questions</p>
-              <p className="font-semibold text-text-light dark:text-text-dark">{test.totalQuestions}</p>
+              <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Questions</p>
+              <p className="font-semibold text-sm sm:text-base text-text-light dark:text-text-dark">{test.totalQuestions}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="material-icons-outlined text-primary text-3xl">rule</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="material-icons-outlined text-primary text-2xl sm:text-3xl">rule</span>
             <div>
-              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Marking Scheme</p>
-              <p className="font-semibold text-text-light dark:text-text-dark">{test.markingScheme}</p>
+              <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">Marking Scheme</p>
+              <p className="font-semibold text-sm sm:text-base text-text-light dark:text-text-dark">{test.markingScheme}</p>
             </div>
           </div>
         </div>

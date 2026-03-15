@@ -686,8 +686,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
   return (
     <div className="w-full h-full flex flex-col lg:grid lg:grid-cols-3 lg:gap-8 min-h-0">
-      {/* Mobile top bar: timer + submit + palette toggle */}
-      <div className="lg:hidden flex items-center justify-between bg-surface-light dark:bg-surface-dark px-3 py-2 rounded-xl shadow-card-light dark:shadow-card-dark mb-2 flex-shrink-0">
+      {/* Mobile fixed top bar: timer + submit + palette toggle */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-[80] flex items-center justify-between bg-surface-light dark:bg-surface-dark px-3 py-2 shadow-card-light dark:shadow-card-dark">
         <div className="flex items-center gap-2">
           <span className="material-icons-outlined text-primary text-xl">timer</span>
           <span className="text-sm font-semibold text-text-light dark:text-text-dark">
@@ -712,8 +712,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         </div>
       </div>
 
-      {/* Question area — pb-16 on mobile to clear the fixed bottom nav */}
-      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-3 pb-16 sm:p-6 md:p-8 lg:pb-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 flex-1 lg:h-full">
+      {/* Question area — pt-12 on mobile to clear fixed top bar, pb-16 to clear fixed bottom nav */}
+      <div className="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-3 pt-12 pb-16 sm:p-6 md:p-8 lg:pt-8 lg:pb-8 rounded-xl shadow-card-light dark:shadow-card-dark flex flex-col min-h-0 flex-1 lg:h-full">
         <div className="flex-grow overflow-y-auto min-h-0 no-scrollbar p-1">
           {currentQuestion && (
             <>
