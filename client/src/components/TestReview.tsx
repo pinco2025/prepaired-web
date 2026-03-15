@@ -271,8 +271,8 @@ const TestReview: React.FC = () => {
                                         {renderHtml(currentQuestion.text)}
                                     </div>
                                     {currentQuestion.image && (
-                                        <div className="flex justify-center">
-                                            <ImageWithProgress src={currentQuestion.image} alt="Question" className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                        <div className="mt-2 w-full flex justify-center">
+                                            <ImageWithProgress src={currentQuestion.image} alt="Question" className="max-w-full md:max-w-xl max-h-[35vh] w-auto h-auto rounded-lg" />
                                         </div>
                                     )}
                                     <div className="space-y-3">
@@ -318,8 +318,8 @@ const TestReview: React.FC = () => {
                                                         <div className="flex-grow text-lg">
                                                             {renderHtml(option.text)}
                                                             {option.image && (
-                                                                <div className="mt-4 flex justify-center">
-                                                                    <ImageWithProgress src={option.image} alt={`Option ${option.id}`} className="max-w-full h-auto rounded-lg border border-border-light dark:border-border-dark" />
+                                                                <div className="mt-2 text-center flex justify-center">
+                                                                    <ImageWithProgress src={option.image} alt={`Option ${option.id}`} className="max-w-full max-h-40 w-auto h-auto inline-block rounded-lg" />
                                                                 </div>
                                                             )}
                                                         </div>
@@ -354,8 +354,8 @@ const TestReview: React.FC = () => {
                                                         {renderHtml(currentSolution.solution_text)}
                                                     </div>
                                                     {currentSolution.solution_image_url && (
-                                                        <div className="flex justify-center mt-4">
-                                                            <ImageWithProgress src={currentSolution.solution_image_url} alt="Solution" className="rounded-lg max-w-full h-auto" />
+                                                        <div className="mt-2 w-full flex justify-center">
+                                                            <ImageWithProgress src={currentSolution.solution_image_url} alt="Solution" className="max-w-full md:max-w-xl max-h-[35vh] w-auto h-auto rounded-lg" />
                                                         </div>
                                                     )}
                                                 </div>

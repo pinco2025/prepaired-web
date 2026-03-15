@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -29,6 +29,8 @@ import CondensedPractice from './components/CondensedPractice';
 import PricingPlans from './components/PricingPlans';
 import ResponseUpload from './components/ResponseUpload';
 import ResponseResult from './components/ResponseResult';
+import AIPTPage from './components/AIPTPage';
+import AIPTAnnouncementModal from './components/AIPTAnnouncementModal';
 import Waitlist from './components/Waitlist';
 import WaitlistSuccess from './components/WaitlistSuccess';
 import RegisterSuccess from './components/RegisterSuccess';
@@ -71,6 +73,30 @@ const HomeRoute: React.FC = () => {
 export const AppContent: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+  const [showAIPTModal, setShowAIPTModal] = useState(false);
+  const prevAuthRef = useRef(false);
+
+  // Show AIPT announcement modal when user logs in (every login, not on refresh)
+  useEffect(() => {
+    if (!loading && isAuthenticated && !prevAuthRef.current) {
+      const dismissed = sessionStorage.getItem('aipt_announcement_dismissed');
+      if (!dismissed) {
+        setShowAIPTModal(true);
+        sessionStorage.setItem('aipt_announcement_dismissed', 'true');
+      }
+    }
+    // Clear dismissed flag on logout so it shows again on next login
+    if (!loading && !isAuthenticated && prevAuthRef.current) {
+      sessionStorage.removeItem('aipt_announcement_dismissed');
+    }
+    if (!loading) {
+      prevAuthRef.current = isAuthenticated;
+    }
+  }, [isAuthenticated, loading]);
+
+  const handleCloseAIPTModal = () => {
+    setShowAIPTModal(false);
+  };
 
   // TEMPORARY: Mocking lite user for verification
   const isLiteUser = true; // subscriptionType?.toLowerCase() === 'lite';
@@ -78,6 +104,7 @@ export const AppContent: React.FC = () => {
   // Check if user is on a test-taking route (hide sidebar during test)
   // Matches /tests/:testId but not /tests (the list page)
   const isTestRoute = /^\/tests\/[^/]+$/.test(location.pathname);
+  const isAIPTRoute = location.pathname === '/aipt';
 
   // Also hide sidebar on the test-submitted page
   const isTestSubmittedRoute = location.pathname === '/test-submitted';
@@ -89,12 +116,14 @@ export const AppContent: React.FC = () => {
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
   const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
-  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
+  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isAIPTRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
       {/* Background layer: color + grid image */}
       <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark -z-10"></div>
+      {/* AIPT Announcement Modal */}
+      <AIPTAnnouncementModal isOpen={showAIPTModal} onClose={handleCloseAIPTModal} />
       {showSidebar && <Sidebar />}
       <main className="flex-1 w-full relative">
         <Routes>
@@ -207,6 +236,11 @@ export const AppContent: React.FC = () => {
               <SingleQuestion />
             } />
 
+            <Route path="/aipt" element={
+              <RequireAuth allowFree>
+                <AIPTPage />
+              </RequireAuth>
+            } />
             <Route path="/tests" element={
               isLiteUser ? (
                 <RequireAuth allowFree>

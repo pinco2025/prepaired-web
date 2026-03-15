@@ -48,6 +48,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
     { to: "/response-upload", icon: "upload_file", label: "Response Analysis" },
     { to: "/dashboard", icon: "dashboard", label: "Dashboard" },
     { to: "/tests", icon: "quiz", label: "Tests & Analysis" },
+    { to: "/aipt", icon: "psychology", label: "AIPT" },
   ];
 
   return (

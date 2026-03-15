@@ -5,9 +5,10 @@ import { formatDuration } from '../utils/formatters';
 interface JEEMInstructionsProps {
   test: Test;
   onStartTest: () => void;
+  footerOverride?: React.ReactNode;
 }
 
-const JEEMInstructions: React.FC<JEEMInstructionsProps> = ({ test, onStartTest }) => {
+const JEEMInstructions: React.FC<JEEMInstructionsProps> = ({ test, onStartTest, footerOverride }) => {
   return (
     <div className="max-w-4xl mx-auto bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 md:p-12">
       <div className="text-center mb-8">
@@ -128,12 +129,14 @@ const JEEMInstructions: React.FC<JEEMInstructionsProps> = ({ test, onStartTest }
         </div>
       </div>
       <div className="text-center">
-        <button
-            onClick={onStartTest}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-12 py-4 border border-transparent text-base font-semibold rounded-lg shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark transition-colors duration-300">
-            Start Test
-            <span className="material-symbols-outlined ml-2">arrow_forward</span>
-        </button>
+        {footerOverride || (
+          <button
+              onClick={onStartTest}
+              className="w-full sm:w-auto inline-flex items-center justify-center px-12 py-4 border border-transparent text-base font-semibold rounded-lg shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark transition-colors duration-300">
+              Start Test
+              <span className="material-symbols-outlined ml-2">arrow_forward</span>
+          </button>
+        )}
       </div>
     </div>
   );

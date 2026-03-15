@@ -642,11 +642,11 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                 {renderMixedMath(currentQuestion.text)}
               </p>
               {currentQuestion.image && (
-                <div className="mb-8 flex justify-center">
+                <div className="mt-2 mb-8 w-full flex justify-center">
                   <ImageWithProgress
                     src={currentQuestion.image}
                     alt="Question Illustration"
-                    className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                    className="max-w-full md:max-w-xl max-h-[35vh] w-auto h-auto rounded-lg"
                   />
                 </div>
               )}
@@ -708,11 +708,13 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                       <div className="flex flex-col w-full gap-3">
                         <span className="text-xl text-text-light dark:text-text-dark">{renderMixedMath(option.text)}</span>
                         {option.image && (
-                          <ImageWithProgress
-                            src={option.image}
-                            alt={`Option ${option.id} Illustration`}
-                            className="max-w-full h-auto rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm"
-                          />
+                          <div className="mt-2 text-center flex justify-center">
+                            <ImageWithProgress
+                              src={option.image}
+                              alt={`Option ${option.id} Illustration`}
+                              className="max-w-full max-h-40 w-auto h-auto inline-block rounded-lg"
+                            />
+                          </div>
                         )}
                       </div>
                     </button>
