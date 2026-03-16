@@ -38,6 +38,7 @@ import OrganicQuestion from './components/OrganicQuestion';
 import OrganicQuestionList from './components/OrganicQuestionList';
 import SingleQuestion from './components/SingleQuestion';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import DeleteAccount from './components/DeleteAccount';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -217,6 +218,9 @@ export const AppContent: React.FC = () => {
             } />
             <Route path="/privacy" element={
               <PrivacyPolicy />
+            } />
+            <Route path="/delete-account" element={
+              <DeleteAccount />
             } />
             <Route path="/waitlist" element={
               <Waitlist />
