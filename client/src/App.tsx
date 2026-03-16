@@ -37,6 +37,7 @@ import RegisterSuccess from './components/RegisterSuccess';
 import OrganicQuestion from './components/OrganicQuestion';
 import OrganicQuestionList from './components/OrganicQuestionList';
 import SingleQuestion from './components/SingleQuestion';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -213,6 +214,9 @@ export const AppContent: React.FC = () => {
             } />
             <Route path="/pricing" element={
               <PricingPlans />
+            } />
+            <Route path="/privacy" element={
+              <PrivacyPolicy />
             } />
             <Route path="/waitlist" element={
               <Waitlist />
