@@ -162,7 +162,7 @@ const Tests: React.FC = () => {
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <h1 className="text-4xl md:text-5xl font-bold text-text-light dark:text-text-dark tracking-tight mb-4">Select Your Test</h1>
-                        <p className="text-text-secondary-light dark:text-text-secondary-dark text-lg max-w-2xl mx-auto">Navigate through the mastery path. Unlock new challenges by completing levels.</p>
+                        <p className="text-text-secondary-light dark:text-text-secondary-dark text-lg max-w-2xl mx-auto">Navigate through the handcrafted mastery path for JEE Main 2026 & JEE Advanced 2026. Verified challenges — unlock new levels by completing each.</p>
                     </div>
                     <div className="relative w-full max-w-5xl mx-auto py-10" style={{ minHeight: `${Math.max(tests.length > 0 ? testPositions[Math.min(tests.length - 1, testPositions.length - 1)].top + 200 : 400, 400)}px` }}>
                         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-0 hidden md:block" style={{ strokeWidth: 3, fill: 'none' }}>

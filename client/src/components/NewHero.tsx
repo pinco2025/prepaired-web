@@ -21,7 +21,7 @@ const NewHero: React.FC = () => {
                     Get your Target %ile with <br></br><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-electric-blue drop-shadow-sm">prepAIred Lite</span>
                 </h1>
                 <p className="max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-display">
-                    Follow our fluid learning timeline designed by top IITians. Watch your progress flow from foundational concepts to exam-day strategy.
+                    Follow our handcrafted learning timeline designed by top IITians. Hand-picked, most analysed resources for JEE Main 2026 & JEE Advanced 2026 — watch your progress flow from foundational concepts to exam-day strategy.
                 </p>
             </section>
 
@@ -93,7 +93,7 @@ const NewHero: React.FC = () => {
                                 </span>
                             </div>
                             <p className="text-slate-600 dark:text-slate-400 text-sm leading-snug font-medium pl-[52px]">
-                                High-yield JEE Mains problems. Curated by IIT alumni.
+                                Hand-picked, high-yield JEE Main 2026 problems. Handcrafted & verified by IIT alumni.
                             </p>
                         </div>
 
@@ -132,7 +132,7 @@ const NewHero: React.FC = () => {
                                 </span>
                             </div>
                             <p className="text-slate-600 dark:text-slate-400 text-sm leading-snug font-medium pl-[52px]">
-                                AI-proctored full-length exams. Real pressure, real results.
+                                Best AI-proctored full-length exams for JEE Main 2026 & JEE Advanced 2026. Verified difficulty, real pressure, real results.
                             </p>
                         </div>
 
@@ -165,7 +165,7 @@ const NewHero: React.FC = () => {
                                 </span>
                             </div>
                             <p className="text-slate-500 dark:text-slate-500 text-sm leading-snug font-medium pl-[52px]">
-                                Deep dives into Rotational Mechanics & Integral Calculus.
+                                Most analysed deep dives into Rotational Mechanics & Integral Calculus for JEE Advanced 2026 & 2027.
                             </p>
                         </div>
 
@@ -198,7 +198,7 @@ const NewHero: React.FC = () => {
                                 </span>
                             </div>
                             <p className="text-slate-500 dark:text-slate-500 text-sm leading-snug font-medium pl-[52px]">
-                                Live webinars on exam temperament & time management.
+                                Handcrafted live webinars on exam temperament & time management for JEE Main 2026 aspirants.
                             </p>
                         </div>
 

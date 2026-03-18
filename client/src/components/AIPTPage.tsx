@@ -54,17 +54,17 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
                         prepAIred Lite Required
                     </h2>
                     <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                        This test is exclusively available to Lite subscribers. Upgrade to unlock all 6 AIPT tests and more.
+                        This test is exclusively available to Lite subscribers. Upgrade to unlock all 6 hand-picked, verified AIPT tests and more.
                     </p>
                 </div>
 
                 {/* Perks */}
                 <div className="w-full space-y-2 sm:space-y-3 text-left">
                     {[
-                        '4 AI-Powered Tests with detailed performance analysis',
-                        'Complete Condensed PYQ Set',
-                        'Statement Based & Fast-Track Sets',
-                        '360° Preparation Set',
+                        '4 Best AI-Powered Tests with verified performance analysis',
+                        'Hand-picked Condensed PYQ Set based on JEE Main 2026 Jan',
+                        'Handcrafted Statement Based & Fast-Track Sets',
+                        'Most analysed 360° Preparation Set',
                         'JEE Advanced Phase 2 coverage included',
                     ].map((perk, i) => (
                         <div key={i} className="flex items-center gap-2 sm:gap-3">
@@ -156,7 +156,7 @@ const SelectionScreen: React.FC<SelectionScreenProps> = ({ tests, onSelectTest, 
                     Select Your AIPT
                 </h1>
                 <p className="text-text-secondary-light dark:text-text-secondary-dark text-base md:text-lg max-w-2xl mx-auto px-2">
-                    Benchmark your performance against thousands of students. Each AIPT gives you a percentile rank powered by AI analysis.
+                    Benchmark your JEE Main 2026 & JEE Advanced 2026 performance against thousands of students. Each AIPT gives you a verified percentile rank powered by the best AI analysis.
                 </p>
             </div>
 

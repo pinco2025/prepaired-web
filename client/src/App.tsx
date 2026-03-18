@@ -39,6 +39,8 @@ import OrganicQuestionList from './components/OrganicQuestionList';
 import SingleQuestion from './components/SingleQuestion';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import DeleteAccount from './components/DeleteAccount';
+import InAppBrowserOverlay from './components/InAppBrowserOverlay';
+import { isInAppBrowser, getIsIOS } from './utils/inAppBrowserRedirect';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -122,6 +124,8 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
+      {/* In-app browser overlay (iOS only — Android is handled in index.tsx) */}
+      {isInAppBrowser() && getIsIOS() && <InAppBrowserOverlay />}
       {/* Background layer: color + grid image */}
       <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark -z-10"></div>
       {/* AIPT Announcement Modal */}

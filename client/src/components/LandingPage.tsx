@@ -14,7 +14,7 @@ import accuracySpeedImg from '../assets/cards/accuracy-speed.png';
 import lvl2PyqImg from '../assets/cards/lvl-2-pyq.png';
 
 const LandingPage: React.FC = () => {
-    usePageTitle('AI-Powered JEE & NEET Prep');
+    usePageTitle('Best AI-Powered JEE Main 2026 & JEE Advanced 2026 Prep');
     const navigate = useNavigate();
     const { user } = useAuth();
     const [darkMode, setDarkMode] = useState(true);
@@ -22,9 +22,10 @@ const LandingPage: React.FC = () => {
     // Header taglines for typewriter effect
     const headerTaglines = [
         'Crafted by IITians',
-        'AI-powered analytics',
-        'JEE Mains difficulty',
-        'Personalized insights',
+        'Best JEE Main 2026 prep',
+        'Hand-picked questions',
+        'Verified by IITians',
+        'Most analysed PYQs',
     ];
     const [taglineIndex, setTaglineIndex] = useState(0);
     const [displayedTagline, setDisplayedTagline] = useState('');
@@ -220,7 +221,7 @@ const LandingPage: React.FC = () => {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-300">More</span>
                         </h2>
                         <p className="text-gray-700 dark:text-gray-300 text-sm md:text-lg max-w-lg leading-relaxed mt-2">
-                            Get started just at ₹119, Cancel Anytime
+                            Handcrafted & verified for JEE Main 2026 & JEE Advanced 2026. Start just at ₹119, Cancel Anytime
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-6">
                             <button onClick={handleClickToStart} className="flex items-center justify-center gap-2 bg-primary hover:bg-blue-600 text-white px-8 py-3 rounded text-base font-bold transition-all transform hover:scale-105 shadow-lg shadow-primary/30">
@@ -327,7 +328,7 @@ const LandingPage: React.FC = () => {
                             See the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent animate-gradient-shift">Difference</span>
                         </h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm md:text-lg max-w-2xl mx-auto">
-                            Why solve PYQs, when you can have <span className="font-semibold text-slate-700 dark:text-slate-200">better - IPQs</span>
+                            Why solve PYQs, when you can have <span className="font-semibold text-slate-700 dark:text-slate-200">hand-picked, verified & best — IPQs</span>
                         </p>
                     </div>
                     {/* Video Container */}

@@ -58,17 +58,17 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
                         prepAIred Lite Required
                     </h2>
                     <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                        This question set is exclusively available to Lite subscribers. Upgrade to unlock all sets and maximize your prep efficiency.
+                        This question set is exclusively available to Lite subscribers. Upgrade to unlock all hand-picked, verified sets and maximize your JEE Main 2026 prep efficiency.
                     </p>
                 </div>
 
                 {/* Perks */}
                 <div className="w-full space-y-2 sm:space-y-3 text-left">
                     {[
-                        '4 AI-Powered Tests with performance analysis',
-                        'Complete Condensed PYQ Set',
-                        'Statement Based Set — the new JEE pattern, covered',
-                        'Fast-Track Set + 360° Preparation Set',
+                        '4 Best AI-Powered Tests with verified performance analysis',
+                        'Hand-picked Condensed PYQ Set based on JEE Main 2026 Jan',
+                        'Handcrafted Statement Based Set — the new JEE pattern, covered',
+                        'Most analysed Fast-Track Set + 360° Preparation Set',
                         'JEE Advanced Phase 2 included',
                     ].map((perk, i) => (
                         <div key={i} className="flex items-center gap-2 sm:gap-3">
@@ -196,7 +196,7 @@ const QuestionSet: React.FC = () => {
             id: 'physics',
             name: 'Physics',
             title: 'Physics - Mechanics & Thermodynamics',
-            description: 'Master the toughest core concepts with questions distilled from the last 10 years of exams. Focus on what really repeats.',
+            description: 'Hand-picked, verified questions distilled from the last 10 years of JEE Main & JEE Advanced. Based on JEE Main 2026 Jan session patterns. Focus on what really repeats.',
             stats: { questions: '160 Qs', time: '12 Hrs', difficulty: 'Hard' },
             tags: ['Condensed PYQs', 'High Yield'],
             image: phyImg,
@@ -210,7 +210,7 @@ const QuestionSet: React.FC = () => {
             id: 'chemistry',
             name: 'Chemistry',
             title: 'Chemistry - Physical & Inorganic',
-            description: 'Focus on high-yield formulas and exception-based questions from the last decade.',
+            description: 'Handcrafted, most analysed high-yield formulas and exception-based questions from the last decade of JEE Main exams.',
             stats: { questions: '175 Qs', time: '10 Hrs', difficulty: 'Medium' },
             tags: ['Condensed PYQs', 'Formula Based'],
             image: chemImg,
@@ -224,7 +224,7 @@ const QuestionSet: React.FC = () => {
             id: 'mathematics',
             name: 'Mathematics',
             title: 'Mathematics - Calculus & Algebra',
-            description: 'Practice the most probable problem types and improve your speed in calculations.',
+            description: 'Best hand-picked problem types verified for JEE Main 2026 & JEE Advanced 2026 to improve your speed in calculations.',
             stats: { questions: '140 Qs', time: '14 Hrs', difficulty: 'Hard' },
             tags: ['Condensed PYQs', 'Calculation Heavy'],
             image: mathImg,
@@ -241,7 +241,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'condensed_main',
             title: 'Condensed PYQs',
-            description: 'High-yield questions from the last 10 years needed to crack the exam. Filtered for maximum relevance.',
+            description: 'Hand-picked, verified high-yield questions from the last 10 years of JEE Main, based on JEE Main 2026 Jan session. Filtered for maximum relevance.',
             stats: { questions: '~150 Qs/Subject', time: '36 Hrs', type: '2026 Relevant', difficulty: 'Medium' },
             tags: ['Most Popular'],
             action: () => { setSelectedSet('condensed_main'); setViewState('subject_selection'); },
@@ -255,7 +255,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'super30',
             title: 'Super 30',
-            description: 'A highly curated set of 30 complex problems designed to challenge your understanding of multiple concepts at once.',
+            description: 'A handcrafted set of 30 best, most analysed problems designed to challenge your understanding of multiple concepts at once.',
             stats: { questions: '30 Qs/Subject', time: '2 Hrs', type: 'IPQs from PYQs', difficulty: 'Easy' },
             tags: ['Basics Mastery'],
             action: () => navigate('/super30'),
@@ -269,7 +269,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'accuracy',
             title: 'Fast Track Set',
-            description: 'A set comprised to provide maximum marks in minimum time',
+            description: 'Hand-picked set designed to provide maximum marks in minimum time for JEE Main 2026',
             stats: { questions: 'Drills', time: 'Variable', type: 'Speed', difficulty: 'Medium' },
             tags: ['Speed', 'Precision'],
             action: () => { setSelectedSet('accuracy'); setViewState('subject_selection'); },
@@ -283,7 +283,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'statement',
             title: 'Statement Based Set',
-            description: 'Master assertion-reason and statement-based questions that are becoming increasingly common in exams.',
+            description: 'Best verified assertion-reason and statement-based questions based on JEE Main 2026 Jan patterns that are increasingly common in exams.',
             stats: { questions: '60 Qs/Subject', time: 'Complete Coverage', type: '2026 Relevant', difficulty: 'Easy' },
             tags: ['A&R', 'Statement Based'],
             action: () => { setSelectedSet('statement'); setViewState('subject_selection'); },
@@ -297,7 +297,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'level2',
             title: '360° Set',
-            description: 'The final full coverage set to use as your last resort',
+            description: 'Most analysed, best full-coverage set — your handcrafted last resort for JEE Main 2026 & JEE Advanced 2026',
             stats: { questions: 'Rank Booster', time: 'Variable', type: 'Advanced', difficulty: 'Extreme' },
             tags: ['Rank Booster', 'High Difficulty'],
             action: () => { setSelectedSet('level2'); setViewState('subject_selection'); },
@@ -315,7 +315,7 @@ const QuestionSet: React.FC = () => {
             id: 'physics',
             name: 'Physics',
             title: 'Physics - Fast Track',
-            description: 'A set comprised to provide maximum marks in minimum time. Essential drills for mechanics and modern physics.',
+            description: 'Hand-picked set designed to provide maximum marks in minimum time for JEE Main 2026. Best verified drills for mechanics and modern physics.',
             stats: { questions: 'Variable Qs', time: 'Depends', difficulty: 'Medium' },
             tags: ['Speed', 'Precision'],
             image: phyImg,
@@ -329,7 +329,7 @@ const QuestionSet: React.FC = () => {
             id: 'chemistry',
             name: 'Chemistry',
             title: 'Chemistry - Fast Track',
-            description: 'Maximize your scoring rate with these high-frequency chemistry drills.',
+            description: 'Handcrafted, most analysed high-frequency chemistry drills to maximize your JEE Main 2026 scoring rate.',
             stats: { questions: 'Variable Qs', time: 'Depends', difficulty: 'Medium' },
             tags: ['Speed', 'Precision'],
             image: chemImg,
@@ -346,7 +346,7 @@ const QuestionSet: React.FC = () => {
             id: 'physics',
             name: 'Physics',
             title: 'Physics - 360° Set',
-            description: 'Full coverage rank booster questions for complete preparation.',
+            description: 'Hand-picked, verified full coverage rank booster questions for complete JEE Main 2026 & JEE Advanced 2026 preparation.',
             stats: { questions: 'Rank Booster', time: 'Variable', difficulty: 'Hard' },
             tags: ['Rank Booster', 'High Difficulty'],
             image: phyImg,
@@ -360,7 +360,7 @@ const QuestionSet: React.FC = () => {
             id: 'chemistry',
             name: 'Chemistry',
             title: 'Chemistry - 360° Set',
-            description: 'The ultimate final revision covering tricky edge-cases and exceptions.',
+            description: 'Most analysed, best final revision covering tricky edge-cases and exceptions for JEE Main 2026.',
             stats: { questions: 'Rank Booster', time: 'Variable', difficulty: 'Hard' },
             tags: ['Rank Booster', 'High Difficulty'],
             image: chemImg,
@@ -374,7 +374,7 @@ const QuestionSet: React.FC = () => {
             id: 'mathematics',
             name: 'Mathematics',
             title: 'Mathematics - 360° Set',
-            description: 'Complex multi-concept problems to solidify your edge in Mathematics.',
+            description: 'Handcrafted, verified multi-concept problems to solidify your edge in Mathematics for JEE Advanced 2026.',
             stats: { questions: 'Rank Booster', time: 'Variable', difficulty: 'Hard' },
             tags: ['Rank Booster', 'High Difficulty'],
             image: mathImg,
@@ -391,7 +391,7 @@ const QuestionSet: React.FC = () => {
             id: 'physics',
             name: 'Physics',
             title: 'Physics - Statement Based',
-            description: 'Master assertion-reason and statement-based questions in Physics.',
+            description: 'Best verified assertion-reason and statement-based questions in Physics for JEE Main 2026.',
             stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Medium' },
             tags: ['Assertion-Reason'],
             image: phyImg,
@@ -405,7 +405,7 @@ const QuestionSet: React.FC = () => {
             id: 'chemistry',
             name: 'Chemistry',
             title: 'Chemistry - Statement Based',
-            description: 'Master statement-based formats covering Physical, Inorganic, and Organic Chemistry.',
+            description: 'Hand-picked, most analysed statement-based formats covering Physical, Inorganic, and Organic Chemistry for JEE Main 2026.',
             stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Medium' },
             tags: ['Statement Based'],
             image: chemImg,
@@ -419,7 +419,7 @@ const QuestionSet: React.FC = () => {
             id: 'mathematics',
             name: 'Mathematics',
             title: 'Mathematics - Statement Based',
-            description: 'Tackle statement and assertion questions for Algebra and Calculus.',
+            description: 'Handcrafted, verified statement and assertion questions for Algebra and Calculus — based on JEE Main 2026 Jan patterns.',
             stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Hard' },
             tags: ['Statement Based'],
             image: mathImg,
@@ -489,7 +489,7 @@ const QuestionSet: React.FC = () => {
                         </h1>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal max-w-2xl mt-2">
                             {viewState === 'dashboard'
-                                ? 'Browse our curated collection of high-yield question sets designed to maximize your prep efficiency.'
+                                ? 'Browse our hand-picked, verified collection of high-yield question sets — handcrafted for JEE Main 2026 & JEE Advanced 2026 to maximize your prep efficiency.'
                                 : 'Choose a subject to start practicing.'}
                         </p>
                     </div>

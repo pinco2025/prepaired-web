@@ -582,7 +582,7 @@ const Super30: React.FC = () => {
                                 Super 30 <span className="text-primary">Practice</span>
                             </h1>
                             <p className="text-slate-500 dark:text-slate-400 font-medium">
-                                Read the instructions carefully before starting.
+                                Handcrafted, best & most analysed — read the instructions carefully before starting.
                             </p>
                         </div>
 
@@ -591,8 +591,8 @@ const Super30: React.FC = () => {
                             <div className="flex items-start gap-3">
                                 <span className="material-symbols-outlined text-primary mt-0.5">format_list_numbered</span>
                                 <div>
-                                    <h3 className="font-bold text-slate-800 dark:text-slate-200">30 Questions</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">A mix of Physics, Chemistry, and Maths questions.</p>
+                                    <h3 className="font-bold text-slate-800 dark:text-slate-200">30 Hand-Picked Questions</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">Best, verified mix of Physics, Chemistry, and Maths questions for JEE Main 2026.</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3">
@@ -606,7 +606,7 @@ const Super30: React.FC = () => {
                                 <span className="material-symbols-outlined text-amber-500 mt-0.5">timer</span>
                                 <div>
                                     <h3 className="font-bold text-slate-800 dark:text-slate-200">Timed Session</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">Track your speed and accuracy in real-time.</p>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">Track your speed and accuracy in real-time — verified JEE Main 2026 difficulty.</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3">

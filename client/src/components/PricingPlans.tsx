@@ -60,14 +60,14 @@ const PricingPlans: React.FC = () => {
                     }}
                 />
 
-                <div className="relative max-w-7xl mx-auto flex flex-col gap-10 p-6 md:p-10 pb-20">
+                <div className="relative max-w-7xl mx-auto flex flex-col gap-6 md:gap-10 px-4 py-8 md:p-10 md:pb-20">
                     {/* Header */}
                     <div className="flex flex-col items-center text-center gap-4 pt-4">
                         <h1 className="text-text-light dark:text-text-dark text-3xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
                             Invest in your future rank
                         </h1>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark text-base md:text-lg font-normal leading-normal max-w-2xl">
-                            Unlock the full potential of AI-driven preparation. Choose the plan that fits your ambition.
+                            Unlock the best, hand-picked AI-driven preparation for JEE Main 2026 & JEE Advanced 2026. Choose the plan that fits your ambition.
                         </p>
 
                         {/* Billing Toggle */}
@@ -100,16 +100,16 @@ const PricingPlans: React.FC = () => {
                     </div>
 
                     {/* Pricing Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start mt-4">
                         {/* Free Plan */}
-                        <div className="relative flex flex-col rounded-2xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="relative flex flex-col rounded-2xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow order-2 md:order-1">
                             <h3 className="text-lg font-semibold text-text-secondary-light dark:text-text-secondary-dark">Free</h3>
                             <div className="mt-4 mb-6 flex items-baseline text-text-light dark:text-text-dark">
                                 <span className="text-4xl font-bold tracking-tight">₹0</span>
                                 <span className="ml-1 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">/month</span>
                             </div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6 min-h-[40px]">
-                                Essential tools for getting started with your JEE/NEET journey.
+                                Verified essential tools for getting started with your JEE Main 2026 & JEE Advanced 2026 journey.
                             </p>
                             <button
                                 disabled={isCurrentPlan('free')}
@@ -121,7 +121,7 @@ const PricingPlans: React.FC = () => {
                                 {isCurrentPlan('free') ? 'Current Plan' : 'Downgrade'}
                             </button>
                             <div className="space-y-4">
-                                {['Daily Practice Questions', '2026 PYQs', 'In-Depth PYQ solutions', 'Limited access to Super-30'].map((feature, i) => (
+                                {['Daily Practice Questions', 'Verified JEE Main 2026 PYQs', 'In-Depth PYQ solutions', 'Limited access to Super-30'].map((feature, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <span className="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark text-[20px] shrink-0">check</span>
                                         <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{feature}</span>
@@ -131,7 +131,7 @@ const PricingPlans: React.FC = () => {
                         </div>
 
                         {/* Lite Plan - Popular (formerly Pro) */}
-                        <div className="relative flex flex-col rounded-2xl bg-surface-light dark:bg-surface-dark p-8 shadow-2xl ring-2 ring-primary transform md:scale-105 z-10" style={{ boxShadow: '0 0 40px -10px rgba(19,91,236,0.15)' }}>
+                        <div className="relative flex flex-col rounded-2xl bg-surface-light dark:bg-surface-dark p-6 md:p-8 shadow-2xl ring-2 ring-primary transform md:scale-105 z-10 order-1 md:order-2" style={{ boxShadow: '0 0 40px -10px rgba(19,91,236,0.15)' }}>
                             <div className="absolute -top-4 left-0 right-0 flex justify-center">
                                 <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white shadow-sm uppercase tracking-wide">
                                     Most Popular
@@ -169,10 +169,10 @@ const PricingPlans: React.FC = () => {
                             <div className="space-y-4">
                                 {[
                                     'Everything in Free',
-                                    '4 AI-Powered Tests with in-depth performance analysis',
-                                    'Condensed PYQ Set — high-yield, exam-ready questions',
-                                    'Statement Based & Fast-Track Sets',
-                                    '360° Preparation Set + JEE Advanced Phase 2',
+                                    '4 Best AI-Powered Tests with verified in-depth performance analysis',
+                                    'Hand-picked Condensed PYQ Set — JEE Main 2026 Jan based, exam-ready questions',
+                                    'Handcrafted Statement Based & Fast-Track Sets',
+                                    'Most analysed 360° Preparation Set + JEE Advanced Phase 2',
                                 ].map((feature, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <div className="rounded-full bg-primary/10 p-0.5 text-primary">
@@ -187,7 +187,7 @@ const PricingPlans: React.FC = () => {
                         </div>
 
                         {/* Elite Plan - Coming Soon */}
-                        <div className="relative flex flex-col rounded-2xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-8 shadow-sm overflow-hidden">
+                        <div className="relative flex flex-col rounded-2xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6 md:p-8 shadow-sm overflow-hidden order-3">
                             {/* Coming Soon Overlay */}
                             <div className="absolute inset-0 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
                                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4 animate-premium-icon">
@@ -206,7 +206,7 @@ const PricingPlans: React.FC = () => {
                                 <span className="ml-1 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">/month</span>
                             </div>
                             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6 min-h-[40px]">
-                                Personalized mentorship for students aiming for top ranks.
+                                Handcrafted personalized mentorship for students aiming for top ranks in JEE Advanced 2026 & 2027.
                             </p>
                             <button className="mb-8 block w-full rounded-xl bg-white dark:bg-gray-800 border-2 border-text-light dark:border-text-dark px-4 py-3 text-center text-sm font-bold text-text-light dark:text-text-dark">
                                 Get Elite
