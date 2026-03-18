@@ -35,6 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Track if initial load is done
   const initialLoadDone = useRef(false);
+  // Track current user ID to avoid re-fetching on token refreshes
+  const userIdRef = useRef<string | null>(null);
 
   // Fetch subscription data from database
   const fetchSubscription = useCallback(async (userId: string): Promise<string | null> => {
@@ -102,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (session?.user) {
           setUser(session.user);
+          userIdRef.current = session.user.id;
 
           // Fetch subscription and exam type in parallel
           const [subscription, exam] = await Promise.all([
@@ -115,6 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } else {
           setUser(null);
+          userIdRef.current = null;
           setSubscriptionType(null);
           setExamType(null);
         }
@@ -143,8 +147,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Skip if initial load hasn't completed yet - initializeAuth handles it
         if (!initialLoadDone.current) return;
 
+        // If the user hasn't changed, skip re-fetching entirely.
+        // Supabase fires SIGNED_IN and TOKEN_REFRESHED on tab-switch/visibility
+        // change even though the user is the same — this prevents the cascading
+        // re-renders that break downstream components.
+        if (session?.user?.id && session.user.id === userIdRef.current) {
+          return;
+        }
+
         if (session?.user) {
           setUser(session.user);
+          userIdRef.current = session.user.id;
 
           // Fetch subscription data
           const [subscription, exam] = await Promise.all([
@@ -158,6 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } else {
           setUser(null);
+          userIdRef.current = null;
           setSubscriptionType(null);
           setExamType(null);
         }

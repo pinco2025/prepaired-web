@@ -175,7 +175,9 @@ const QuestionSet: React.FC = () => {
     const isItemComingSoon = (itemId: string): boolean => {
         const setId = ITEM_SET_ID[itemId];
         if (!setId) return false;
-        if (setsLoading) return true;
+        // While loading, preserve previous data instead of flashing "Coming Soon"
+        if (setsLoading && Object.keys(setDataMap).length === 0) return true;
+        if (setsLoading) return false;
         return setDataMap[setId]?.url == null;
     };
 

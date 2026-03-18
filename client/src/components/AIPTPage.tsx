@@ -406,6 +406,8 @@ const AIPTPage: React.FC = () => {
 
     // Track which fetch is the "current" one so stale fetches can't update state
     const fetchIdRef = React.useRef(0);
+    // Track whether we've done the initial load (avoids referencing rawTests in effect)
+    const hasLoadedRef = React.useRef(false);
 
     // Fetch raw data — only depends on user, NOT isPaidUser
     useEffect(() => {
@@ -415,7 +417,8 @@ const AIPTPage: React.FC = () => {
         }
 
         const id = ++fetchIdRef.current;
-        setIsLoading(true);
+        // Only show loading skeleton on first fetch — not on re-fetches
+        if (!hasLoadedRef.current) setIsLoading(true);
         setError(null);
 
         const fetchTests = async (attempt = 0): Promise<void> => {
@@ -456,6 +459,7 @@ const AIPTPage: React.FC = () => {
                 if (fetchIdRef.current === id) {
                     setRawTests(testsData || []);
                     setSubmissionsMap(sMap);
+                    hasLoadedRef.current = true;
                 }
             } catch (err: any) {
                 if (attempt < 2 && fetchIdRef.current === id) {
