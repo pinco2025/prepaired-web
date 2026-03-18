@@ -65,11 +65,11 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
                 {/* Perks */}
                 <div className="w-full space-y-2 sm:space-y-3 text-left">
                     {[
-                        'All 6 AIPT tests — full access',
-                        'Unlimited Condensed PYQs',
-                        'Accuracy Boosters & Statement Sets',
-                        'Level-2 PYQs for rank boosting',
-                        'High-quality, detailed solution showcase',
+                        '4 AI-Powered Tests with performance analysis',
+                        'Complete Condensed PYQ Set',
+                        'Statement Based Set — the new JEE pattern, covered',
+                        'Fast-Track Set + 360° Preparation Set',
+                        'JEE Advanced Phase 2 included',
                     ].map((perk, i) => (
                         <div key={i} className="flex items-center gap-2 sm:gap-3">
                             <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
@@ -109,24 +109,33 @@ const QuestionSet: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, isPaidUser } = useAuth();
-    const [viewState, setViewState] = useState<'dashboard' | 'condensed_selection' | 'statement_parts' | 'statement_subjects'>(
+    const [viewState, setViewState] = useState<'dashboard' | 'subject_selection'>(
         (location.state as any)?.viewState || 'dashboard'
     );
-    const [statementPart, setStatementPart] = useState<'part1' | 'part2' | null>(null);
+    const [selectedSet, setSelectedSet] = useState<string | null>((location.state as any)?.selectedSet || null);
 
     // Supabase question set data: url + tier per set_id
     const [setDataMap, setSetDataMap] = useState<Record<string, { url: string | null; tier: string | null }>>({});
     const [setsLoading, setSetsLoading] = useState(true);
     const [showPaywallModal, setShowPaywallModal] = useState(false);
 
+    // Track which fetch is the "current" one so stale fetches can't update state
+    const fetchIdRef = React.useRef(0);
+
     useEffect(() => {
-        const fetchSetData = async () => {
+        const id = ++fetchIdRef.current;
+        setSetsLoading(true);
+
+        const fetchSetData = async (attempt = 0): Promise<void> => {
             try {
                 const { data, error } = await supabase
                     .from('question_set')
                     .select('set_id, url, tier')
                     .in('set_id', ['condensed', 'super-30', 'sufficient', 'anr', 'last-resort']);
+
+                if (fetchIdRef.current !== id) return;
                 if (error) throw error;
+
                 const map: Record<string, { url: string | null; tier: string | null }> = {
                     condensed: { url: null, tier: null },
                     'super-30': { url: null, tier: null },
@@ -137,15 +146,30 @@ const QuestionSet: React.FC = () => {
                 (data || []).forEach((row: any) => {
                     map[row.set_id] = { url: row.url ?? null, tier: row.tier ?? null };
                 });
-                setSetDataMap(map);
+
+                // If query returned no rows and user is authenticated, the session
+                // token may be stale — retry after a brief delay
+                const hasData = (data || []).length > 0;
+                if (!hasData && isAuthenticated && attempt < 2) {
+                    await new Promise(r => setTimeout(r, 800));
+                    if (fetchIdRef.current === id) return fetchSetData(attempt + 1);
+                    return;
+                }
+
+                if (fetchIdRef.current === id) setSetDataMap(map);
             } catch (err) {
-                console.error('Failed to load question set data:', err);
+                console.error('[QuestionSet] fetch error:', err);
+                if (isAuthenticated && attempt < 2 && fetchIdRef.current === id) {
+                    await new Promise(r => setTimeout(r, 800));
+                    if (fetchIdRef.current === id) return fetchSetData(attempt + 1);
+                }
             } finally {
-                setSetsLoading(false);
+                if (fetchIdRef.current === id) setSetsLoading(false);
             }
         };
+
         fetchSetData();
-    }, []);
+    }, [isAuthenticated]);
 
     // null url → coming soon (content not ready)
     const isItemComingSoon = (itemId: string): boolean => {
@@ -218,7 +242,7 @@ const QuestionSet: React.FC = () => {
             description: 'High-yield questions from the last 10 years needed to crack the exam. Filtered for maximum relevance.',
             stats: { questions: '~150 Qs/Subject', time: '36 Hrs', type: '2026 Relevant', difficulty: 'Medium' },
             tags: ['Most Popular'],
-            action: () => setViewState('condensed_selection'),
+            action: () => { setSelectedSet('condensed_main'); setViewState('subject_selection'); },
             classes: {
                 badgeBg: 'bg-blue-500',
                 tagMain: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
@@ -246,7 +270,7 @@ const QuestionSet: React.FC = () => {
             description: 'A set comprised to provide maximum marks in minimum time',
             stats: { questions: 'Drills', time: 'Variable', type: 'Speed', difficulty: 'Medium' },
             tags: ['Speed', 'Precision'],
-            action: () => {},
+            action: () => { setSelectedSet('accuracy'); setViewState('subject_selection'); },
             classes: {
                 badgeBg: 'bg-amber-500',
                 tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
@@ -260,7 +284,7 @@ const QuestionSet: React.FC = () => {
             description: 'Master assertion-reason and statement-based questions that are becoming increasingly common in exams.',
             stats: { questions: '60 Qs/Subject', time: 'Complete Coverage', type: '2026 Relevant', difficulty: 'Easy' },
             tags: ['A&R', 'Statement Based'],
-            action: () => setViewState('statement_parts'),
+            action: () => { setSelectedSet('statement'); setViewState('subject_selection'); },
             classes: {
                 badgeBg: 'bg-rose-500',
                 tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
@@ -274,7 +298,7 @@ const QuestionSet: React.FC = () => {
             description: 'The final full coverage set to use as your last resort',
             stats: { questions: 'Rank Booster', time: 'Variable', type: 'Advanced', difficulty: 'Extreme' },
             tags: ['Rank Booster', 'High Difficulty'],
-            action: () => {},
+            action: () => { setSelectedSet('level2'); setViewState('subject_selection'); },
             classes: {
                 badgeBg: 'bg-emerald-500',
                 tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
@@ -284,62 +308,142 @@ const QuestionSet: React.FC = () => {
         }
     ];
 
-    const handleStatementPartSelect = (part: 'part1' | 'part2') => {
-        setStatementPart(part);
-        setViewState('statement_subjects');
-    };
-
-    const statementSubjects = [
+    const fastTrackSubjects = [
         {
             id: 'physics',
             name: 'Physics',
-            title: 'Physics',
-            description: statementPart === 'part1' ? 'Mechanics, Properties of Matter' : 'Electrodynamics, Optics, Modern Physics',
-            stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Easy' },
-            tags: ['Assertion-Reason'],
+            title: 'Physics - Fast Track',
+            description: 'A set comprised to provide maximum marks in minimum time. Essential drills for mechanics and modern physics.',
+            stats: { questions: 'Variable Qs', time: 'Depends', difficulty: 'Medium' },
+            tags: ['Speed', 'Precision'],
             image: phyImg,
             classes: {
-                badgeBg: 'bg-blue-500',
-                tagMain: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-                titleHover: 'group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                badgeBg: 'bg-amber-500',
+                tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+                titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
             }
         },
         {
             id: 'chemistry',
             name: 'Chemistry',
-            title: 'Chemistry',
-            description: statementPart === 'part1' ? 'Physical Chemistry & Inorganic' : 'Organic Chemistry',
-            stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Easy' },
-            tags: ['Statement Based'],
+            title: 'Chemistry - Fast Track',
+            description: 'Maximize your scoring rate with these high-frequency chemistry drills.',
+            stats: { questions: 'Variable Qs', time: 'Depends', difficulty: 'Medium' },
+            tags: ['Speed', 'Precision'],
             image: chemImg,
             classes: {
-                badgeBg: 'bg-teal-500',
-                tagMain: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400',
-                titleHover: 'group-hover:text-teal-600 dark:group-hover:text-teal-400'
+                badgeBg: 'bg-amber-500',
+                tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+                titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
+            }
+        }
+    ];
+
+    const level2Subjects = [
+        {
+            id: 'physics',
+            name: 'Physics',
+            title: 'Physics - 360° Set',
+            description: 'Full coverage rank booster questions for complete preparation.',
+            stats: { questions: 'Rank Booster', time: 'Variable', difficulty: 'Hard' },
+            tags: ['Rank Booster', 'High Difficulty'],
+            image: phyImg,
+            classes: {
+                badgeBg: 'bg-emerald-500',
+                tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+                titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
+            }
+        },
+        {
+            id: 'chemistry',
+            name: 'Chemistry',
+            title: 'Chemistry - 360° Set',
+            description: 'The ultimate final revision covering tricky edge-cases and exceptions.',
+            stats: { questions: 'Rank Booster', time: 'Variable', difficulty: 'Hard' },
+            tags: ['Rank Booster', 'High Difficulty'],
+            image: chemImg,
+            classes: {
+                badgeBg: 'bg-emerald-500',
+                tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+                titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
             }
         },
         {
             id: 'mathematics',
             name: 'Mathematics',
-            title: 'Mathematics',
-            description: statementPart === 'part1' ? 'Algebra & Trigonometry' : 'Calculus & Vectors',
-            stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Easy' },
-            tags: ['Statement Based'],
+            title: 'Mathematics - 360° Set',
+            description: 'Complex multi-concept problems to solidify your edge in Mathematics.',
+            stats: { questions: 'Rank Booster', time: 'Variable', difficulty: 'Hard' },
+            tags: ['Rank Booster', 'High Difficulty'],
             image: mathImg,
             classes: {
-                badgeBg: 'bg-indigo-500',
-                tagMain: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
-                titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                badgeBg: 'bg-emerald-500',
+                tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+                titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
             }
         }
     ];
 
-    const handleStartStatementSet = (subjectId: string) => {
+    const statementSubjects = [
+        {
+            id: 'physics',
+            name: 'Physics',
+            title: 'Physics - Statement Based',
+            description: 'Master assertion-reason and statement-based questions in Physics.',
+            stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Medium' },
+            tags: ['Assertion-Reason'],
+            image: phyImg,
+            classes: {
+                badgeBg: 'bg-rose-500',
+                tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+                titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
+            }
+        },
+        {
+            id: 'chemistry',
+            name: 'Chemistry',
+            title: 'Chemistry - Statement Based',
+            description: 'Master statement-based formats covering Physical, Inorganic, and Organic Chemistry.',
+            stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Medium' },
+            tags: ['Statement Based'],
+            image: chemImg,
+            classes: {
+                badgeBg: 'bg-rose-500',
+                tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+                titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
+            }
+        },
+        {
+            id: 'mathematics',
+            name: 'Mathematics',
+            title: 'Mathematics - Statement Based',
+            description: 'Tackle statement and assertion questions for Algebra and Calculus.',
+            stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Hard' },
+            tags: ['Statement Based'],
+            image: mathImg,
+            classes: {
+                badgeBg: 'bg-rose-500',
+                tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+                titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
+            }
+        }
+    ];
+
+    const getActiveSubjects = () => {
+        if (selectedSet === 'accuracy') return fastTrackSubjects;
+        if (selectedSet === 'level2') return level2Subjects;
+        if (selectedSet === 'statement') return statementSubjects;
+        return condensedSubjects;
+    };
+
+    const handleStartPractice = (subjectId: string) => {
         if (!isAuthenticated) {
             navigate('/login');
             return;
         }
-        navigate(`/question-set/statement-${statementPart}-${subjectId}/practice`);
+        if (!selectedSet) return;
+        const dbSetId = ITEM_SET_ID[selectedSet] || 'condensed';
+        navigate(`/question-set/${dbSetId}/${subjectId}/practice`);
     };
 
     return (
@@ -379,16 +483,12 @@ const QuestionSet: React.FC = () => {
                             <span>Question Bank</span>
                         </div>
                         <h1 className="text-text-light dark:text-text-dark text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
-                            {viewState === 'dashboard' ? 'Explore Question Sets' :
-                                viewState === 'statement_parts' ? 'Select Part' :
-                                    'Select Subject'}
+                            {viewState === 'dashboard' ? 'Explore Question Sets' : 'Select Subject'}
                         </h1>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal max-w-2xl mt-2">
                             {viewState === 'dashboard'
                                 ? 'Browse our curated collection of high-yield question sets designed to maximize your prep efficiency.'
-                                : viewState === 'statement_parts'
-                                    ? 'Choose between Part 1 and Part 2 of the Statement Based Questions.'
-                                    : 'Choose a subject to start practicing.'}
+                                : 'Choose a subject to start practicing.'}
                         </p>
                     </div>
 
@@ -397,17 +497,13 @@ const QuestionSet: React.FC = () => {
                         <div>
                             <button
                                 onClick={() => {
-                                    if (viewState === 'statement_subjects') {
-                                        setViewState('statement_parts');
-                                        setStatementPart(null);
-                                    } else {
-                                        setViewState('dashboard');
-                                    }
+                                    setViewState('dashboard');
+                                    setSelectedSet(null);
                                 }}
                                 className="flex items-center gap-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors"
                             >
                                 <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-                                {viewState === 'statement_subjects' ? 'Back to Parts' : 'Back to All Sets'}
+                                Back to All Sets
                             </button>
                         </div>
                     )}
@@ -570,43 +666,10 @@ const QuestionSet: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Statement Parts Selection View */}
-                    {viewState === 'statement_parts' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {['part1', 'part2'].map((part) => (
-                                <div
-                                    key={part}
-                                    onClick={() => handleStatementPartSelect(part as 'part1' | 'part2')}
-                                    className="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30 transition-all duration-300"
-                                >
-                                    <div className="h-40 bg-gradient-to-br from-rose-500/20 to-purple-500/20 dark:from-rose-900/40 dark:to-purple-900/40 flex items-center justify-center relative overflow-hidden">
-                                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                                        <h1 className="text-4xl font-black text-rose-500 dark:text-rose-400 z-10">
-                                            {part === 'part1' ? 'PART 1' : 'PART 2'}
-                                        </h1>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-bold text-text-light dark:text-text-dark mb-2">
-                                            {part === 'part1' ? 'Core Concepts & Mechanics' : 'Advanced Application & Theory'}
-                                        </h3>
-                                        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">
-                                            {part === 'part1'
-                                                ? 'Focus on fundamental assertion-reason questions covering mechanics, physical chemistry, and algebra basics.'
-                                                : 'Challenge yourself with advanced topics including electrodynamics, organic chemistry mechanisms, and calculus.'}
-                                        </p>
-                                        <div className="flex items-center text-sm font-semibold text-primary">
-                                            Select Part <span className="material-symbols-outlined ml-2 text-lg">arrow_forward</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Statement Subjects Selection View */}
-                    {viewState === 'statement_subjects' && (
+                    {/* Subject Selection View */}
+                    {viewState === 'subject_selection' && (
                         <div className="grid grid-cols-1 gap-5">
-                            {statementSubjects.map((subject) => (
+                            {getActiveSubjects().map((subject) => (
                                 <div
                                     key={subject.id}
                                     className="group relative flex flex-col md:flex-row bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30 transition-all duration-300"
@@ -679,101 +742,7 @@ const QuestionSet: React.FC = () => {
                                             </div>
 
                                             <button
-                                                onClick={() => handleStartStatementSet(subject.id)}
-                                                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-[0.98] bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30"
-                                            >
-                                                Start Practice
-                                                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {viewState === 'condensed_selection' && (
-                        <div className="grid grid-cols-1 gap-5">
-                            {condensedSubjects.map((subject) => (
-                                <div
-                                    key={subject.id}
-                                    className="group relative flex flex-col md:flex-row bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30 transition-all duration-300"
-                                >
-                                    {/* Image Section */}
-                                    <div className="md:w-56 h-36 md:h-auto bg-black relative overflow-hidden shrink-0 flex items-center justify-center p-4">
-                                        {subject.image && (
-                                            <div
-                                                className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
-                                                style={{ backgroundImage: `url("${subject.image}")` }}
-                                            />
-                                        )}
-                                        {subject.tags && (
-                                            <div className="md:hidden absolute bottom-2 left-2">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold text-white ${subject.classes.badgeBg}`}>
-                                                    {subject.tags[0]}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Content Section */}
-                                    <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="flex items-center gap-3">
-                                                    {subject.tags && subject.tags.map((tag, idx) => (
-                                                        <span key={idx} className={`hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide
-                                                            ${idx === 0
-                                                                ? subject.classes.tagMain
-                                                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                                                            }`}>
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide
-                                                    ${subject.stats.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                        subject.stats.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                            subject.stats.difficulty === 'Hard' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
-                                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                    }`}>
-                                                    <span className="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
-                                                    <span>{subject.stats.difficulty}</span>
-                                                </div>
-                                            </div>
-
-                                            <h3 className={`text-text-light dark:text-text-dark text-lg md:text-xl font-bold mb-1 transition-colors ${subject.classes.titleHover}`}>
-                                                {subject.title}
-                                            </h3>
-                                            <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs md:text-sm leading-relaxed line-clamp-2">
-                                                {subject.description}
-                                            </p>
-                                        </div>
-
-                                        <div className="mt-4 md:mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-border-light dark:border-border-dark pt-3 md:pt-4">
-                                            <div className="flex items-center gap-4 text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                                                <div className="flex items-center gap-1.5" title="Items">
-                                                    <span className="material-symbols-outlined text-[16px] md:text-[18px]">format_list_numbered</span>
-                                                    <span className="font-medium">{subject.stats.questions}</span>
-                                                </div>
-                                                <div className="hidden md:flex items-center gap-1.5" title="Estimated Time">
-                                                    <span className="material-symbols-outlined text-[18px]">schedule</span>
-                                                    <span className="font-medium">{subject.stats.time}</span>
-                                                </div>
-                                                <div className="hidden md:flex items-center gap-1.5" title="Difficulty">
-                                                    <span className="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
-                                                    <span className="font-medium">{subject.stats.difficulty}</span>
-                                                </div>
-                                            </div>
-
-                                            <button
-                                                onClick={() => {
-                                                    if (!isAuthenticated) {
-                                                        navigate('/login');
-                                                    } else {
-                                                        navigate(`/question-set/${subject.id}/practice`);
-                                                    }
-                                                }}
+                                                onClick={() => handleStartPractice(subject.id)}
                                                 className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-[0.98] bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30"
                                             >
                                                 Start Practice

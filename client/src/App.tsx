@@ -206,6 +206,9 @@ export const AppContent: React.FC = () => {
             <Route path="/question-set/:subject/practice" element={
               <CondensedPractice />
             } />
+            <Route path="/question-set/:setId/:subject/practice" element={
+              <CondensedPractice />
+            } />
             <Route path="/response-upload" element={
               <ResponseUpload />
             } />

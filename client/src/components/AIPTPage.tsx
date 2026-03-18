@@ -61,11 +61,11 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
                 {/* Perks */}
                 <div className="w-full space-y-2 sm:space-y-3 text-left">
                     {[
-                        'All 6 AIPT tests — full access',
-                        'Unlimited Condensed PYQs',
-                        'Early access to upcoming sets',
-                        'High-quality, detailed solution showcase',
-                        'Speed Booster & Level 2 PYQ sets',
+                        '4 AI-Powered Tests with detailed performance analysis',
+                        'Complete Condensed PYQ Set',
+                        'Statement Based & Fast-Track Sets',
+                        '360° Preparation Set',
+                        'JEE Advanced Phase 2 coverage included',
                     ].map((perk, i) => (
                         <div key={i} className="flex items-center gap-2 sm:gap-3">
                             <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
@@ -392,47 +392,45 @@ const SelectionScreen: React.FC<SelectionScreenProps> = ({ tests, onSelectTest, 
 // ── Main AIPTPage ────────────────────────────────────────────────────────────
 const AIPTPage: React.FC = () => {
     usePageTitle('AIPT');
-    const { user, isPaidUser, loading: authLoading } = useAuth();
+    const { user, isPaidUser } = useAuth();
     const navigate = useNavigate();
     const { invalidateCache } = useDataCache();
 
-    const [tests, setTests] = useState<AIPTTest[]>([]);
+    const [rawTests, setRawTests] = useState<any[] | null>(null);
+    const [submissionsMap, setSubmissionsMap] = useState<Map<string, { id: string; hasResult: boolean }>>(new Map());
     const [selectedTest, setSelectedTest] = useState<Test | null>(null);
     const [pageState, setPageState] = useState<PageState>('selection');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
-    useEffect(() => {
-        // Wait for auth to fully settle (user + subscription both resolved)
-        if (authLoading) return;
+    // Track which fetch is the "current" one so stale fetches can't update state
+    const fetchIdRef = React.useRef(0);
 
-        // Not logged in — nothing to fetch
+    // Fetch raw data — only depends on user, NOT isPaidUser
+    useEffect(() => {
         if (!user?.id) {
             setIsLoading(false);
             return;
         }
 
-        let mounted = true;
+        const id = ++fetchIdRef.current;
         setIsLoading(true);
         setError(null);
 
-        const fetchTests = async () => {
+        const fetchTests = async (attempt = 0): Promise<void> => {
             try {
-                // Fetch all AIPT tests ordered by testID
                 const { data: testsData, error: testsError } = await supabase
                     .from('tests')
                     .select('*')
                     .ilike('testID', 'AIPT-%')
                     .order('testID');
 
-                if (!mounted) return;
-
+                if (fetchIdRef.current !== id) return;
                 if (testsError) throw testsError;
 
                 const testIds = (testsData || []).map((t: any) => String(t.testID));
 
-                // Fetch user's submissions for these AIPT tests
                 const { data: submissionsData, error: submissionsError } = await supabase
                     .from('student_tests')
                     .select('id, test_id, result_url, submitted_at')
@@ -440,62 +438,76 @@ const AIPTPage: React.FC = () => {
                     .in('test_id', testIds.length > 0 ? testIds : ['__none__'])
                     .not('submitted_at', 'is', null);
 
-                if (!mounted) return;
-
+                if (fetchIdRef.current !== id) return;
                 if (submissionsError) throw submissionsError;
 
-                const submissionsMap = new Map<string, { id: string; hasResult: boolean }>();
+                // If tests query returned nothing, session may be stale — retry
+                if ((testsData || []).length === 0 && attempt < 2) {
+                    await new Promise(r => setTimeout(r, 800));
+                    if (fetchIdRef.current === id) return fetchTests(attempt + 1);
+                    return;
+                }
+
+                const sMap = new Map<string, { id: string; hasResult: boolean }>();
                 (submissionsData || []).forEach((s: any) => {
-                    submissionsMap.set(s.test_id, { id: s.id, hasResult: !!s.result_url });
+                    sMap.set(s.test_id, { id: s.id, hasResult: !!s.result_url });
                 });
 
-                let firstFreeUnlocked = false;
-
-                const testsWithStatus: AIPTTest[] = (testsData || []).map((test: any) => {
-                    const submissionInfo = submissionsMap.get(String(test.testID));
-                    const isCompleted = !!submissionInfo;
-                    const testTier = ((test.tier || 'free') as 'free' | 'lite');
-
-                    if (isCompleted) {
-                        return {
-                            ...test,
-                            tier: testTier,
-                            status: 'completed' as TestStatus,
-                            submissionId: submissionInfo?.id,
-                            hasResult: submissionInfo?.hasResult,
-                        };
-                    }
-
-                    // Lite subscribers: all unfinished tests are unlocked
-                    if (isPaidUser) {
-                        return { ...test, tier: testTier, status: 'unlocked' as TestStatus };
-                    }
-
-                    // Free users: lite tests always require subscription
-                    if (testTier === 'lite') {
-                        return { ...test, tier: testTier, status: 'subscription_required' as TestStatus };
-                    }
-
-                    // Free users: sequentially unlock free tests
-                    if (!firstFreeUnlocked) {
-                        firstFreeUnlocked = true;
-                        return { ...test, tier: testTier, status: 'unlocked' as TestStatus };
-                    }
-
-                    return { ...test, tier: testTier, status: 'locked' as TestStatus };
-                });
-
-                if (mounted) setTests(testsWithStatus);
+                if (fetchIdRef.current === id) {
+                    setRawTests(testsData || []);
+                    setSubmissionsMap(sMap);
+                }
             } catch (err: any) {
-                if (mounted) setError(err.message || 'Failed to load tests.');
+                if (attempt < 2 && fetchIdRef.current === id) {
+                    await new Promise(r => setTimeout(r, 800));
+                    if (fetchIdRef.current === id) return fetchTests(attempt + 1);
+                }
+                if (fetchIdRef.current === id) setError(err.message || 'Failed to load tests.');
             } finally {
-                if (mounted) setIsLoading(false);
+                if (fetchIdRef.current === id) setIsLoading(false);
             }
         };
 
         fetchTests();
-        return () => { mounted = false; };
-    }, [user?.id, isPaidUser, authLoading]);
+    }, [user?.id]);
+
+    // Compute test statuses from raw data + isPaidUser (no refetch needed)
+    const tests: AIPTTest[] = React.useMemo(() => {
+        if (!rawTests) return [];
+
+        let firstFreeUnlocked = false;
+
+        return rawTests.map((test: any) => {
+            const submissionInfo = submissionsMap.get(String(test.testID));
+            const isCompleted = !!submissionInfo;
+            const testTier = ((test.tier || 'free') as 'free' | 'lite');
+
+            if (isCompleted) {
+                return {
+                    ...test,
+                    tier: testTier,
+                    status: 'completed' as TestStatus,
+                    submissionId: submissionInfo?.id,
+                    hasResult: submissionInfo?.hasResult,
+                };
+            }
+
+            if (isPaidUser) {
+                return { ...test, tier: testTier, status: 'unlocked' as TestStatus };
+            }
+
+            if (testTier === 'lite') {
+                return { ...test, tier: testTier, status: 'subscription_required' as TestStatus };
+            }
+
+            if (!firstFreeUnlocked) {
+                firstFreeUnlocked = true;
+                return { ...test, tier: testTier, status: 'unlocked' as TestStatus };
+            }
+
+            return { ...test, tier: testTier, status: 'locked' as TestStatus };
+        });
+    }, [rawTests, submissionsMap, isPaidUser]);
 
     // Handle back button during test
     useEffect(() => {

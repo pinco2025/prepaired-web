@@ -53,11 +53,11 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
 
                 <div className="w-full space-y-2 sm:space-y-3 text-left">
                     {[
-                        'Unlimited Condensed PYQs',
-                        'All 6 AIPT tests — full access',
-                        'Accuracy Boosters & Statement Sets',
-                        'Level-2 PYQs for rank boosting',
-                        'High-quality, detailed solution showcase',
+                        'Complete Condensed PYQ Set — every question, unlocked',
+                        '4 AI-Powered Tests with performance breakdown',
+                        'Statement Based Set — the pattern that catches toppers off-guard',
+                        'Fast-Track Set + 360° Preparation Set',
+                        'JEE Advanced Phase 2 coverage included',
                     ].map((perk, i) => (
                         <div key={i} className="flex items-center gap-2 sm:gap-3">
                             <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
@@ -140,7 +140,8 @@ interface ChaptersJson {
 }
 
 const CondensedPractice: React.FC = () => {
-    const { subject } = useParams<{ subject: string }>();
+    const { setId, subject } = useParams<{ setId?: string; subject: string }>();
+    const targetSetId = setId || 'condensed';
     const navigate = useNavigate();
     const { isPaidUser, loading: authLoading } = useAuth();
 
@@ -216,7 +217,7 @@ const CondensedPractice: React.FC = () => {
                 const { data: setData, error: setError } = await supabase
                     .from('question_set')
                     .select('url')
-                    .eq('set_id', 'condensed')
+                    .eq('set_id', targetSetId)
                     .single();
 
                 if (setError) throw new Error('Failed to load question set configuration');
@@ -231,17 +232,23 @@ const CondensedPractice: React.FC = () => {
                         .replace('https://github.com/', 'https://raw.githubusercontent.com/')
                         .replace('/tree/', '/');
                 }
-                const questionUrl = `${baseUrl}/${capitalizedSubject}_questions.enc`;
-                const solutionUrl = `${baseUrl}/${capitalizedSubject}_solutions.enc`;
+                const isCondensed = targetSetId === 'condensed';
+                const fileExt = isCondensed ? '.enc' : '.json';
+                const questionUrl = `${baseUrl}/${capitalizedSubject}_questions${fileExt}`;
+                const solutionUrl = `${baseUrl}/${capitalizedSubject}_solutions${fileExt}`;
 
-                // Fetch and decrypt Questions
-                console.log('Fetching encrypted questions from:', questionUrl);
-                const questionsData = await fetchEncryptedJson<QuestionsJsonResponse>(questionUrl);
+                // Fetch Questions
+                console.log(`Fetching ${isCondensed ? 'encrypted ' : ''}questions from:`, questionUrl);
+                const questionsData: QuestionsJsonResponse = isCondensed
+                    ? await fetchEncryptedJson<QuestionsJsonResponse>(questionUrl)
+                    : await (await fetch(questionUrl)).json();
 
                 // Fetch Solutions (Non-blocking)
                 try {
-                    console.log('Fetching encrypted solutions from:', solutionUrl);
-                    const solutionsData = await fetchEncryptedJson<SolutionsJsonResponse>(solutionUrl);
+                    console.log(`Fetching ${isCondensed ? 'encrypted ' : ''}solutions from:`, solutionUrl);
+                    const solutionsData: SolutionsJsonResponse = isCondensed
+                        ? await fetchEncryptedJson<SolutionsJsonResponse>(solutionUrl)
+                        : await (await fetch(solutionUrl)).json();
                     // Map solutions by question ID (q1, q2, etc.)
                     const solMap: { [key: string]: { text: string; image: string | null } } = {};
                     if (solutionsData.questions) {
@@ -294,7 +301,7 @@ const CondensedPractice: React.FC = () => {
         };
 
         fetchData();
-    }, [subject, authLoading, isPaidUser]);
+    }, [subject, targetSetId, authLoading, isPaidUser]);
 
     const handleOptionSelect = (optionId: string) => {
         if (showSolution) return; // Prevent changing answer after proper check
@@ -451,14 +458,14 @@ const CondensedPractice: React.FC = () => {
             <header className="h-14 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark flex items-center justify-between px-4 md:px-8 z-30 shrink-0">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate('/question-set', { state: { viewState: 'condensed_selection' } })}
+                        onClick={() => navigate('/question-set', { state: { viewState: 'subject_selection', selectedSet: targetSetId === 'condensed' ? 'condensed_main' : targetSetId === 'sufficient' ? 'accuracy' : targetSetId === 'last-resort' ? 'level2' : 'statement' } })}
                         className="p-2 hover:bg-background-light dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                         <span className="material-symbols-outlined text-text-secondary-light">arrow_back</span>
                     </button>
                     <div className="flex flex-col">
                         <h2 className="font-bold text-text-light dark:text-text-dark text-sm md:text-base line-clamp-1">
-                            Condensed PYQ Practice
+                            {targetSetId === 'sufficient' ? 'Fast Track Practice' : targetSetId === 'last-resort' ? '360° Preparation' : targetSetId === 'anr' ? 'Statement Based Practice' : 'Condensed PYQ Practice'}
                         </h2>
                         <div className="flex items-center gap-2 text-xs text-text-secondary-light font-medium uppercase tracking-wider">
                             <span className="text-primary">{displaySubject}</span>

@@ -169,19 +169,17 @@ const PricingPlans: React.FC = () => {
                             <div className="space-y-4">
                                 {[
                                     'Everything in Free',
-                                    { text: 'Unlimited ', bold: 'Condensed PYQs' },
-                                    { text: '', bold: 'Early Access to upcoming sets' },
-                                    'High-quality, detailed solution showcase',
-                                    'Access to upcoming Statement Based, Speed Booster & Level 2 PYQ sets',
+                                    '4 AI-Powered Tests with in-depth performance analysis',
+                                    'Condensed PYQ Set — high-yield, exam-ready questions',
+                                    'Statement Based & Fast-Track Sets',
+                                    '360° Preparation Set + JEE Advanced Phase 2',
                                 ].map((feature, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <div className="rounded-full bg-primary/10 p-0.5 text-primary">
                                             <span className="material-symbols-outlined text-[18px] font-bold">check</span>
                                         </div>
                                         <span className="text-sm font-medium text-text-light dark:text-text-dark">
-                                            {typeof feature === 'string' ? feature : (
-                                                <>{feature.text}<span className="font-bold">{feature.bold}</span></>
-                                            )}
+                                            {feature}
                                         </span>
                                     </div>
                                 ))}
