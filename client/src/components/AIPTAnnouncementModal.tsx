@@ -83,7 +83,7 @@ const AIPTAnnouncementModal: React.FC<AIPTAnnouncementModalProps> = ({ isOpen, o
 
           {/* Title */}
           <h2 className="text-2xl font-black tracking-tight text-text-light dark:text-text-dark mb-2">
-            AIPT-01 is Live
+            AIPT-02 is Live
           </h2>
 
           {/* Description */}
@@ -112,7 +112,7 @@ const AIPTAnnouncementModal: React.FC<AIPTAnnouncementModalProps> = ({ isOpen, o
             onClick={handleAttemptNow}
             className="w-full rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all hover:scale-[1.02] active:scale-[0.98] glow-button"
           >
-            Attempt AIPT-01 Now
+            Attempt AIPT-02 Now
           </button>
 
           {/* Dismiss */}

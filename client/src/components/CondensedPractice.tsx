@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
 import { fetchEncryptedJson } from '../utils/cryptoUtils';
+import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
 import {
     RenderMath,
     NumericKeypad,
@@ -10,6 +12,85 @@ import {
     SolutionDisplay,
     isIntegerTypeQuestion,
 } from './question';
+
+const FREE_QUESTION_LIMIT = 10;
+
+// ── Subscription Modal ────────────────────────────────────────────────────────
+const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }> = ({ onClose, onUpgrade }) => (
+    <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+    >
+        <div
+            className="relative bg-surface-light dark:bg-surface-dark rounded-2xl p-5 sm:p-8 max-w-md w-full mx-4 shadow-2xl border border-border-light dark:border-border-dark"
+            onClick={e => e.stopPropagation()}
+        >
+            <button
+                onClick={onClose}
+                className="absolute top-3 right-3 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+            >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+
+            <div className="flex flex-col items-center text-center gap-3 sm:gap-5">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span
+                        className="material-symbols-outlined text-primary text-lg sm:text-xl"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                        lock
+                    </span>
+                </div>
+
+                <div>
+                    <h2 className="text-lg sm:text-2xl font-bold text-text-light dark:text-text-dark mb-1">
+                        prepAIred Lite Required
+                    </h2>
+                    <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                        You've reached the free preview. Upgrade to Lite to continue practising all questions in this set.
+                    </p>
+                </div>
+
+                <div className="w-full space-y-2 sm:space-y-3 text-left">
+                    {[
+                        'Unlimited Condensed PYQs',
+                        'All 6 AIPT tests — full access',
+                        'Accuracy Boosters & Statement Sets',
+                        'Level-2 PYQs for rank boosting',
+                        'High-quality, detailed solution showcase',
+                    ].map((perk, i) => (
+                        <div key={i} className="flex items-center gap-2 sm:gap-3">
+                            <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
+                                <span className="material-symbols-outlined text-primary text-[15px] sm:text-[18px] font-bold">check</span>
+                            </div>
+                            <span className="text-xs sm:text-sm font-medium text-text-light dark:text-text-dark">{perk}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="w-full">
+                    <div className="flex items-baseline justify-center gap-1.5 mb-3">
+                        <span className="text-base sm:text-xl line-through text-text-secondary-light dark:text-text-secondary-dark font-medium">₹399</span>
+                        <span className="text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark">₹119</span>
+                        <span className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">/month</span>
+                    </div>
+                    <button
+                        onClick={onUpgrade}
+                        className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:bg-primary-dark hover:scale-[1.02] transition-all"
+                    >
+                        Get prepAIred Lite for ₹119 →
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="w-full mt-1.5 py-2 text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                    >
+                        Maybe later
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 // Local interfaces for JSON response structures
 interface LocalQuestion {
@@ -61,8 +142,10 @@ interface ChaptersJson {
 const CondensedPractice: React.FC = () => {
     const { subject } = useParams<{ subject: string }>();
     const navigate = useNavigate();
+    const { isPaidUser, loading: authLoading } = useAuth();
 
     const [questions, setQuestions] = useState<LocalQuestion[]>([]);
+    const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
     const [solutions, setSolutions] = useState<{ [key: string]: { text: string; image: string | null } }>({});
     const [chapterMap, setChapterMap] = useState<{ [code: string]: string }>({});
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -72,6 +155,7 @@ const CondensedPractice: React.FC = () => {
     const [numericAnswer, setNumericAnswer] = useState<string>('');
     const [showSolution, setShowSolution] = useState(false);
     const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
+    const [showPaywallModal, setShowPaywallModal] = useState(false);
     // Mobile: closed by default, Desktop (>=1024px): open by default
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
@@ -116,6 +200,9 @@ const CondensedPractice: React.FC = () => {
     };
 
     useEffect(() => {
+        // Don't fetch until auth has resolved — avoids stale isPaidUser in the closure
+        if (authLoading) return;
+
         const fetchData = async () => {
             if (!subject) return;
 
@@ -125,8 +212,27 @@ const CondensedPractice: React.FC = () => {
             try {
                 setLoading(true);
 
-                const questionUrl = `https://raw.githubusercontent.com/pinco2025/tests/refs/heads/main/condensed/${capitalizedSubject}_questions.enc`;
-                const solutionUrl = `https://raw.githubusercontent.com/pinco2025/tests/refs/heads/main/condensed/${capitalizedSubject}_solutions.enc`;
+                // Fetch base URL from Supabase question_set table
+                const { data: setData, error: setError } = await supabase
+                    .from('question_set')
+                    .select('url')
+                    .eq('set_id', 'condensed')
+                    .single();
+
+                if (setError) throw new Error('Failed to load question set configuration');
+                if (!setData?.url) throw new Error('Question set is not available');
+
+                // Convert GitHub tree URL to raw URL if needed
+                // e.g. https://github.com/owner/repo/tree/branch/path
+                //   -> https://raw.githubusercontent.com/owner/repo/branch/path
+                let baseUrl = setData.url.replace(/\/$/, '');
+                if (baseUrl.includes('github.com') && baseUrl.includes('/tree/')) {
+                    baseUrl = baseUrl
+                        .replace('https://github.com/', 'https://raw.githubusercontent.com/')
+                        .replace('/tree/', '/');
+                }
+                const questionUrl = `${baseUrl}/${capitalizedSubject}_questions.enc`;
+                const solutionUrl = `${baseUrl}/${capitalizedSubject}_solutions.enc`;
 
                 // Fetch and decrypt Questions
                 console.log('Fetching encrypted questions from:', questionUrl);
@@ -169,7 +275,8 @@ const CondensedPractice: React.FC = () => {
                     return q;
                 });
 
-                setQuestions(randomizedQuestions);
+                setTotalQuestionsCount(randomizedQuestions.length);
+                setQuestions(isPaidUser ? randomizedQuestions : randomizedQuestions.slice(0, FREE_QUESTION_LIMIT));
 
                 // Reset state for new subject
                 setCurrentQuestionIndex(0);
@@ -187,7 +294,7 @@ const CondensedPractice: React.FC = () => {
         };
 
         fetchData();
-    }, [subject]);
+    }, [subject, authLoading, isPaidUser]);
 
     const handleOptionSelect = (optionId: string) => {
         if (showSolution) return; // Prevent changing answer after proper check
@@ -233,6 +340,9 @@ const CondensedPractice: React.FC = () => {
                 setNumericAnswer('');
             }
             setShowSolution(false);
+        } else if (!isPaidUser && totalQuestionsCount > FREE_QUESTION_LIMIT) {
+            // Last free question — more exist behind the paywall
+            setShowPaywallModal(true);
         }
     };
 
@@ -341,7 +451,7 @@ const CondensedPractice: React.FC = () => {
             <header className="h-14 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark flex items-center justify-between px-4 md:px-8 z-30 shrink-0">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate('/question-set')}
+                        onClick={() => navigate('/question-set', { state: { viewState: 'condensed_selection' } })}
                         className="p-2 hover:bg-background-light dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                         <span className="material-symbols-outlined text-text-secondary-light">arrow_back</span>
@@ -468,26 +578,65 @@ const CondensedPractice: React.FC = () => {
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </h3>
-                        <div className="grid grid-cols-5 gap-2 pb-20">
-                            {questions.map((_, idx) => {
-                                const isCurrent = currentQuestionIndex === idx;
-                                const isAnswered = !!userAnswers[idx];
-                                let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
+                        <div className="relative">
+                            <div className="grid grid-cols-5 gap-2">
+                                {questions.map((_, idx) => {
+                                    const isCurrent = currentQuestionIndex === idx;
+                                    const isAnswered = !!userAnswers[idx];
+                                    let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
 
-                                if (isCurrent) btnClass += "bg-primary text-white shadow-md shadow-primary/30";
-                                else if (isAnswered) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
-                                else btnClass += "border border-border-light dark:border-border-dark text-text-secondary-light hover:border-primary/50";
+                                    if (isCurrent) btnClass += "bg-primary text-white shadow-md shadow-primary/30";
+                                    else if (isAnswered) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
+                                    else btnClass += "border border-border-light dark:border-border-dark text-text-secondary-light hover:border-primary/50";
 
-                                return (
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handlePaletteSelect(idx)}
+                                            className={btnClass}
+                                        >
+                                            {idx + 1}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Locked questions fade section for free users */}
+                            {!isPaidUser && totalQuestionsCount > FREE_QUESTION_LIMIT && (
+                                <div className="mt-1">
+                                    {/* Phantom locked question numbers with fade */}
+                                    <div className="relative">
+                                        <div className="grid grid-cols-5 gap-2 opacity-40 pointer-events-none select-none">
+                                            {Array.from({ length: Math.min(totalQuestionsCount - FREE_QUESTION_LIMIT, 10) }).map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="w-10 h-10 rounded-xl text-sm flex items-center justify-center border border-border-light dark:border-border-dark text-text-secondary-light"
+                                                >
+                                                    {FREE_QUESTION_LIMIT + i + 1}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {/* Gradient fade overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-surface-light/70 to-surface-light dark:via-surface-dark/70 dark:to-surface-dark pointer-events-none" />
+                                    </div>
+
+                                    {/* Upgrade nudge */}
                                     <button
-                                        key={idx}
-                                        onClick={() => handlePaletteSelect(idx)}
-                                        className={btnClass}
+                                        onClick={() => setShowPaywallModal(true)}
+                                        className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors group"
                                     >
-                                        {idx + 1}
+                                        <span
+                                            className="material-symbols-outlined text-primary text-[15px]"
+                                            style={{ fontVariationSettings: "'FILL' 1" }}
+                                        >
+                                            lock
+                                        </span>
+                                        <span className="text-xs font-semibold text-primary">
+                                            {totalQuestionsCount - FREE_QUESTION_LIMIT} more · Get Lite
+                                        </span>
                                     </button>
-                                );
-                            })}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </aside>
@@ -526,19 +675,44 @@ const CondensedPractice: React.FC = () => {
                     </div>
 
                     {/* Next Button */}
-                    <button
-                        onClick={handleNext}
-                        disabled={isLastQuestion}
-                        className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl bg-primary md:bg-primary text-white font-bold shadow-md shadow-primary/20 hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Next Question"
-                    >
-                        <span className="hidden md:inline mr-1">Next</span>
-                        <span className="material-symbols-outlined text-2xl md:text-xl">
-                            chevron_right
-                        </span>
-                    </button>
+                    {isLastQuestion && !isPaidUser && totalQuestionsCount > FREE_QUESTION_LIMIT ? (
+                        // Soft paywall nudge on the last free question
+                        <button
+                            onClick={() => setShowPaywallModal(true)}
+                            className="flex items-center justify-center gap-1.5 w-12 h-12 md:w-auto md:h-auto md:px-5 md:py-2.5 rounded-full md:rounded-xl bg-surface-light dark:bg-surface-dark border border-primary/40 text-primary font-bold shadow-sm transition-all hover:bg-primary/5"
+                            title="Unlock more questions"
+                        >
+                            <span
+                                className="material-symbols-outlined text-xl"
+                                style={{ fontVariationSettings: "'FILL' 1" }}
+                            >
+                                lock
+                            </span>
+                            <span className="hidden md:inline text-sm">Unlock</span>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleNext}
+                            disabled={isLastQuestion}
+                            className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl bg-primary md:bg-primary text-white font-bold shadow-md shadow-primary/20 hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Next Question"
+                        >
+                            <span className="hidden md:inline mr-1">Next</span>
+                            <span className="material-symbols-outlined text-2xl md:text-xl">
+                                chevron_right
+                            </span>
+                        </button>
+                    )}
                 </div>
             </footer>
+
+            {/* Paywall Modal */}
+            {showPaywallModal && (
+                <SubscriptionModal
+                    onClose={() => setShowPaywallModal(false)}
+                    onUpgrade={() => navigate('/pricing')}
+                />
+            )}
         </div >
     );
 };

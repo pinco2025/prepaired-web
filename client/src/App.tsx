@@ -106,7 +106,6 @@ export const AppContent: React.FC = () => {
   // Check if user is on a test-taking route (hide sidebar during test)
   // Matches /tests/:testId but not /tests (the list page)
   const isTestRoute = /^\/tests\/[^/]+$/.test(location.pathname);
-  const isAIPTRoute = location.pathname === '/aipt';
 
   // Also hide sidebar on the test-submitted page
   const isTestSubmittedRoute = location.pathname === '/test-submitted';
@@ -119,7 +118,7 @@ export const AppContent: React.FC = () => {
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
   const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
-  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isAIPTRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute && !isReviewRoute;
+  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute && !isReviewRoute;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">

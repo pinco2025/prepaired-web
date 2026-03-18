@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../utils/supabaseClient';
 
 // Subject Images
 import phyImg from '../assets/cards/phy.png';
@@ -14,11 +15,154 @@ import accuracyImg from '../assets/cards/accuracy-speed.png';
 import assertionImg from '../assets/cards/assertion.png';
 import lvl2PyqImg from '../assets/cards/lvl-2-pyq.png';
 
+// Maps dashboard item id → question_set.set_id in Supabase
+const ITEM_SET_ID: Record<string, string> = {
+    'condensed_main': 'condensed',
+    'super30': 'super-30',
+    'accuracy': 'sufficient',
+    'statement': 'anr',
+    'level2': 'last-resort',
+};
+
+// ── Subscription Modal ────────────────────────────────────────────────────────
+const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }> = ({ onClose, onUpgrade }) => (
+    <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+    >
+        <div
+            className="relative bg-surface-light dark:bg-surface-dark rounded-2xl p-5 sm:p-8 max-w-md w-full mx-4 shadow-2xl border border-border-light dark:border-border-dark"
+            onClick={e => e.stopPropagation()}
+        >
+            <button
+                onClick={onClose}
+                className="absolute top-3 right-3 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+            >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+
+            <div className="flex flex-col items-center text-center gap-3 sm:gap-5">
+                {/* Icon */}
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span
+                        className="material-symbols-outlined text-primary text-lg sm:text-xl"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                        lock
+                    </span>
+                </div>
+
+                {/* Heading */}
+                <div>
+                    <h2 className="text-lg sm:text-2xl font-bold text-text-light dark:text-text-dark mb-1">
+                        prepAIred Lite Required
+                    </h2>
+                    <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                        This question set is exclusively available to Lite subscribers. Upgrade to unlock all sets and maximize your prep efficiency.
+                    </p>
+                </div>
+
+                {/* Perks */}
+                <div className="w-full space-y-2 sm:space-y-3 text-left">
+                    {[
+                        'All 6 AIPT tests — full access',
+                        'Unlimited Condensed PYQs',
+                        'Accuracy Boosters & Statement Sets',
+                        'Level-2 PYQs for rank boosting',
+                        'High-quality, detailed solution showcase',
+                    ].map((perk, i) => (
+                        <div key={i} className="flex items-center gap-2 sm:gap-3">
+                            <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
+                                <span className="material-symbols-outlined text-primary text-[15px] sm:text-[18px] font-bold">check</span>
+                            </div>
+                            <span className="text-xs sm:text-sm font-medium text-text-light dark:text-text-dark">{perk}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Pricing */}
+                <div className="w-full">
+                    <div className="flex items-baseline justify-center gap-1.5 mb-3">
+                        <span className="text-base sm:text-xl line-through text-text-secondary-light dark:text-text-secondary-dark font-medium">₹399</span>
+                        <span className="text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark">₹119</span>
+                        <span className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">/month</span>
+                    </div>
+                    <button
+                        onClick={onUpgrade}
+                        className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:bg-primary-dark hover:scale-[1.02] transition-all"
+                    >
+                        Get prepAIred Lite for ₹119 →
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="w-full mt-1.5 py-2 text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                    >
+                        Maybe later
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 const QuestionSet: React.FC = () => {
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
-    const [viewState, setViewState] = useState<'dashboard' | 'condensed_selection' | 'statement_parts' | 'statement_subjects'>('dashboard');
+    const location = useLocation();
+    const { isAuthenticated, isPaidUser } = useAuth();
+    const [viewState, setViewState] = useState<'dashboard' | 'condensed_selection' | 'statement_parts' | 'statement_subjects'>(
+        (location.state as any)?.viewState || 'dashboard'
+    );
     const [statementPart, setStatementPart] = useState<'part1' | 'part2' | null>(null);
+
+    // Supabase question set data: url + tier per set_id
+    const [setDataMap, setSetDataMap] = useState<Record<string, { url: string | null; tier: string | null }>>({});
+    const [setsLoading, setSetsLoading] = useState(true);
+    const [showPaywallModal, setShowPaywallModal] = useState(false);
+
+    useEffect(() => {
+        const fetchSetData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('question_set')
+                    .select('set_id, url, tier')
+                    .in('set_id', ['condensed', 'super-30', 'sufficient', 'anr', 'last-resort']);
+                if (error) throw error;
+                const map: Record<string, { url: string | null; tier: string | null }> = {
+                    condensed: { url: null, tier: null },
+                    'super-30': { url: null, tier: null },
+                    sufficient: { url: null, tier: null },
+                    anr: { url: null, tier: null },
+                    'last-resort': { url: null, tier: null },
+                };
+                (data || []).forEach((row: any) => {
+                    map[row.set_id] = { url: row.url ?? null, tier: row.tier ?? null };
+                });
+                setSetDataMap(map);
+            } catch (err) {
+                console.error('Failed to load question set data:', err);
+            } finally {
+                setSetsLoading(false);
+            }
+        };
+        fetchSetData();
+    }, []);
+
+    // null url → coming soon (content not ready)
+    const isItemComingSoon = (itemId: string): boolean => {
+        const setId = ITEM_SET_ID[itemId];
+        if (!setId) return false;
+        if (setsLoading) return true;
+        return setDataMap[setId]?.url == null;
+    };
+
+    // non-null url + lite tier + not paid → locked behind paywall
+    const isItemLiteLocked = (itemId: string): boolean => {
+        const setId = ITEM_SET_ID[itemId];
+        if (!setId) return false;
+        if (setsLoading) return false;
+        const entry = setDataMap[setId];
+        return entry?.url != null && entry?.tier === 'lite' && !isPaidUser;
+    };
 
     // Condensed PYQ Subjects Data
     const condensedSubjects = [
@@ -97,27 +241,12 @@ const QuestionSet: React.FC = () => {
             image: super30Img
         },
         {
-            id: 'organic',
-            title: 'Organic Questions',
-            description: 'Curated chemistry questions from JEE & NEET — haloalkanes, haloarenes, and reaction mechanisms. Each with detailed solutions. Freely accessible and individually linkable.',
-            stats: { questions: '10 Qs', time: '1 Hr', type: 'Free Access', difficulty: 'Medium' },
-            tags: ['Free', 'SEO Optimized'],
-            action: () => navigate('/questions/organic'),
-            classes: {
-                badgeBg: 'bg-lime-500',
-                tagMain: 'bg-lime-100 dark:bg-lime-900/30 text-lime-700 dark:text-lime-400',
-                titleHover: 'group-hover:text-lime-600 dark:group-hover:text-lime-400'
-            },
-            image: condensedImg
-        },
-        {
             id: 'accuracy',
             title: 'Accuracy Boosters',
             description: 'Speed-focused drills to minimize silly mistakes and improve exam temperament.',
             stats: { questions: 'Drills', time: 'Variable', type: 'Speed', difficulty: 'Medium' },
             tags: ['Speed', 'Precision'],
-            action: () => { }, // Placeholder
-            disabled: true,
+            action: () => {},
             classes: {
                 badgeBg: 'bg-amber-500',
                 tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
@@ -131,8 +260,7 @@ const QuestionSet: React.FC = () => {
             description: 'Master assertion-reason and statement-based questions that are becoming increasingly common in exams.',
             stats: { questions: '60 Qs/Subject', time: 'Complete Coverage', type: '2026 Relevant', difficulty: 'Easy' },
             tags: ['A&R', 'Statement Based'],
-            action: () => { }, // Placeholder
-            disabled: true,
+            action: () => setViewState('statement_parts'),
             classes: {
                 badgeBg: 'bg-rose-500',
                 tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
@@ -146,8 +274,7 @@ const QuestionSet: React.FC = () => {
             description: 'The toughest previous year questions filtered to boost your rank and challenge your limits.',
             stats: { questions: 'Rank Booster', time: 'Variable', type: 'Advanced', difficulty: 'Extreme' },
             tags: ['Rank Booster', 'High Difficulty'],
-            action: () => { }, // Placeholder
-            disabled: true,
+            action: () => {},
             classes: {
                 badgeBg: 'bg-emerald-500',
                 tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
@@ -160,7 +287,7 @@ const QuestionSet: React.FC = () => {
     const handleStatementPartSelect = (part: 'part1' | 'part2') => {
         setStatementPart(part);
         setViewState('statement_subjects');
-    }
+    };
 
     const statementSubjects = [
         {
@@ -212,11 +339,7 @@ const QuestionSet: React.FC = () => {
             navigate('/login');
             return;
         }
-
-        const routeId = `statement-${statementPart}-${subjectId}`;
-        // Example: statement-part1-physics
-
-        navigate(`/question-set/${routeId}/practice`);
+        navigate(`/question-set/statement-${statementPart}-${subjectId}/practice`);
     };
 
     return (
@@ -292,99 +415,158 @@ const QuestionSet: React.FC = () => {
                     {/* Dashboard View */}
                     {viewState === 'dashboard' && (
                         <div className="grid grid-cols-1 gap-5">
-                            {dashboardItems.map((item) => (
-                                <div
-                                    key={item.id}
-                                    onClick={!item.disabled ? item.action : undefined}
-                                    className={`group relative flex flex-col md:flex-row bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300
-                                        ${item.disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30'}
-                                    `}
-                                >
-                                    {/* Image/Icon Section */}
-                                    <div className="md:w-56 h-36 md:h-auto bg-black relative overflow-hidden shrink-0 flex items-center justify-center p-4">
-                                        {item.image && (
-                                            <div
-                                                className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
-                                                style={{ backgroundImage: `url("${item.image}")` }}
-                                            ></div>
-                                        )}
+                            {dashboardItems.map((item) => {
+                                const comingSoon = isItemComingSoon(item.id);
+                                const liteLocked = isItemLiteLocked(item.id);
 
-                                        {item.tags && (
-                                            <div className="md:hidden absolute bottom-2 left-2">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold text-white ${item.classes.badgeBg}`}>
-                                                    {item.tags[0]}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
+                                const handleClick = () => {
+                                    if (comingSoon) return;
+                                    if (liteLocked) { setShowPaywallModal(true); return; }
+                                    item.action();
+                                };
 
-                                    {/* Content Section */}
-                                    <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="flex items-center gap-3">
-                                                    {item.tags && item.tags.map((tag, idx) => (
-                                                        <span key={idx} className={`hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide
-                                                            ${idx === 0
-                                                                ? item.classes.tagMain
-                                                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                                                            }`}>
-                                                            {tag}
-                                                        </span>
-                                                    ))}
+                                return (
+                                    <div
+                                        key={item.id}
+                                        onClick={handleClick}
+                                        className={`group relative flex flex-col md:flex-row bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300
+                                            ${comingSoon
+                                                ? 'opacity-60 cursor-not-allowed'
+                                                : liteLocked
+                                                    ? 'cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.15)] hover:border-primary/50'
+                                                    : 'cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30'}
+                                        `}
+                                    >
+                                        {/* Image/Icon Section */}
+                                        <div className="md:w-56 h-36 md:h-auto bg-black relative overflow-hidden shrink-0 flex items-center justify-center p-4">
+                                            {item.image && (
+                                                <div
+                                                    className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
+                                                    style={{ backgroundImage: `url("${item.image}")` }}
+                                                />
+                                            )}
+
+                                            {/* Lock overlay for lite-locked items */}
+                                            {liteLocked && (
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                    <span
+                                                        className="material-symbols-outlined text-white/70 text-4xl"
+                                                        style={{ fontVariationSettings: "'FILL' 1" }}
+                                                    >
+                                                        lock
+                                                    </span>
                                                 </div>
-                                                <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide
-                                                    ${item.stats.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                        item.stats.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                            item.stats.difficulty === 'Hard' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
-                                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                    }`}>
-                                                    <span className="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
-                                                    <span>{item.stats.difficulty}</span>
-                                                </div>
+                                            )}
+
+                                            {/* Mobile badge */}
+                                            <div className="absolute bottom-2 left-2 md:hidden">
+                                                {liteLocked ? (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black text-white bg-primary uppercase tracking-widest">
+                                                        LITE
+                                                    </span>
+                                                ) : !comingSoon && item.tags ? (
+                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold text-white ${item.classes.badgeBg}`}>
+                                                        {item.tags[0]}
+                                                    </span>
+                                                ) : null}
                                             </div>
 
-                                            <h3 className={`text-text-light dark:text-text-dark text-lg md:text-xl font-bold mb-1 transition-colors ${item.classes.titleHover}`}>
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs md:text-sm leading-relaxed line-clamp-2">
-                                                {item.description}
-                                            </p>
+                                            {/* LITE badge top-right on desktop */}
+                                            {liteLocked && (
+                                                <div className="absolute top-2 right-2 hidden md:block px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                                    LITE
+                                                </div>
+                                            )}
                                         </div>
 
-                                        <div className="mt-4 md:mt-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 border-t border-border-light dark:border-border-dark pt-3 md:pt-4">
-                                            <div className="flex items-center gap-4 text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                                                <div className="flex items-center gap-1.5" title="Items">
-                                                    <span className="material-symbols-outlined text-[16px] md:text-[18px]">format_list_numbered</span>
-                                                    <span className="font-medium">{item.stats.questions}</span>
-                                                </div>
-                                                {item.stats.time && (
-                                                    <div className="hidden md:flex items-center gap-1.5" title="Estimated Time">
-                                                        <span className="material-symbols-outlined text-[18px]">schedule</span>
-                                                        <span className="font-medium">{item.stats.time}</span>
+                                        {/* Content Section */}
+                                        <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex items-center gap-3">
+                                                        {liteLocked ? (
+                                                            <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary">
+                                                                <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
+                                                                prepAIred Lite
+                                                            </span>
+                                                        ) : (
+                                                            item.tags && item.tags.map((tag, idx) => (
+                                                                <span key={idx} className={`hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide
+                                                                    ${idx === 0
+                                                                        ? item.classes.tagMain
+                                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                                                                    }`}>
+                                                                    {tag}
+                                                                </span>
+                                                            ))
+                                                        )}
                                                     </div>
-                                                )}
-                                                <div className="hidden md:flex items-center gap-1.5" title="Type">
-                                                    <span className="material-symbols-outlined text-[18px]">category</span>
-                                                    <span className="font-medium">{item.stats.type}</span>
+                                                    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide
+                                                        ${item.stats.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                            item.stats.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                                item.stats.difficulty === 'Hard' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                                                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                        }`}>
+                                                        <span className="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
+                                                        <span>{item.stats.difficulty}</span>
+                                                    </div>
                                                 </div>
+
+                                                <h3 className={`text-text-light dark:text-text-dark text-lg md:text-xl font-bold mb-1 transition-colors ${item.classes.titleHover}`}>
+                                                    {item.title}
+                                                </h3>
+                                                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs md:text-sm leading-relaxed line-clamp-2">
+                                                    {item.description}
+                                                </p>
                                             </div>
 
-                                            <button
-                                                disabled={item.disabled}
-                                                className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-[0.98]
-                                                    ${item.disabled
-                                                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30'
-                                                    }`}
-                                            >
-                                                {item.disabled ? 'Coming Soon' : (item.id === 'condensed_main' ? 'Start Practice' : 'Start Practice')}
-                                                {!item.disabled && <span className="material-symbols-outlined text-[18px]">arrow_forward</span>}
-                                            </button>
+                                            <div className="mt-4 md:mt-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 border-t border-border-light dark:border-border-dark pt-3 md:pt-4">
+                                                <div className="flex items-center gap-4 text-xs md:text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                                                    <div className="flex items-center gap-1.5" title="Items">
+                                                        <span className="material-symbols-outlined text-[16px] md:text-[18px]">format_list_numbered</span>
+                                                        <span className="font-medium">{item.stats.questions}</span>
+                                                    </div>
+                                                    {item.stats.time && (
+                                                        <div className="hidden md:flex items-center gap-1.5" title="Estimated Time">
+                                                            <span className="material-symbols-outlined text-[18px]">schedule</span>
+                                                            <span className="font-medium">{item.stats.time}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="hidden md:flex items-center gap-1.5" title="Type">
+                                                        <span className="material-symbols-outlined text-[18px]">category</span>
+                                                        <span className="font-medium">{item.stats.type}</span>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    disabled={comingSoon}
+                                                    className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-[0.98]
+                                                        ${comingSoon
+                                                            ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                                                            : liteLocked
+                                                                ? 'bg-primary/90 group-hover:bg-primary text-white shadow-md shadow-primary/20 group-hover:shadow-lg group-hover:shadow-primary/30'
+                                                                : 'bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30'
+                                                        }`}
+                                                >
+                                                    {comingSoon ? (
+                                                        'Coming Soon'
+                                                    ) : liteLocked ? (
+                                                        <>
+                                                            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
+                                                            Unlock with Lite
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            Start Practice
+                                                            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
 
@@ -435,7 +617,7 @@ const QuestionSet: React.FC = () => {
                                             <div
                                                 className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
                                                 style={{ backgroundImage: `url("${subject.image}")` }}
-                                            ></div>
+                                            />
                                         )}
                                         {subject.tags && (
                                             <div className="md:hidden absolute bottom-2 left-2">
@@ -523,7 +705,7 @@ const QuestionSet: React.FC = () => {
                                             <div
                                                 className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
                                                 style={{ backgroundImage: `url("${subject.image}")` }}
-                                            ></div>
+                                            />
                                         )}
                                         {subject.tags && (
                                             <div className="md:hidden absolute bottom-2 left-2">
@@ -586,8 +768,6 @@ const QuestionSet: React.FC = () => {
 
                                             <button
                                                 onClick={() => {
-                                                    // Reusing handleStartSet logic inline or separate?
-                                                    // Let's just define a quick handler here for Condensed since the original one was replaced/modified
                                                     if (!isAuthenticated) {
                                                         navigate('/login');
                                                     } else {
@@ -608,9 +788,14 @@ const QuestionSet: React.FC = () => {
                 </div>
             </div>
 
+            {showPaywallModal && (
+                <SubscriptionModal
+                    onClose={() => setShowPaywallModal(false)}
+                    onUpgrade={() => navigate('/pricing')}
+                />
+            )}
         </div>
     );
 };
 
 export default QuestionSet;
-

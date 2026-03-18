@@ -1,232 +1,650 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { Test } from '../data';
 import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useDataCache } from '../contexts/DataCacheContext';
-import JEELoader from './JEELoader';
 import JEEMInstructions from './JEEMInstructions';
 import TestInterface from './TestInterface';
 import TestSubmitted from './TestSubmitted';
 
-type TestStatus = 'instructions' | 'inProgress' | 'submitted';
+type TestStatus = 'completed' | 'unlocked' | 'locked' | 'subscription_required';
+type PageState = 'selection' | 'instructions' | 'inProgress' | 'submitted';
 
-// AIPT-01 unlock time: 15 March 2026, 3:00 PM IST (UTC+5:30 = 9:30 AM UTC)
-// TODO: Re-enable time lock before production launch
-// const AIPT_UNLOCK_TIME = new Date('2026-03-15T09:30:00Z');
-const AIPT_UNLOCK_TIME = new Date('2020-01-01T00:00:00Z'); // Disabled for testing
+interface AIPTTest extends Test {
+    tier: 'free' | 'lite';
+    status: TestStatus;
+    submissionId?: string;
+    hasResult?: boolean;
+}
 
+// ── Subscription Upgrade Modal ──────────────────────────────────────────────
+const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }> = ({ onClose, onUpgrade }) => (
+    <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+    >
+        <div
+            className="relative bg-surface-light dark:bg-surface-dark rounded-2xl p-5 sm:p-8 max-w-md w-full mx-4 shadow-2xl border border-border-light dark:border-border-dark"
+            onClick={e => e.stopPropagation()}
+        >
+            {/* Close */}
+            <button
+                onClick={onClose}
+                className="absolute top-3 right-3 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+            >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+
+            <div className="flex flex-col items-center text-center gap-3 sm:gap-5">
+                {/* Icon */}
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span
+                        className="material-symbols-outlined text-primary text-lg sm:text-xl"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                        lock
+                    </span>
+                </div>
+
+                {/* Heading */}
+                <div>
+                    <h2 className="text-lg sm:text-2xl font-bold text-text-light dark:text-text-dark mb-1">
+                        prepAIred Lite Required
+                    </h2>
+                    <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                        This test is exclusively available to Lite subscribers. Upgrade to unlock all 6 AIPT tests and more.
+                    </p>
+                </div>
+
+                {/* Perks */}
+                <div className="w-full space-y-2 sm:space-y-3 text-left">
+                    {[
+                        'All 6 AIPT tests — full access',
+                        'Unlimited Condensed PYQs',
+                        'Early access to upcoming sets',
+                        'High-quality, detailed solution showcase',
+                        'Speed Booster & Level 2 PYQ sets',
+                    ].map((perk, i) => (
+                        <div key={i} className="flex items-center gap-2 sm:gap-3">
+                            <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
+                                <span className="material-symbols-outlined text-primary text-[15px] sm:text-[18px] font-bold">check</span>
+                            </div>
+                            <span className="text-xs sm:text-sm font-medium text-text-light dark:text-text-dark">{perk}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Pricing */}
+                <div className="w-full">
+                    <div className="flex items-baseline justify-center gap-1.5 mb-3">
+                        <span className="text-base sm:text-xl line-through text-text-secondary-light dark:text-text-secondary-dark font-medium">₹399</span>
+                        <span className="text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark">₹119</span>
+                        <span className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">/month</span>
+                    </div>
+                    <button
+                        onClick={onUpgrade}
+                        className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:bg-primary-dark hover:scale-[1.02] transition-all"
+                    >
+                        Get prepAIred Lite for ₹119 →
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="w-full mt-1.5 py-2 text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                    >
+                        Maybe later
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+// ── AIPT Test Selection Screen ───────────────────────────────────────────────
+const testPositions = [
+    { top: 0, left: 50 },
+    { top: 120, left: 350 },
+    { top: 0, left: 640 },
+    { top: 240, left: 800 },
+    { top: 480, left: 640 },
+    { top: 360, left: 350 },
+];
+
+interface SelectionScreenProps {
+    tests: AIPTTest[];
+    onSelectTest: (test: AIPTTest) => void;
+    onShowSubscriptionModal: () => void;
+}
+
+const SelectionScreen: React.FC<SelectionScreenProps> = ({ tests, onSelectTest, onShowSubscriptionModal }) => {
+    const numTests = Math.min(tests.length, testPositions.length);
+
+    // Calculate SVG path points
+    const nodeCenter = 40;
+    const points = testPositions.slice(0, numTests).map(pos => ({
+        x: pos.left + 70 + nodeCenter,
+        y: pos.top + 40 + nodeCenter,
+    }));
+
+    let svgPath = '';
+    if (points.length > 1) {
+        const tension = 0.3;
+        svgPath = `M ${points[0].x} ${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[Math.max(0, i - 1)];
+            const p1 = points[i];
+            const p2 = points[i + 1];
+            const p3 = points[Math.min(points.length - 1, i + 2)];
+            const cp1x = p1.x + (p2.x - p0.x) * tension;
+            const cp1y = p1.y + (p2.y - p0.y) * tension;
+            const cp2x = p2.x - (p3.x - p1.x) * tension;
+            const cp2y = p2.y - (p3.y - p1.y) * tension;
+            svgPath += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+        }
+    }
+
+    const minHeight = numTests > 0
+        ? Math.max(testPositions[numTests - 1].top + 200, 400)
+        : 400;
+
+    return (
+        <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-10 md:mb-16">
+                <h1 className="text-3xl md:text-5xl font-bold text-text-light dark:text-text-dark tracking-tight mb-3">
+                    Select Your AIPT
+                </h1>
+                <p className="text-text-secondary-light dark:text-text-secondary-dark text-base md:text-lg max-w-2xl mx-auto px-2">
+                    Benchmark your performance against thousands of students. Each AIPT gives you a percentile rank powered by AI analysis.
+                </p>
+            </div>
+
+            {/* Mobile grid layout */}
+            <div className="md:hidden grid grid-cols-2 gap-6 px-2 pb-8">
+                {tests.map((test, index) => {
+                    const testNumber = index + 1;
+
+                    if (test.status === 'completed' && test.hasResult && test.submissionId) {
+                        return (
+                            <Link key={test.testID} to={`/results/${test.submissionId}`} className="group flex flex-col items-center gap-2">
+                                <div className="relative w-16 h-16 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-green-500 shadow-glow-green flex items-center justify-center">
+                                    <span className="text-xl font-bold text-green-500">{testNumber}</span>
+                                    <span className="material-symbols-outlined absolute -top-1.5 -right-1.5 text-white bg-green-500 rounded-full p-0.5 text-xs shadow-sm">check</span>
+                                </div>
+                                <p className="font-bold text-text-light dark:text-text-dark text-xs leading-tight text-center">{test.title}</p>
+                            </Link>
+                        );
+                    }
+
+                    if (test.status === 'completed') {
+                        return (
+                            <div key={test.testID} className="flex flex-col items-center gap-2">
+                                <div className="relative w-16 h-16 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-amber-500 flex items-center justify-center">
+                                    <span className="text-xl font-bold text-amber-500">{testNumber}</span>
+                                    <span className="material-symbols-outlined absolute -top-1.5 -right-1.5 text-white bg-amber-500 rounded-full p-0.5 text-xs shadow-sm animate-spin">sync</span>
+                                </div>
+                                <p className="font-bold text-text-light dark:text-text-dark text-xs leading-tight text-center">{test.title}</p>
+                            </div>
+                        );
+                    }
+
+                    if (test.status === 'unlocked') {
+                        return (
+                            <button key={test.testID} onClick={() => onSelectTest(test)} className="group flex flex-col items-center gap-2">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg animate-pulse" />
+                                    <div className="relative w-16 h-16 rounded-full bg-primary text-white shadow-glow-primary flex items-center justify-center ring-2 ring-primary/20 group-hover:scale-105 transition-transform">
+                                        <span className="text-xl font-bold">{testNumber}</span>
+                                        <span className="material-symbols-outlined absolute -bottom-2 text-primary bg-white dark:bg-surface-dark rounded-full p-0.5 shadow-md text-sm">play_arrow</span>
+                                    </div>
+                                </div>
+                                <p className="font-bold text-text-light dark:text-text-dark text-xs leading-tight text-center">{test.title}</p>
+                            </button>
+                        );
+                    }
+
+                    if (test.status === 'subscription_required') {
+                        return (
+                            <button key={test.testID} onClick={onShowSubscriptionModal} className="group flex flex-col items-center gap-2">
+                                <div className="relative w-16 h-16 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-primary/40 group-hover:border-primary/70 flex items-center justify-center transition-colors group-hover:scale-105">
+                                    <span className="text-xl font-bold text-primary/60">{testNumber}</span>
+                                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-primary text-white text-[8px] font-black uppercase tracking-widest">LITE</div>
+                                    <span className="material-symbols-outlined absolute -bottom-2 text-white bg-primary/70 group-hover:bg-primary rounded-full p-px shadow-md text-[13px] transition-colors" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
+                                </div>
+                                <p className="font-bold text-text-light dark:text-text-dark text-xs leading-tight text-center">{test.title}</p>
+                            </button>
+                        );
+                    }
+
+                    return (
+                        <div key={test.testID} className="flex flex-col items-center gap-2 cursor-not-allowed opacity-50">
+                            <div className="relative w-16 h-16 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-border-light dark:border-border-dark flex items-center justify-center">
+                                <span className="text-xl font-bold text-text-secondary-light dark:text-text-secondary-dark">{testNumber}</span>
+                                <span className="material-symbols-outlined absolute -bottom-1.5 -right-1.5 bg-border-light dark:bg-border-dark text-text-secondary-light rounded-full p-0.5 text-xs">lock</span>
+                            </div>
+                            <p className="font-semibold text-text-secondary-light dark:text-text-secondary-dark text-xs leading-tight text-center">{test.title}</p>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Desktop path layout */}
+            <div
+                className="relative w-full max-w-5xl mx-auto py-10 hidden md:block"
+                style={{ minHeight: `${minHeight}px` }}
+            >
+                {/* SVG connecting path */}
+                <svg
+                    className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
+                    style={{ strokeWidth: 3, fill: 'none' }}
+                >
+                    <defs>
+                        <linearGradient id="aiptPathGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                            <stop offset="0%" style={{ stopColor: '#22c55e', stopOpacity: 1 }} />
+                            <stop offset="25%" style={{ stopColor: '#0066ff', stopOpacity: 1 }} />
+                            <stop offset="100%" style={{ stopColor: '#9ca3af', stopOpacity: 0.3 }} />
+                        </linearGradient>
+                    </defs>
+                    {svgPath && (
+                        <path
+                            d={svgPath}
+                            style={{ stroke: 'url(#aiptPathGradient)', strokeLinecap: 'round' }}
+                        />
+                    )}
+                </svg>
+
+                {/* Test nodes */}
+                <div className="relative z-10">
+                    {tests.map((test, index) => {
+                        const position = testPositions[index % testPositions.length];
+                        const testNumber = index + 1;
+
+                        // ── Completed with result ──
+                        if (test.status === 'completed' && test.hasResult && test.submissionId) {
+                            return (
+                                <div
+                                    key={test.testID}
+                                    className="flex justify-center md:absolute mb-8 md:mb-0"
+                                    style={{ top: `${position.top}px`, left: `${position.left}px` }}
+                                >
+                                    <Link to={`/results/${test.submissionId}`} className="group relative flex flex-col items-center w-48">
+                                        <div className="relative">
+                                            <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-green-500 shadow-glow-green flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 relative">
+                                                <span className="text-2xl font-bold text-green-500">{testNumber}</span>
+                                                <span className="material-symbols-outlined absolute -top-2 -right-2 text-white bg-green-500 rounded-full p-0.5 text-sm shadow-sm">check</span>
+                                            </div>
+                                        </div>
+                                        <div className="mt-3 text-center w-full">
+                                            <h3 className="font-bold text-text-light dark:text-text-dark text-sm leading-tight">{test.title}</h3>
+                                        </div>
+                                    </Link>
+                                </div>
+                            );
+                        }
+
+                        // ── Completed, result processing ──
+                        if (test.status === 'completed') {
+                            return (
+                                <div
+                                    key={test.testID}
+                                    className="flex justify-center md:absolute mb-8 md:mb-0"
+                                    style={{ top: `${position.top}px`, left: `${position.left}px` }}
+                                >
+                                    <div className="group relative flex flex-col items-center w-48">
+                                        <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-amber-500 flex items-center justify-center z-10 relative">
+                                            <span className="text-2xl font-bold text-amber-500">{testNumber}</span>
+                                            <span className="material-symbols-outlined absolute -top-2 -right-2 text-white bg-amber-500 rounded-full p-0.5 text-sm shadow-sm animate-spin">sync</span>
+                                        </div>
+                                        <div className="mt-3 text-center w-full">
+                                            <h3 className="font-bold text-text-light dark:text-text-dark text-sm leading-tight">{test.title}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        // ── Unlocked (next available test) ──
+                        if (test.status === 'unlocked') {
+                            return (
+                                <div
+                                    key={test.testID}
+                                    className="flex justify-center md:absolute mb-8 md:mb-0 z-20"
+                                    style={{ top: `${position.top}px`, left: `${position.left}px` }}
+                                >
+                                    <button
+                                        onClick={() => onSelectTest(test)}
+                                        className="group relative flex flex-col items-center w-56 text-left"
+                                    >
+                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-primary/30 rounded-full blur-xl animate-pulse" />
+                                        <div className="relative mb-4">
+                                            <div className="w-24 h-24 rounded-full bg-primary text-white shadow-glow-primary flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 ring-4 ring-primary/20 relative">
+                                                <span className="text-3xl font-bold">{testNumber}</span>
+                                                <span className="material-symbols-outlined absolute -bottom-3 text-primary bg-white dark:bg-surface-dark rounded-full p-1 shadow-md text-lg">play_arrow</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-center bg-surface-light dark:bg-surface-dark p-3 rounded-xl shadow-card-light dark:shadow-card-dark border border-primary/20 backdrop-blur-sm w-full">
+                                            <h3 className="font-bold text-text-light dark:text-text-dark text-sm leading-tight">{test.title}</h3>
+                                        </div>
+                                    </button>
+                                </div>
+                            );
+                        }
+
+                        // ── Subscription required (lite test, free user) ──
+                        if (test.status === 'subscription_required') {
+                            return (
+                                <div
+                                    key={test.testID}
+                                    className="flex justify-center md:absolute mb-8 md:mb-0"
+                                    style={{ top: `${position.top}px`, left: `${position.left}px` }}
+                                >
+                                    <button
+                                        onClick={onShowSubscriptionModal}
+                                        className="group relative flex flex-col items-center w-56 text-left"
+                                    >
+                                        {/* Subtle glow to keep it looking clickable */}
+                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-primary/15 rounded-full blur-xl" />
+                                        <div className="relative mb-4">
+                                            <div className="w-24 h-24 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-primary/40 flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105 z-10 relative group-hover:border-primary/70">
+                                                <span className="text-3xl font-bold text-primary/60 group-hover:text-primary/90 transition-colors">{testNumber}</span>
+                                                {/* Lite badge */}
+                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                                    LITE
+                                                </div>
+                                                <span className="material-symbols-outlined absolute -bottom-3 text-white bg-primary/70 group-hover:bg-primary rounded-full p-1 shadow-md text-base transition-colors" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-center bg-surface-light dark:bg-surface-dark p-3 rounded-xl shadow-card-light dark:shadow-card-dark border border-primary/20 group-hover:border-primary/40 transition-colors backdrop-blur-sm w-full">
+                                            <h3 className="font-bold text-text-light dark:text-text-dark text-sm leading-tight">{test.title}</h3>
+                                        </div>
+                                    </button>
+                                </div>
+                            );
+                        }
+
+                        // ── Locked (sequential, free test) ──
+                        return (
+                            <div
+                                key={test.testID}
+                                className="flex justify-center md:absolute mb-8 md:mb-0"
+                                style={{ top: `${position.top}px`, left: `${position.left}px` }}
+                            >
+                                <div className="group relative flex flex-col items-center w-48 cursor-not-allowed">
+                                    <div className="w-20 h-20 rounded-full bg-surface-light dark:bg-surface-dark border-[3px] border-border-light dark:border-border-dark flex items-center justify-center z-10 relative">
+                                        <span className="text-2xl font-bold text-text-secondary-light dark:text-text-secondary-dark">{testNumber}</span>
+                                        <div className="absolute inset-0 bg-black/5 dark:bg-white/5 rounded-full" />
+                                        <span className="material-symbols-outlined absolute bottom-0 right-0 bg-border-light dark:bg-border-dark text-text-secondary-light dark:text-text-secondary-dark rounded-full p-1 text-xs">lock</span>
+                                    </div>
+                                    <div className="mt-3 text-center w-full">
+                                        <h3 className="font-semibold text-text-secondary-light dark:text-text-secondary-dark text-sm leading-tight">{test.title}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ── Main AIPTPage ────────────────────────────────────────────────────────────
 const AIPTPage: React.FC = () => {
-  usePageTitle('AIPT');
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { invalidateCache } = useDataCache();
-  const [test, setTest] = useState<Test | null>(null);
-  const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [now, setNow] = useState(new Date());
-  const isUnlocked = now >= AIPT_UNLOCK_TIME;
+    usePageTitle('AIPT');
+    const { user, isPaidUser, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
+    const { invalidateCache } = useDataCache();
 
-  // Update time every second for the countdown
-  useEffect(() => {
-    if (isUnlocked) return;
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, [isUnlocked]);
+    const [tests, setTests] = useState<AIPTTest[]>([]);
+    const [selectedTest, setSelectedTest] = useState<Test | null>(null);
+    const [pageState, setPageState] = useState<PageState>('selection');
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
+    useEffect(() => {
+        // Wait for auth to fully settle (user + subscription both resolved)
+        if (authLoading) return;
 
-    const fetchAIPTTest = async () => {
-      try {
-        // Fetch the AIPT-01 test from the database
-        // Try exact match first, then fuzzy match
-        let { data: testsArr, error: testError } = await supabase
-          .from('tests')
-          .select('*')
-          .ilike('title', '%AIPT%')
-          .limit(1);
-
-        if (!mounted) return;
-
-        if (testError || !testsArr || testsArr.length === 0) {
-          // Fallback: fetch all tests and find AIPT by scanning titles
-          const { data: allTests } = await supabase
-            .from('tests')
-            .select('*')
-            .order('testID', { ascending: false });
-
-          if (!mounted) return;
-
-          const aiptTest = allTests?.find((t: any) =>
-            t.title?.toLowerCase().includes('aipt') ||
-            t.description?.toLowerCase().includes('aipt')
-          );
-
-          if (!aiptTest) {
-            setError('AIPT test not found. Please ensure the test has been added to the database.');
+        // Not logged in — nothing to fetch
+        if (!user?.id) {
             setIsLoading(false);
             return;
-          }
-
-          testsArr = [aiptTest];
         }
 
-        const testData = testsArr[0];
-        setTest(testData as Test);
+        let mounted = true;
+        setIsLoading(true);
+        setError(null);
 
-        // Check if the user has already attempted this test
-        if (user?.id && testData.testID) {
-          const { data: submissions } = await supabase
-            .from('student_tests')
-            .select('id, result_url')
-            .eq('user_id', user.id)
-            .eq('test_id', String(testData.testID))
-            .not('submitted_at', 'is', null)
-            .limit(1);
+        const fetchTests = async () => {
+            try {
+                // Fetch all AIPT tests ordered by testID
+                const { data: testsData, error: testsError } = await supabase
+                    .from('tests')
+                    .select('*')
+                    .ilike('testID', 'AIPT-%')
+                    .order('testID');
 
-          if (!mounted) return;
+                if (!mounted) return;
 
-          if (submissions && submissions.length > 0) {
-            // Redirect to results directly (same pattern as TestPage)
-            navigate(`/results/${submissions[0].id}`, { replace: true });
-            return;
-          }
+                if (testsError) throw testsError;
+
+                const testIds = (testsData || []).map((t: any) => String(t.testID));
+
+                // Fetch user's submissions for these AIPT tests
+                const { data: submissionsData, error: submissionsError } = await supabase
+                    .from('student_tests')
+                    .select('id, test_id, result_url, submitted_at')
+                    .eq('user_id', user.id)
+                    .in('test_id', testIds.length > 0 ? testIds : ['__none__'])
+                    .not('submitted_at', 'is', null);
+
+                if (!mounted) return;
+
+                if (submissionsError) throw submissionsError;
+
+                const submissionsMap = new Map<string, { id: string; hasResult: boolean }>();
+                (submissionsData || []).forEach((s: any) => {
+                    submissionsMap.set(s.test_id, { id: s.id, hasResult: !!s.result_url });
+                });
+
+                let firstFreeUnlocked = false;
+
+                const testsWithStatus: AIPTTest[] = (testsData || []).map((test: any) => {
+                    const submissionInfo = submissionsMap.get(String(test.testID));
+                    const isCompleted = !!submissionInfo;
+                    const testTier = ((test.tier || 'free') as 'free' | 'lite');
+
+                    if (isCompleted) {
+                        return {
+                            ...test,
+                            tier: testTier,
+                            status: 'completed' as TestStatus,
+                            submissionId: submissionInfo?.id,
+                            hasResult: submissionInfo?.hasResult,
+                        };
+                    }
+
+                    // Lite subscribers: all unfinished tests are unlocked
+                    if (isPaidUser) {
+                        return { ...test, tier: testTier, status: 'unlocked' as TestStatus };
+                    }
+
+                    // Free users: lite tests always require subscription
+                    if (testTier === 'lite') {
+                        return { ...test, tier: testTier, status: 'subscription_required' as TestStatus };
+                    }
+
+                    // Free users: sequentially unlock free tests
+                    if (!firstFreeUnlocked) {
+                        firstFreeUnlocked = true;
+                        return { ...test, tier: testTier, status: 'unlocked' as TestStatus };
+                    }
+
+                    return { ...test, tier: testTier, status: 'locked' as TestStatus };
+                });
+
+                if (mounted) setTests(testsWithStatus);
+            } catch (err: any) {
+                if (mounted) setError(err.message || 'Failed to load tests.');
+            } finally {
+                if (mounted) setIsLoading(false);
+            }
+        };
+
+        fetchTests();
+        return () => { mounted = false; };
+    }, [user?.id, isPaidUser, authLoading]);
+
+    // Handle back button during test
+    useEffect(() => {
+        const handlePopState = () => setPageState('instructions');
+        if (pageState === 'inProgress' || pageState === 'submitted') {
+            window.history.pushState({ state: pageState }, '');
+            window.addEventListener('popstate', handlePopState);
         }
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Failed to load AIPT test.');
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [pageState]);
+
+    const handleSelectTest = (test: AIPTTest) => {
+        setSelectedTest(test as Test);
+        setPageState('instructions');
     };
 
-    fetchAIPTTest();
-
-    return () => {
-      mounted = false;
-    };
-  }, [user?.id, navigate]);
-
-  // Handle back button during test
-  useEffect(() => {
-    const handlePopState = () => {
-      setTestStatus('instructions');
+    const handleStartTest = () => {
+        setPageState('inProgress');
+        document.documentElement.requestFullscreen?.().catch(() => {});
     };
 
-    if (testStatus === 'inProgress' || testStatus === 'submitted') {
-      window.history.pushState({ status: testStatus }, '');
-      window.addEventListener('popstate', handlePopState);
+    const handleSubmitSuccess = () => {
+        invalidateCache('all');
+        setPageState('submitted');
+    };
+
+    const handleBackToSelection = () => {
+        setSelectedTest(null);
+        setPageState('selection');
+    };
+
+    const isTestInProgress = pageState === 'inProgress';
+
+    // ── Loading skeleton ──
+    if (isLoading) {
+        return (
+            <main className="flex-grow">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div className="max-w-6xl mx-auto">
+                        {/* Header skeleton */}
+                        <div className="text-center mb-16 flex flex-col items-center gap-4">
+                            <div className="relative overflow-hidden rounded-full bg-black/5 dark:bg-white/5 h-7 w-40">
+                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+                            </div>
+                            <div className="relative overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 h-10 w-64 sm:w-80">
+                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+                            </div>
+                            <div className="relative overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 h-5 w-72 sm:w-96">
+                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+                            </div>
+                        </div>
+                        {/* Test nodes skeleton — mobile: vertical list, desktop: scattered */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 max-w-2xl mx-auto">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="flex flex-col items-center gap-3">
+                                    <div className="relative overflow-hidden rounded-full bg-black/5 dark:bg-white/5 w-20 h-20">
+                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" style={{ animationDelay: `${i * 0.15}s` }} />
+                                    </div>
+                                    <div className="relative overflow-hidden rounded-lg bg-black/5 dark:bg-white/5 h-4 w-24">
+                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" style={{ animationDelay: `${i * 0.15}s` }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </main>
+        );
     }
 
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [testStatus]);
-
-  if (isLoading) {
-    return (
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <JEELoader variant="compact" message="Loading AIPT..." />
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (error || !test) {
-    return (
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <span className="material-icons-outlined text-red-500 text-5xl mb-4">error_outline</span>
-            <p className="text-red-500 text-lg font-medium mb-4">{error || 'Test not found.'}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  const handleStartTest = () => {
-    setTestStatus('inProgress');
-    const element = document.documentElement;
-    if (element.requestFullscreen) {
-      element.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-      });
+    // ── Error ──
+    if (error) {
+        return (
+            <main className="flex-grow">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div className="flex flex-col items-center justify-center min-h-[400px]">
+                        <span className="material-icons-outlined text-red-500 text-5xl mb-4">error_outline</span>
+                        <p className="text-red-500 text-lg font-medium mb-4">{error}</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                </div>
+            </main>
+        );
     }
-  };
 
-  const handleSubmitSuccess = () => {
-    invalidateCache('all');
-    setTestStatus('submitted');
-  };
-
-  const isTestInProgress = testStatus === 'inProgress';
-
-  const renderContent = () => {
-    switch (testStatus) {
-      case 'inProgress':
-        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} />;
-      case 'submitted':
-        return <TestSubmitted />;
-      case 'instructions':
-      default:
-        if (!isUnlocked) {
-          const diff = AIPT_UNLOCK_TIME.getTime() - now.getTime();
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-          const countdownFooter = (
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-center px-4 py-3 rounded-xl bg-primary/10 min-w-[72px]">
-                  <span className="text-2xl font-black text-primary">{String(hours).padStart(2, '0')}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">Hours</span>
+    // ── Test in progress ──
+    if (isTestInProgress && selectedTest) {
+        return (
+            <main className="flex-grow h-screen overflow-hidden">
+                <div className="w-full h-full p-4 bg-background-light dark:bg-background-dark">
+                    <TestInterface test={selectedTest} onSubmitSuccess={handleSubmitSuccess} exam={selectedTest.exam} />
                 </div>
-                <span className="text-2xl font-bold text-text-secondary-light dark:text-text-secondary-dark">:</span>
-                <div className="flex flex-col items-center px-4 py-3 rounded-xl bg-primary/10 min-w-[72px]">
-                  <span className="text-2xl font-black text-primary">{String(minutes).padStart(2, '0')}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">Minutes</span>
+            </main>
+        );
+    }
+
+    // ── Submitted ──
+    if (pageState === 'submitted') {
+        return (
+            <main className="flex-grow">
+                <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 flex justify-center">
+                    <TestSubmitted />
                 </div>
-                <span className="text-2xl font-bold text-text-secondary-light dark:text-text-secondary-dark">:</span>
-                <div className="flex flex-col items-center px-4 py-3 rounded-xl bg-primary/10 min-w-[72px]">
-                  <span className="text-2xl font-black text-primary">{String(seconds).padStart(2, '0')}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">Seconds</span>
+            </main>
+        );
+    }
+
+    // ── Instructions for selected test ──
+    if (pageState === 'instructions' && selectedTest) {
+        return (
+            <main className="flex-grow">
+                <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col items-center gap-4">
+                    <button
+                        onClick={handleBackToSelection}
+                        className="self-start flex items-center gap-1.5 text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                        Back to AIPT
+                    </button>
+                    <JEEMInstructions test={selectedTest} onStartTest={handleStartTest} />
                 </div>
-              </div>
-              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                Test unlocks on 15th March, 3:00 PM IST
-              </p>
+            </main>
+        );
+    }
+
+    // ── Selection screen ──
+    return (
+        <main className="flex-grow">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <SelectionScreen
+                    tests={tests}
+                    onSelectTest={handleSelectTest}
+                    onShowSubscriptionModal={() => setShowSubscriptionModal(true)}
+                />
             </div>
-          );
 
-          return <JEEMInstructions test={test} onStartTest={handleStartTest} footerOverride={countdownFooter} />;
-        }
-        return <JEEMInstructions test={test} onStartTest={handleStartTest} />;
-    }
-  };
-
-  return (
-    <main className={`flex-grow ${isTestInProgress ? 'h-screen overflow-hidden' : ''}`}>
-      <div className={isTestInProgress
-        ? "w-full h-full p-4 bg-background-light dark:bg-background-dark"
-        : "container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 flex justify-center"
-      }>
-        {renderContent()}
-      </div>
-    </main>
-  );
+            {showSubscriptionModal && (
+                <SubscriptionModal
+                    onClose={() => setShowSubscriptionModal(false)}
+                    onUpgrade={() => navigate('/pricing')}
+                />
+            )}
+        </main>
+    );
 };
 
 export default AIPTPage;
