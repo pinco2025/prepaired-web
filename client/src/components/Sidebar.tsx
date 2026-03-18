@@ -44,11 +44,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 
   const menuItems = [
     { to: "/question-set", icon: "bolt", label: "Question Set", highlight: true },
+    { to: "/aipt", icon: "psychology", label: "AIPT" },
     { to: "/pyq-2026", icon: "calendar_today", label: "2026 PYQ" },
     { to: "/response-upload", icon: "upload_file", label: "Response Analysis" },
-    { to: "/dashboard", icon: "dashboard", label: "Dashboard" },
-    { to: "/tests", icon: "quiz", label: "Tests & Analysis" },
-    { to: "/aipt", icon: "psychology", label: "AIPT" },
   ];
 
   return (
