@@ -11,9 +11,9 @@ import mathImg from '../assets/cards/math.png';
 // Dashboard Card Images
 import condensedImg from '../assets/cards/condensed-pyq.png';
 import super30Img from '../assets/cards/super30.png';
-import accuracyImg from '../assets/cards/accuracy-speed.png';
+import accuracyImg from '../assets/cards/fast-track-set.png';
 import assertionImg from '../assets/cards/assertion.png';
-import lvl2PyqImg from '../assets/cards/lvl-2-pyq.png';
+import lvl2PyqImg from '../assets/cards/360-degree-set.png';
 
 // Maps dashboard item id → question_set.set_id in Supabase
 const ITEM_SET_ID: Record<string, string> = {
@@ -242,8 +242,8 @@ const QuestionSet: React.FC = () => {
         },
         {
             id: 'accuracy',
-            title: 'Accuracy Boosters',
-            description: 'Speed-focused drills to minimize silly mistakes and improve exam temperament.',
+            title: 'Fast Track Set',
+            description: 'A set comprised to provide maximum marks in minimum time',
             stats: { questions: 'Drills', time: 'Variable', type: 'Speed', difficulty: 'Medium' },
             tags: ['Speed', 'Precision'],
             action: () => {},
@@ -270,8 +270,8 @@ const QuestionSet: React.FC = () => {
         },
         {
             id: 'level2',
-            title: 'Level-2 PYQs',
-            description: 'The toughest previous year questions filtered to boost your rank and challenge your limits.',
+            title: '360° Set',
+            description: 'The final full coverage set to use as your last resort',
             stats: { questions: 'Rank Booster', time: 'Variable', type: 'Advanced', difficulty: 'Extreme' },
             tags: ['Rank Booster', 'High Difficulty'],
             action: () => {},

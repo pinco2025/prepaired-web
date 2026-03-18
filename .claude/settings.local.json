@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find 'C:/Users/Harshit Sayal/Desktop/BDP/prepAIred/prepaired-dev/prepaired-web' -type f -name *AIPT* -o -type f -name *aipt*)"
+    ]
+  }
+}
