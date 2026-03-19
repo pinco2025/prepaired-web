@@ -67,7 +67,7 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
                     {[
                         '4 Best AI-Powered Tests with verified performance analysis',
                         'Hand-picked Condensed PYQ Set based on JEE Main 2026 Jan',
-                        'Handcrafted Statement Based Set — the new JEE pattern, covered',
+                        'Handcrafted A&R Set — the new JEE pattern, covered',
                         'Most analysed Fast-Track Set + 360° Preparation Set',
                         'JEE Advanced Phase 2 included',
                     ].map((perk, i) => (
@@ -239,6 +239,20 @@ const QuestionSet: React.FC = () => {
     // Main Dashboard Items
     const dashboardItems = [
         {
+            id: 'statement',
+            title: 'A&R Set',
+            description: 'Best verified assertion-reason and statement-based questions based on JEE Main 2026 Jan patterns that are increasingly common in exams.',
+            stats: { questions: '60 Qs/Subject', time: 'Complete Coverage', type: '2026 Relevant', difficulty: 'Easy' },
+            tags: ['A&R', 'Statement Based'],
+            action: () => { setSelectedSet('statement'); setViewState('subject_selection'); },
+            classes: {
+                badgeBg: 'bg-rose-500',
+                tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+                titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
+            },
+            image: assertionImg
+        },
+        {
             id: 'condensed_main',
             title: 'Condensed PYQs',
             description: 'Hand-picked, verified high-yield questions from the last 10 years of JEE Main, based on JEE Main 2026 Jan session. Filtered for maximum relevance.',
@@ -279,20 +293,6 @@ const QuestionSet: React.FC = () => {
                 titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
             },
             image: accuracyImg
-        },
-        {
-            id: 'statement',
-            title: 'Statement Based Set',
-            description: 'Best verified assertion-reason and statement-based questions based on JEE Main 2026 Jan patterns that are increasingly common in exams.',
-            stats: { questions: '60 Qs/Subject', time: 'Complete Coverage', type: '2026 Relevant', difficulty: 'Easy' },
-            tags: ['A&R', 'Statement Based'],
-            action: () => { setSelectedSet('statement'); setViewState('subject_selection'); },
-            classes: {
-                badgeBg: 'bg-rose-500',
-                tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
-                titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
-            },
-            image: assertionImg
         },
         {
             id: 'level2',
@@ -390,7 +390,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'physics',
             name: 'Physics',
-            title: 'Physics - Statement Based',
+            title: 'Physics - A&R Set',
             description: 'Best verified assertion-reason and statement-based questions in Physics for JEE Main 2026.',
             stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Medium' },
             tags: ['Assertion-Reason'],
@@ -404,7 +404,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'chemistry',
             name: 'Chemistry',
-            title: 'Chemistry - Statement Based',
+            title: 'Chemistry - A&R Set',
             description: 'Hand-picked, most analysed statement-based formats covering Physical, Inorganic, and Organic Chemistry for JEE Main 2026.',
             stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Medium' },
             tags: ['Statement Based'],
@@ -418,7 +418,7 @@ const QuestionSet: React.FC = () => {
         {
             id: 'mathematics',
             name: 'Mathematics',
-            title: 'Mathematics - Statement Based',
+            title: 'Mathematics - A&R Set',
             description: 'Handcrafted, verified statement and assertion questions for Algebra and Calculus — based on JEE Main 2026 Jan patterns.',
             stats: { questions: '60 Qs', time: '5 Hrs', difficulty: 'Hard' },
             tags: ['Statement Based'],
