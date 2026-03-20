@@ -392,7 +392,7 @@ const SelectionScreen: React.FC<SelectionScreenProps> = ({ tests, onSelectTest, 
 // ── Main AIPTPage ────────────────────────────────────────────────────────────
 const AIPTPage: React.FC = () => {
     usePageTitle('AIPT');
-    const { user, isPaidUser } = useAuth();
+    const { user, isPaidUser, examType } = useAuth();
     const navigate = useNavigate();
     const { invalidateCache } = useDataCache();
 
@@ -475,13 +475,19 @@ const AIPTPage: React.FC = () => {
         fetchTests();
     }, [user?.id]);
 
-    // Compute test statuses from raw data + isPaidUser (no refetch needed)
+    // Compute test statuses from raw data + isPaidUser + examType (no refetch needed)
     const tests: AIPTTest[] = React.useMemo(() => {
         if (!rawTests) return [];
 
+        // Filter to only tests matching the user's exam type.
+        // If examType is null or the test has no exam field, include it.
+        const examFilteredTests = examType
+            ? rawTests.filter((t: any) => !t.exam || t.exam.toUpperCase() === examType.toUpperCase())
+            : rawTests;
+
         let firstFreeUnlocked = false;
 
-        return rawTests.map((test: any) => {
+        return examFilteredTests.map((test: any) => {
             const submissionInfo = submissionsMap.get(String(test.testID));
             const isCompleted = !!submissionInfo;
             const testTier = ((test.tier || 'free') as 'free' | 'lite');
@@ -511,7 +517,7 @@ const AIPTPage: React.FC = () => {
 
             return { ...test, tier: testTier, status: 'locked' as TestStatus };
         });
-    }, [rawTests, submissionsMap, isPaidUser]);
+    }, [rawTests, submissionsMap, isPaidUser, examType]);
 
     // Handle back button during test
     useEffect(() => {
@@ -637,6 +643,27 @@ const AIPTPage: React.FC = () => {
                         Back to AIPT
                     </button>
                     <JEEMInstructions test={selectedTest} onStartTest={handleStartTest} />
+                </div>
+            </main>
+        );
+    }
+
+    // ── No tests available for this exam type ──
+    if (!isLoading && !error && tests.length === 0 && examType) {
+        return (
+            <main className="flex-grow">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center">
+                    <div className="flex flex-col items-center justify-center text-center py-16 px-6 gap-4 max-w-md">
+                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                            <span className="material-symbols-outlined text-primary text-3xl">science</span>
+                        </div>
+                        <h2 className="text-text-light dark:text-text-dark text-xl font-bold">
+                            {examType.toUpperCase()} AIPTs are on their way!
+                        </h2>
+                        <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm leading-relaxed">
+                            We're building AI-powered tests specifically for {examType.toUpperCase()} aspirants. Till then, stay consistent with your practice and check back soon!
+                        </p>
+                    </div>
                 </div>
             </main>
         );

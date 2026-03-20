@@ -24,100 +24,18 @@ const ITEM_SET_ID: Record<string, string> = {
     'level2': 'last-resort',
 };
 
-// ── Subscription Modal ────────────────────────────────────────────────────────
-const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }> = ({ onClose, onUpgrade }) => (
-    <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-    >
-        <div
-            className="relative bg-surface-light dark:bg-surface-dark rounded-2xl p-5 sm:p-8 max-w-md w-full mx-4 shadow-2xl border border-border-light dark:border-border-dark"
-            onClick={e => e.stopPropagation()}
-        >
-            <button
-                onClick={onClose}
-                className="absolute top-3 right-3 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
-            >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-            </button>
-
-            <div className="flex flex-col items-center text-center gap-3 sm:gap-5">
-                {/* Icon */}
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span
-                        className="material-symbols-outlined text-primary text-lg sm:text-xl"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                        lock
-                    </span>
-                </div>
-
-                {/* Heading */}
-                <div>
-                    <h2 className="text-lg sm:text-2xl font-bold text-text-light dark:text-text-dark mb-1">
-                        prepAIred Lite Required
-                    </h2>
-                    <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                        This question set is exclusively available to Lite subscribers. Upgrade to unlock all hand-picked, verified sets and maximize your JEE Main 2026 prep efficiency.
-                    </p>
-                </div>
-
-                {/* Perks */}
-                <div className="w-full space-y-2 sm:space-y-3 text-left">
-                    {[
-                        '4 Best AI-Powered Tests with verified performance analysis',
-                        'Hand-picked Condensed PYQ Set based on JEE Main 2026 Jan',
-                        'Handcrafted A&R Set — the new JEE pattern, covered',
-                        'Most analysed Fast-Track Set + 360° Preparation Set',
-                        'JEE Advanced Phase 2 included',
-                    ].map((perk, i) => (
-                        <div key={i} className="flex items-center gap-2 sm:gap-3">
-                            <div className="rounded-full bg-primary/10 p-0.5 shrink-0">
-                                <span className="material-symbols-outlined text-primary text-[15px] sm:text-[18px] font-bold">check</span>
-                            </div>
-                            <span className="text-xs sm:text-sm font-medium text-text-light dark:text-text-dark">{perk}</span>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Pricing */}
-                <div className="w-full">
-                    <div className="flex items-baseline justify-center gap-1.5 mb-3">
-                        <span className="text-base sm:text-xl line-through text-text-secondary-light dark:text-text-secondary-dark font-medium">₹399</span>
-                        <span className="text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark">₹119</span>
-                        <span className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">/month</span>
-                    </div>
-                    <button
-                        onClick={onUpgrade}
-                        className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:bg-primary-dark hover:scale-[1.02] transition-all"
-                    >
-                        Get prepAIred Lite for ₹119 →
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="w-full mt-1.5 py-2 text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
-                    >
-                        Maybe later
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-);
-
 const QuestionSet: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isAuthenticated, isPaidUser } = useAuth();
+    const { isAuthenticated, examType } = useAuth();
     const [viewState, setViewState] = useState<'dashboard' | 'subject_selection'>(
         (location.state as any)?.viewState || 'dashboard'
     );
     const [selectedSet, setSelectedSet] = useState<string | null>((location.state as any)?.selectedSet || null);
 
-    // Supabase question set data: url + tier per set_id
-    const [setDataMap, setSetDataMap] = useState<Record<string, { url: string | null; tier: string | null }>>({});
+    // Supabase question set data: url + tier + exam per set_id
+    const [setDataMap, setSetDataMap] = useState<Record<string, { url: string | null; tier: string | null; exam: string | null }>>({});
     const [setsLoading, setSetsLoading] = useState(true);
-    const [showPaywallModal, setShowPaywallModal] = useState(false);
 
     // Track which fetch is the "current" one so stale fetches can't update state
     const fetchIdRef = React.useRef(0);
@@ -130,21 +48,21 @@ const QuestionSet: React.FC = () => {
             try {
                 const { data, error } = await supabase
                     .from('question_set')
-                    .select('set_id, url, tier')
+                    .select('set_id, url, tier, exam')
                     .in('set_id', ['condensed', 'super-30', 'sufficient', 'anr', 'last-resort']);
 
                 if (fetchIdRef.current !== id) return;
                 if (error) throw error;
 
-                const map: Record<string, { url: string | null; tier: string | null }> = {
-                    condensed: { url: null, tier: null },
-                    'super-30': { url: null, tier: null },
-                    sufficient: { url: null, tier: null },
-                    anr: { url: null, tier: null },
-                    'last-resort': { url: null, tier: null },
+                const map: Record<string, { url: string | null; tier: string | null; exam: string | null }> = {
+                    condensed: { url: null, tier: null, exam: null },
+                    'super-30': { url: null, tier: null, exam: null },
+                    sufficient: { url: null, tier: null, exam: null },
+                    anr: { url: null, tier: null, exam: null },
+                    'last-resort': { url: null, tier: null, exam: null },
                 };
                 (data || []).forEach((row: any) => {
-                    map[row.set_id] = { url: row.url ?? null, tier: row.tier ?? null };
+                    map[row.set_id] = { url: row.url ?? null, tier: row.tier ?? null, exam: row.exam ?? null };
                 });
 
                 // If query returned no rows and user is authenticated, the session
@@ -181,13 +99,16 @@ const QuestionSet: React.FC = () => {
         return setDataMap[setId]?.url == null;
     };
 
-    // non-null url + lite tier + not paid → locked behind paywall
-    const isItemLiteLocked = (itemId: string): boolean => {
+    // Returns false if the set's exam doesn't match the user's exam type.
+    // If no exam restriction on the set (null), or user has no exam type set, it's visible.
+    const isItemExamMatch = (itemId: string): boolean => {
+        if (!examType) return true;
         const setId = ITEM_SET_ID[itemId];
-        if (!setId) return false;
-        if (setsLoading) return false;
-        const entry = setDataMap[setId];
-        return entry?.url != null && entry?.tier === 'lite' && !isPaidUser;
+        if (!setId) return true;
+        if (setsLoading) return true;
+        const setExam = setDataMap[setId]?.exam;
+        if (!setExam) return true;
+        return setExam.toUpperCase() === examType.toUpperCase();
     };
 
     // Condensed PYQ Subjects Data
@@ -513,13 +434,24 @@ const QuestionSet: React.FC = () => {
                     {/* Dashboard View */}
                     {viewState === 'dashboard' && (
                         <div className="grid grid-cols-1 gap-5">
-                            {dashboardItems.map((item) => {
+                            {!setsLoading && examType && dashboardItems.every(item => !isItemExamMatch(item.id)) ? (
+                                <div className="flex flex-col items-center justify-center text-center py-16 px-6 gap-4">
+                                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                        <span className="material-symbols-outlined text-primary text-3xl">menu_book</span>
+                                    </div>
+                                    <h2 className="text-text-light dark:text-text-dark text-xl font-bold">
+                                        Sets for {examType.toUpperCase()} are on their way!
+                                    </h2>
+                                    <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm max-w-sm leading-relaxed">
+                                        We're handcrafting the best question sets for {examType.toUpperCase()} aspirants. Till then, keep your practice sharp — head over to the Practice section and stay ahead of the curve.
+                                    </p>
+                                </div>
+                            ) : (
+                            dashboardItems.filter(item => isItemExamMatch(item.id)).map((item) => {
                                 const comingSoon = isItemComingSoon(item.id);
-                                const liteLocked = isItemLiteLocked(item.id);
 
                                 const handleClick = () => {
                                     if (comingSoon) return;
-                                    if (liteLocked) { setShowPaywallModal(true); return; }
                                     item.action();
                                 };
 
@@ -530,9 +462,7 @@ const QuestionSet: React.FC = () => {
                                         className={`group relative flex flex-col md:flex-row bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300
                                             ${comingSoon
                                                 ? 'opacity-60 cursor-not-allowed'
-                                                : liteLocked
-                                                    ? 'cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.15)] hover:border-primary/50'
-                                                    : 'cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30'}
+                                                : 'cursor-pointer hover:shadow-[0_8px_24px_rgb(19,91,236,0.08)] hover:border-primary/30'}
                                         `}
                                     >
                                         {/* Image/Icon Section */}
@@ -544,35 +474,12 @@ const QuestionSet: React.FC = () => {
                                                 />
                                             )}
 
-                                            {/* Lock overlay for lite-locked items */}
-                                            {liteLocked && (
-                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                                    <span
-                                                        className="material-symbols-outlined text-white/70 text-4xl"
-                                                        style={{ fontVariationSettings: "'FILL' 1" }}
-                                                    >
-                                                        lock
-                                                    </span>
-                                                </div>
-                                            )}
-
                                             {/* Mobile badge */}
-                                            <div className="absolute bottom-2 left-2 md:hidden">
-                                                {liteLocked ? (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black text-white bg-primary uppercase tracking-widest">
-                                                        LITE
-                                                    </span>
-                                                ) : !comingSoon && item.tags ? (
+                                            {!comingSoon && item.tags && (
+                                                <div className="absolute bottom-2 left-2 md:hidden">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold text-white ${item.classes.badgeBg}`}>
                                                         {item.tags[0]}
                                                     </span>
-                                                ) : null}
-                                            </div>
-
-                                            {/* LITE badge top-right on desktop */}
-                                            {liteLocked && (
-                                                <div className="absolute top-2 right-2 hidden md:block px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase tracking-widest shadow-sm">
-                                                    LITE
                                                 </div>
                                             )}
                                         </div>
@@ -582,22 +489,15 @@ const QuestionSet: React.FC = () => {
                                             <div>
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div className="flex items-center gap-3">
-                                                        {liteLocked ? (
-                                                            <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary">
-                                                                <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-                                                                prepAIred Lite
+                                                        {item.tags && item.tags.map((tag, idx) => (
+                                                            <span key={idx} className={`hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide
+                                                                ${idx === 0
+                                                                    ? item.classes.tagMain
+                                                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                                                                }`}>
+                                                                {tag}
                                                             </span>
-                                                        ) : (
-                                                            item.tags && item.tags.map((tag, idx) => (
-                                                                <span key={idx} className={`hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide
-                                                                    ${idx === 0
-                                                                        ? item.classes.tagMain
-                                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                                                                    }`}>
-                                                                    {tag}
-                                                                </span>
-                                                            ))
-                                                        )}
+                                                        ))}
                                                     </div>
                                                     <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide
                                                         ${item.stats.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
@@ -641,18 +541,11 @@ const QuestionSet: React.FC = () => {
                                                     className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-[0.98]
                                                         ${comingSoon
                                                             ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
-                                                            : liteLocked
-                                                                ? 'bg-primary/90 group-hover:bg-primary text-white shadow-md shadow-primary/20 group-hover:shadow-lg group-hover:shadow-primary/30'
-                                                                : 'bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30'
+                                                            : 'bg-primary text-white shadow-md shadow-blue-500/20 hover:bg-primary-dark hover:shadow-lg hover:shadow-blue-500/30'
                                                         }`}
                                                 >
                                                     {comingSoon ? (
                                                         'Coming Soon'
-                                                    ) : liteLocked ? (
-                                                        <>
-                                                            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-                                                            Unlock with Lite
-                                                        </>
                                                     ) : (
                                                         <>
                                                             Start Practice
@@ -664,7 +557,8 @@ const QuestionSet: React.FC = () => {
                                         </div>
                                     </div>
                                 );
-                            })}
+                            })
+                            )}
                         </div>
                     )}
 
@@ -759,12 +653,6 @@ const QuestionSet: React.FC = () => {
                 </div>
             </div>
 
-            {showPaywallModal && (
-                <SubscriptionModal
-                    onClose={() => setShowPaywallModal(false)}
-                    onUpgrade={() => navigate('/pricing')}
-                />
-            )}
         </div>
     );
 };
