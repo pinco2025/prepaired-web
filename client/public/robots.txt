@@ -1,11 +1,21 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-
-# Sitemap
-Sitemap: https://prepaired.in/sitemap.xml
+Allow: /pyq-2026
+Allow: /pyq/*
+Allow: /question/*
+Allow: /questions/organic
+Allow: /pricing
 
 # Disallow admin/private routes
 Disallow: /dashboard
 Disallow: /tests/*
 Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /delete-account
+Disallow: /response-upload
+
+# Sitemaps
+Sitemap: https://www.prepaired.site/api/sitemap
+Sitemap: https://www.prepaired.site/sitemap.xml

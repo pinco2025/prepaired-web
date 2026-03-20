@@ -73,15 +73,59 @@ const SingleQuestion: React.FC = () => {
     }
 
     const { tag1, tag2 } = question.tags || {};
-    const plainTextQuestion = question.text.replace(/\\/g, '').substring(0, 150) + '...';
-    const seoTitle = `JEE 2026 PYQ: ${question.subject || 'Practice'} | prepAIred.in`;
+    const subjectName = question.subject || 'Practice';
+    const plainTextQuestion = question.text
+        .replace(/\$\$[\s\S]+?\$\$/g, '[equation]')
+        .replace(/\$[\s\S]+?\$/g, '[formula]')
+        .replace(/\\text\{([^}]*)\}/g, '$1')
+        .replace(/\\textbf\{([^}]*)\}/g, '$1')
+        .replace(/\\[a-zA-Z]+/g, '')
+        .replace(/[{}\\^_]/g, '')
+        .replace(/\n/g, ' ')
+        .trim();
+    const shortText = plainTextQuestion.substring(0, 150) + (plainTextQuestion.length > 150 ? '...' : '');
+    const seoTitle = `JEE Main 2026 PYQ: ${subjectName}${tag1 ? ` - ${tag1}` : ''} | prepAIred`;
+    const seoDescription = `JEE Main 2026 Previous Year Question (${subjectName})${tag1 ? ` from ${tag1}` : ''}. ${shortText} Practice with detailed solution on prepAIred.`;
+    const canonicalUrl = `https://www.prepaired.site/pyq/${uuid}`;
 
     return (
         <>
             <Helmet>
                 <title>{seoTitle}</title>
-                <meta name="description" content={plainTextQuestion} />
-                <link rel="canonical" href={`https://www.prepaired.site/pyq/${uuid}`} />
+                <meta name="description" content={seoDescription} />
+                <meta name="keywords" content={`JEE Main 2026 PYQ, JEE 2026 previous year questions, ${subjectName}, JEE Main solutions, prepAIred`} />
+                <link rel="canonical" href={canonicalUrl} />
+
+                {/* Open Graph */}
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content={canonicalUrl} />
+                <meta property="og:title" content={seoTitle} />
+                <meta property="og:description" content={seoDescription} />
+                <meta property="og:site_name" content="prepAIred" />
+                <meta property="og:image" content="https://www.prepaired.site/og-image.png" />
+
+                {/* Twitter */}
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:url" content={canonicalUrl} />
+                <meta name="twitter:title" content={seoTitle} />
+                <meta name="twitter:description" content={seoDescription} />
+
+                {/* JSON-LD */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Quiz",
+                        "name": seoTitle,
+                        "description": seoDescription,
+                        "url": canonicalUrl,
+                        "dateCreated": "2026-01-01T00:00:00Z",
+                        "educationalLevel": "Higher Secondary",
+                        "about": { "@type": "Thing", "name": subjectName },
+                        "provider": { "@type": "EducationalOrganization", "name": "prepAIred", "url": "https://www.prepaired.site/" },
+                        "isAccessibleForFree": true,
+                        "inLanguage": "en"
+                    })}
+                </script>
             </Helmet>
 
             <div className="flex flex-col h-full bg-surface-light dark:bg-surface-dark relative overflow-hidden p-3 md:p-8">
