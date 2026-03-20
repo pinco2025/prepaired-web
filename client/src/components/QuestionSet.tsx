@@ -160,6 +160,20 @@ const QuestionSet: React.FC = () => {
     // Main Dashboard Items
     const dashboardItems = [
         {
+            id: 'accuracy',
+            title: 'Fast Track Set',
+            description: 'Hand-picked set designed to provide maximum marks in minimum time for JEE Main 2026',
+            stats: { questions: 'Drills', time: 'Variable', type: 'Speed', difficulty: 'Medium' },
+            tags: ['Speed', 'Precision'],
+            action: () => { setSelectedSet('accuracy'); setViewState('subject_selection'); },
+            classes: {
+                badgeBg: 'bg-amber-500',
+                tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+                titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
+            },
+            image: accuracyImg
+        },
+        {
             id: 'statement',
             title: 'A&R Set',
             description: 'Best verified assertion-reason and statement-based questions based on JEE Main 2026 Jan patterns that are increasingly common in exams.',
@@ -200,20 +214,6 @@ const QuestionSet: React.FC = () => {
                 titleHover: 'group-hover:text-purple-600 dark:group-hover:text-purple-400'
             },
             image: super30Img
-        },
-        {
-            id: 'accuracy',
-            title: 'Fast Track Set',
-            description: 'Hand-picked set designed to provide maximum marks in minimum time for JEE Main 2026',
-            stats: { questions: 'Drills', time: 'Variable', type: 'Speed', difficulty: 'Medium' },
-            tags: ['Speed', 'Precision'],
-            action: () => { setSelectedSet('accuracy'); setViewState('subject_selection'); },
-            classes: {
-                badgeBg: 'bg-amber-500',
-                tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-                titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
-            },
-            image: accuracyImg
         },
         {
             id: 'level2',
