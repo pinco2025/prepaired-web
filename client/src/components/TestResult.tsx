@@ -65,6 +65,7 @@ const TestResult: React.FC = () => {
   const [result, setResult] = useState<TestResultData | null>(null);
   const [submissionTime, setSubmissionTime] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<string | null>(null);
+  const [percentile99Score, setPercentile99Score] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [polling, setPolling] = useState(false);
   const pollCountRef = useRef(0);
@@ -81,7 +82,7 @@ const TestResult: React.FC = () => {
       try {
         const { data: submissionData, error } = await supabase
           .from('student_tests')
-          .select('submitted_at, started_at, result_url')
+          .select('submitted_at, started_at, result_url, test_id')
           .eq('id', submissionId)
           .single();
 
@@ -90,6 +91,17 @@ const TestResult: React.FC = () => {
 
         setSubmissionTime(submissionData.submitted_at);
         setStartTime(submissionData.started_at);
+
+        if (submissionData.test_id) {
+          const { data: testMeta } = await supabase
+            .from('tests')
+            .select('99ile')
+            .eq('testID', submissionData.test_id)
+            .single();
+          if (!cancelled && testMeta) {
+            setPercentile99Score(testMeta['99ile'] ?? null);
+          }
+        }
 
         if (submissionData.result_url) {
           const response = await fetch(submissionData.result_url);
@@ -230,11 +242,19 @@ const TestResult: React.FC = () => {
                 <p className="text-lg sm:text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">{timeTakenFormatted}</p>
                 <p className="text-[10px] sm:text-xs text-text-secondary-light dark:text-text-secondary-dark">Avg: --</p>
               </div>
-              <div className="col-span-2 md:col-span-2 flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl bg-amber-50 dark:bg-amber-900/15 border border-amber-200 dark:border-amber-800/30">
-                <span className="material-icons-outlined text-amber-500 dark:text-amber-400 text-xl sm:text-2xl flex-shrink-0">schedule</span>
+              <div className="col-span-2 md:col-span-2 flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/15 border border-indigo-200 dark:border-indigo-800/30">
+                <span className="material-icons-outlined text-primary text-xl sm:text-2xl flex-shrink-0">leaderboard</span>
                 <div>
-                  <p className="text-sm sm:text-base font-semibold text-text-light dark:text-text-dark">Rank & Percentile drop at 9 PM tonight.</p>
-                  <p className="text-[10px] sm:text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5">Till then, review your answers and sharpen your weak spots.</p>
+                  <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">PrepAIred Percentile</p>
+                  {percentile99Score != null && percentile99Score > 0 ? (() => {
+                    const raw = (total_stats.total_score / percentile99Score) * 99;
+                    const percentile = raw < 0 ? Math.abs(raw) / 10 : raw;
+                    return (
+                      <p className="text-lg sm:text-xl md:text-2xl font-bold text-primary">{percentile.toFixed(2)}</p>
+                    );
+                  })() : (
+                    <p className="text-sm sm:text-base font-semibold text-text-light dark:text-text-dark">Available at 9 PM</p>
+                  )}
                 </div>
               </div>
             </div>
