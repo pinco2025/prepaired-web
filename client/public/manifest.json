@@ -1,11 +1,11 @@
 {
   "short_name": "prepAIred",
-  "name": "prepAIred - AI-Powered JEE Preparation",
-  "description": "Ace your JEE exams with AI-generated questions, personalized analytics, and adaptive learning.",
+  "name": "prepAIred - AI-Powered JEE & NEET Preparation",
+  "description": "Ace JEE Main 2026, JEE Advanced 2026 & NEET 2026 with 730+ free PYQs, AI mock tests, test series & personalised analytics.",
   "icons": [
     {
-      "src": "logo.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "src": "favicon.ico",
+      "sizes": "48x48 32x32 16x16",
       "type": "image/x-icon"
     },
     {
