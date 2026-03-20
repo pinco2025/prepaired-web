@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 import { withTimeout } from '../utils/promiseUtils';
+import ExamTypeModal from './ExamTypeModal';
 
 interface SidebarContentProps {
   mobile?: boolean;
@@ -19,6 +20,7 @@ interface SidebarContentProps {
   toggleUserMenu: () => void;
   handleSignOut: (e: React.MouseEvent) => void;
   isSigningOut: boolean;
+  onSwitchExam: () => void;
   handleMouseEnter: (e: React.MouseEvent, label: string) => void;
   handleMouseLeave: () => void;
 }
@@ -37,6 +39,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   toggleUserMenu,
   handleSignOut,
   isSigningOut,
+  onSwitchExam,
   handleMouseEnter,
   handleMouseLeave
 }) => {
@@ -149,6 +152,13 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                       <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
                     </div>
                     <button
+                      onClick={onSwitchExam}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary active:bg-primary/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+                    >
+                      <span className="material-symbols-outlined text-lg">swap_horiz</span>
+                      <span>Switch Exam</span>
+                    </button>
+                    <button
                       onClick={handleSignOut}
                       disabled={isSigningOut}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 active:bg-red-500/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none ${isSigningOut ? 'opacity-60 pointer-events-none' : ''}`}
@@ -205,6 +215,7 @@ const Sidebar: React.FC = () => {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showSuper30Preview, setShowSuper30Preview] = useState(false);
   const [showQuestionSetPreview, setShowQuestionSetPreview] = useState(false);
+  const [showExamSwitcher, setShowExamSwitcher] = useState(false);
   const [previewPos, setPreviewPos] = useState({ top: 0, left: 0 });
 
   // Close preview on route change
@@ -452,6 +463,7 @@ const Sidebar: React.FC = () => {
           toggleUserMenu={toggleUserMenu}
           handleSignOut={handleSignOut}
           isSigningOut={isSigningOut}
+          onSwitchExam={() => { setIsUserMenuOpen(false); setShowExamSwitcher(true); }}
           handleMouseEnter={handleMouseEnter}
           handleMouseLeave={handleMouseLeave}
         />
@@ -486,12 +498,22 @@ const Sidebar: React.FC = () => {
                 toggleUserMenu={toggleUserMenu}
                 handleSignOut={handleSignOut}
                 isSigningOut={isSigningOut}
+                onSwitchExam={() => { setIsUserMenuOpen(false); setIsMobileMenuOpen(false); setShowExamSwitcher(true); }}
                 handleMouseEnter={handleMouseEnter}
                 handleMouseLeave={handleMouseLeave}
               />
             </div>
           </div>
         </div>
+      )}
+
+      {/* Exam Type Switcher Modal (triggered from profile menu) */}
+      {showExamSwitcher && (
+        <ExamTypeModal
+          allowDismiss
+          onDismiss={() => setShowExamSwitcher(false)}
+          onComplete={() => setShowExamSwitcher(false)}
+        />
       )}
 
       {/* Global styles for view transition */}

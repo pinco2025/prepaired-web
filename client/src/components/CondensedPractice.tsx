@@ -106,25 +106,12 @@ interface LocalQuestion {
     type?: string;
 }
 
-interface Solution {
-    id: string;
-    number: number;
-    solution_text: string;
-    solution_image_url: string;
-}
-
 interface QuestionsJsonResponse {
     setId: string;
     subject: string;
     totalQuestions: number;
     exportedAt: string;
     questions: LocalQuestion[];
-}
-
-interface SolutionsJsonResponse {
-    setId: string;
-    subject: string;
-    questions: Solution[];
 }
 
 interface ChapterInfo {
@@ -234,25 +221,68 @@ const CondensedPractice: React.FC = () => {
                 }
                 const isCondensed = targetSetId === 'condensed';
                 const fileExt = isCondensed ? '.enc' : '.json';
-                const questionUrl = `${baseUrl}/${capitalizedSubject}_questions${fileExt}`;
-                const solutionUrl = `${baseUrl}/${capitalizedSubject}_solutions${fileExt}`;
+                let questionUrl = `${baseUrl}/${capitalizedSubject}_questions${fileExt}`;
+                let solutionUrl = `${baseUrl}/${capitalizedSubject}_solutions${fileExt}`;
+
+                if (targetSetId === 'neet-phy') {
+                    questionUrl = `${baseUrl}/${subject}/exported_questions.json`;
+                    solutionUrl = `${baseUrl}/${subject}/exported_solutions.json`;
+                }
 
                 // Fetch Questions
                 console.log(`Fetching ${isCondensed ? 'encrypted ' : ''}questions from:`, questionUrl);
-                const questionsData: QuestionsJsonResponse = isCondensed
-                    ? await fetchEncryptedJson<QuestionsJsonResponse>(questionUrl)
+                const rawQuestions = isCondensed
+                    ? await fetchEncryptedJson<any>(questionUrl)
                     : await (await fetch(questionUrl)).json();
+
+                let questionsData: QuestionsJsonResponse;
+                if (targetSetId === 'neet-phy') {
+                    questionsData = {
+                        setId: targetSetId,
+                        subject: subject,
+                        totalQuestions: rawQuestions.length,
+                        exportedAt: new Date().toISOString(),
+                        questions: rawQuestions.map((q: any, index: number) => ({
+                            id: q.uuid || `q${index}`,
+                            uuid: q.uuid || `q${index}`,
+                            text: q.question,
+                            image: q.question_image_url || null,
+                            options: [
+                                { id: 'a', text: q.option_a, image: q.option_a_image_url || null },
+                                { id: 'b', text: q.option_b, image: q.option_b_image_url || null },
+                                { id: 'c', text: q.option_c, image: q.option_c_image_url || null },
+                                { id: 'd', text: q.option_d, image: q.option_d_image_url || null }
+                            ].filter(opt => opt.text || opt.image),
+                            correctAnswer: q.answer?.toLowerCase(),
+                            chapterCode: q.tag_2 || null,
+                            year: q.year || null,
+                            type: q.type || null
+                        }))
+                    };
+                } else {
+                    questionsData = rawQuestions as QuestionsJsonResponse;
+                }
 
                 // Fetch Solutions (Non-blocking)
                 try {
                     console.log(`Fetching ${isCondensed ? 'encrypted ' : ''}solutions from:`, solutionUrl);
-                    const solutionsData: SolutionsJsonResponse = isCondensed
-                        ? await fetchEncryptedJson<SolutionsJsonResponse>(solutionUrl)
+                    const rawSolutions = isCondensed
+                        ? await fetchEncryptedJson<any>(solutionUrl)
                         : await (await fetch(solutionUrl)).json();
-                    // Map solutions by question ID (q1, q2, etc.)
+                    
                     const solMap: { [key: string]: { text: string; image: string | null } } = {};
-                    if (solutionsData.questions) {
-                        solutionsData.questions.forEach(sol => {
+                    
+                    if (targetSetId === 'neet-phy') {
+                        rawSolutions.forEach((sol: any) => {
+                            if (sol.uuid) {
+                                solMap[sol.uuid] = {
+                                    text: sol.solution_text || '',
+                                    image: sol.solution_image_url || null
+                                };
+                            }
+                        });
+                    } else if (rawSolutions.questions) {
+                        rawSolutions.questions.forEach((sol: any) => {
                             solMap[sol.id] = {
                                 text: sol.solution_text || '',
                                 image: sol.solution_image_url || null
@@ -458,14 +488,14 @@ const CondensedPractice: React.FC = () => {
             <header className="h-14 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark flex items-center justify-between px-4 md:px-8 z-30 shrink-0">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate('/question-set', { state: { viewState: 'subject_selection', selectedSet: targetSetId === 'condensed' ? 'condensed_main' : targetSetId === 'sufficient' ? 'accuracy' : targetSetId === 'last-resort' ? 'level2' : 'statement' } })}
+                        onClick={() => navigate('/question-set', { state: { viewState: 'subject_selection', selectedSet: targetSetId === 'condensed' ? 'condensed_main' : targetSetId === 'sufficient' ? 'accuracy' : targetSetId === 'last-resort' ? 'level2' : targetSetId === 'neet-phy' ? 'neet_phy' : 'statement' } })}
                         className="p-2 hover:bg-background-light dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                         <span className="material-symbols-outlined text-text-secondary-light">arrow_back</span>
                     </button>
                     <div className="flex flex-col">
                         <h2 className="font-bold text-text-light dark:text-text-dark text-sm md:text-base line-clamp-1">
-                            {targetSetId === 'sufficient' ? 'Fast Track Practice' : targetSetId === 'last-resort' ? '360° Preparation' : targetSetId === 'anr' ? 'Statement Based Practice' : 'Condensed PYQ Practice'}
+                            {targetSetId === 'sufficient' ? 'Fast Track Practice' : targetSetId === 'last-resort' ? '360° Preparation' : targetSetId === 'anr' ? 'Statement Based Practice' : targetSetId === 'neet-phy' ? 'NEET Physics Set' : 'Condensed PYQ Practice'}
                         </h2>
                         <div className="flex items-center gap-2 text-xs text-text-secondary-light font-medium uppercase tracking-wider">
                             <span className="text-primary">{displaySubject}</span>

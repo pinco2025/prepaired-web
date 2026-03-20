@@ -36,7 +36,7 @@ const SignUp: React.FC = () => {
         }
         throw error;
       }
-      navigate('/register-success');
+      navigate('/question-set');
     } catch (error: any) {
       alert(error.message);
     }

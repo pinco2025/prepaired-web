@@ -13,6 +13,7 @@ type AuthContextValue = {
   isPaidUser: boolean; // True only if subscription is IPFT-01-2026
   examType: string | null;
   refreshSubscription: () => Promise<void>;
+  refreshExamType: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextValue>({
   isPaidUser: false,
   examType: null,
   refreshSubscription: async () => { },
+  refreshExamType: async () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -90,6 +92,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSubscriptionType(subscription);
     }
   }, [user, fetchSubscription]);
+
+  // Manual refresh function for after exam type selection
+  const refreshExamType = useCallback(async () => {
+    if (user) {
+      const exam = await fetchExamType(user.id);
+      setExamType(exam);
+    }
+  }, [user, fetchExamType]);
 
   // Initial auth check
   useEffect(() => {
@@ -197,6 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isPaidUser,
     examType,
     refreshSubscription,
+    refreshExamType,
   };
 
   return (

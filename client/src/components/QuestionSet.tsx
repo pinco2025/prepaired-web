@@ -15,6 +15,15 @@ import accuracyImg from '../assets/cards/fast-track-set.png';
 import assertionImg from '../assets/cards/assertion.png';
 import lvl2PyqImg from '../assets/cards/360-degree-set.png';
 
+// NEET Physics Images
+import neetPhyMechImg from '../assets/cards/neet_phy_mechanics.png';
+import neetPhyThermoImg from '../assets/cards/neet_phy_thermo.png';
+import neetPhyWavesImg from '../assets/cards/neet_phy_waves.png';
+import neetPhyElectroImg from '../assets/cards/neet_phy_electro.png';
+import neetPhyOpticsImg from '../assets/cards/neet_phy_optics.png';
+import neetPhyModernImg from '../assets/cards/neet_phy_modern.png';
+import neetPhyNuclearImg from '../assets/cards/neet_phy_nuclear.png';
+
 // Maps dashboard item id → question_set.set_id in Supabase
 const ITEM_SET_ID: Record<string, string> = {
     'condensed_main': 'condensed',
@@ -22,6 +31,7 @@ const ITEM_SET_ID: Record<string, string> = {
     'accuracy': 'sufficient',
     'statement': 'anr',
     'level2': 'last-resort',
+    'neet_phy': 'neet-phy',
 };
 
 const QuestionSet: React.FC = () => {
@@ -49,7 +59,7 @@ const QuestionSet: React.FC = () => {
                 const { data, error } = await supabase
                     .from('question_set')
                     .select('set_id, url, tier, exam')
-                    .in('set_id', ['condensed', 'super-30', 'sufficient', 'anr', 'last-resort']);
+                    .in('set_id', ['condensed', 'super-30', 'sufficient', 'anr', 'last-resort', 'neet-phy']);
 
                 if (fetchIdRef.current !== id) return;
                 if (error) throw error;
@@ -60,6 +70,7 @@ const QuestionSet: React.FC = () => {
                     sufficient: { url: null, tier: null, exam: null },
                     anr: { url: null, tier: null, exam: null },
                     'last-resort': { url: null, tier: null, exam: null },
+                    'neet-phy': { url: null, tier: null, exam: null },
                 };
                 (data || []).forEach((row: any) => {
                     map[row.set_id] = { url: row.url ?? null, tier: row.tier ?? null, exam: row.exam ?? null };
@@ -228,6 +239,20 @@ const QuestionSet: React.FC = () => {
                 titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
             },
             image: lvl2PyqImg
+        },
+        {
+            id: 'neet_phy',
+            title: 'Physics Set (Lite Plan)',
+            description: 'Exclusive NEET Physics question set with targeted practice across 7 modules to maximize your score.',
+            stats: { questions: '7 Modules', time: 'Comprehensive', type: 'NEET Relevant', difficulty: 'Medium' },
+            tags: ['Lite Plan', 'NEET Physics'],
+            action: () => { setSelectedSet('neet_phy'); setViewState('subject_selection'); },
+            classes: {
+                badgeBg: 'bg-indigo-500',
+                tagMain: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+                titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+            },
+            image: phyImg
         }
     ];
 
@@ -352,10 +377,112 @@ const QuestionSet: React.FC = () => {
         }
     ];
 
+    const neetPhySubjects = [
+        {
+            id: '1',
+            name: 'Full Syllabus 1',
+            title: 'Set 1 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Medium' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyMechImg,
+            classes: {
+                badgeBg: 'bg-indigo-500',
+                tagMain: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+                titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+            }
+        },
+        {
+            id: '2',
+            name: 'Full Syllabus 2',
+            title: 'Set 2 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Medium' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyThermoImg,
+            classes: {
+                badgeBg: 'bg-orange-500',
+                tagMain: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+                titleHover: 'group-hover:text-orange-600 dark:group-hover:text-orange-400'
+            }
+        },
+        {
+            id: '3',
+            name: 'Full Syllabus 3',
+            title: 'Set 3 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Medium' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyWavesImg,
+            classes: {
+                badgeBg: 'bg-cyan-500',
+                tagMain: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
+                titleHover: 'group-hover:text-cyan-600 dark:group-hover:text-cyan-400'
+            }
+        },
+        {
+            id: '4',
+            name: 'Full Syllabus 4',
+            title: 'Set 4 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Hard' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyElectroImg,
+            classes: {
+                badgeBg: 'bg-amber-500',
+                tagMain: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+                titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400'
+            }
+        },
+        {
+            id: '5',
+            name: 'Full Syllabus 5',
+            title: 'Set 5 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Medium' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyOpticsImg,
+            classes: {
+                badgeBg: 'bg-violet-500',
+                tagMain: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+                titleHover: 'group-hover:text-violet-600 dark:group-hover:text-violet-400'
+            }
+        },
+        {
+            id: '6',
+            name: 'Full Syllabus 6',
+            title: 'Set 6 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Easy' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyModernImg,
+            classes: {
+                badgeBg: 'bg-emerald-500',
+                tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+                titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
+            }
+        },
+        {
+            id: '7',
+            name: 'Full Syllabus 7',
+            title: 'Set 7 - Full Syllabus Mock',
+            description: 'Comprehensive full syllabus practice set for NEET Physics, covering all major topics to boost your exam readiness.',
+            stats: { questions: 'Full Mock', time: 'Depends', difficulty: 'Easy' },
+            tags: ['NEET Physics', 'Full Syllabus'],
+            image: neetPhyNuclearImg,
+            classes: {
+                badgeBg: 'bg-rose-500',
+                tagMain: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+                titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
+            }
+        }
+    ];
+
     const getActiveSubjects = () => {
         if (selectedSet === 'accuracy') return fastTrackSubjects;
         if (selectedSet === 'level2') return level2Subjects;
         if (selectedSet === 'statement') return statementSubjects;
+        if (selectedSet === 'neet_phy') return neetPhySubjects;
         return condensedSubjects;
     };
 
@@ -434,7 +561,37 @@ const QuestionSet: React.FC = () => {
                     {/* Dashboard View */}
                     {viewState === 'dashboard' && (
                         <div className="grid grid-cols-1 gap-5">
-                            {!setsLoading && examType && dashboardItems.every(item => !isItemExamMatch(item.id)) ? (
+                            {setsLoading && Object.keys(setDataMap).length === 0 ? (
+                                /* Skeleton Loading Cards */
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <div
+                                        key={`skeleton-${i}`}
+                                        className="relative flex flex-col md:flex-row bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden animate-pulse"
+                                    >
+                                        {/* Image skeleton */}
+                                        <div className="md:w-56 h-36 md:h-auto bg-gray-200 dark:bg-gray-800 shrink-0" />
+                                        {/* Content skeleton */}
+                                        <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                                                    <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                                                </div>
+                                                <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+                                                <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded mb-1" />
+                                                <div className="h-4 w-3/4 bg-gray-100 dark:bg-gray-800 rounded" />
+                                            </div>
+                                            <div className="mt-4 md:mt-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 border-t border-border-light dark:border-border-dark pt-3 md:pt-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                                                    <div className="hidden md:block h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                                                </div>
+                                                <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : !setsLoading && examType && dashboardItems.every(item => !isItemExamMatch(item.id)) ? (
                                 <div className="flex flex-col items-center justify-center text-center py-16 px-6 gap-4">
                                     <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-2">
                                         <span className="material-symbols-outlined text-primary text-3xl">menu_book</span>
@@ -489,7 +646,7 @@ const QuestionSet: React.FC = () => {
                                             <div>
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div className="flex items-center gap-3">
-                                                        {item.tags && item.tags.map((tag, idx) => (
+                                                        {item.tags && item.tags.map((tag: string, idx: number) => (
                                                             <span key={idx} className={`hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide
                                                                 ${idx === 0
                                                                     ? item.classes.tagMain

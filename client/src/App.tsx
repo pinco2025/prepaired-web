@@ -40,6 +40,7 @@ import SingleQuestion from './components/SingleQuestion';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import DeleteAccount from './components/DeleteAccount';
 import InAppBrowserOverlay from './components/InAppBrowserOverlay';
+import ExamTypeModal from './components/ExamTypeModal';
 import { isInAppBrowser, getIsIOS } from './utils/inAppBrowserRedirect';
 
 /**
@@ -75,7 +76,7 @@ const HomeRoute: React.FC = () => {
 };
 
 export const AppContent: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, examType, loading } = useAuth();
   const location = useLocation();
   const [showAIPTModal, setShowAIPTModal] = useState(false);
   const prevAuthRef = useRef(false);
@@ -130,6 +131,10 @@ export const AppContent: React.FC = () => {
       <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark -z-10"></div>
       {/* AIPT Announcement Modal */}
       <AIPTAnnouncementModal isOpen={showAIPTModal} onClose={handleCloseAIPTModal} />
+      {/* Exam Type Selection Modal — shown when authenticated user has no exam type */}
+      {!loading && isAuthenticated && examType === null && (
+        <ExamTypeModal onComplete={() => {}} />
+      )}
       {showSidebar && <Sidebar />}
       <main className="flex-1 w-full relative flex flex-col min-h-0">
         <Routes>
