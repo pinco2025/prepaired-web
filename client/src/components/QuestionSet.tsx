@@ -171,6 +171,20 @@ const QuestionSet: React.FC = () => {
     // Main Dashboard Items
     const dashboardItems = [
         {
+            id: 'level2',
+            title: '360° Set',
+            description: 'Most analysed, best full-coverage set — your handcrafted last resort for JEE Main 2026 & JEE Advanced 2026',
+            stats: { questions: 'Rank Booster', time: 'Variable', type: 'Advanced', difficulty: 'Extreme' },
+            tags: ['Rank Booster', 'High Difficulty'],
+            action: () => { setSelectedSet('level2'); setViewState('subject_selection'); },
+            classes: {
+                badgeBg: 'bg-emerald-500',
+                tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+                titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
+            },
+            image: lvl2PyqImg
+        },
+        {
             id: 'accuracy',
             title: 'Fast Track Set',
             description: 'Hand-picked set designed to provide maximum marks in minimum time for JEE Main 2026',
@@ -225,20 +239,6 @@ const QuestionSet: React.FC = () => {
                 titleHover: 'group-hover:text-purple-600 dark:group-hover:text-purple-400'
             },
             image: super30Img
-        },
-        {
-            id: 'level2',
-            title: '360° Set',
-            description: 'Most analysed, best full-coverage set — your handcrafted last resort for JEE Main 2026 & JEE Advanced 2026',
-            stats: { questions: 'Rank Booster', time: 'Variable', type: 'Advanced', difficulty: 'Extreme' },
-            tags: ['Rank Booster', 'High Difficulty'],
-            action: () => { setSelectedSet('level2'); setViewState('subject_selection'); },
-            classes: {
-                badgeBg: 'bg-emerald-500',
-                tagMain: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
-                titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
-            },
-            image: lvl2PyqImg
         },
         {
             id: 'neet_phy',
