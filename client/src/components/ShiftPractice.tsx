@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { withTimeout } from '../utils/promiseUtils';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
+import ReportFlag from './ReportFlag';
 import {
     RenderMath,
     MCQOptions,
@@ -336,11 +337,14 @@ const ShiftPractice: React.FC = () => {
 
                             {/* Question Content */}
                             <div className="mb-4">
-                                <div className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest mb-4 ${isCurrentInteger
-                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                                    : 'bg-background-light dark:bg-white/5 text-text-secondary-light'
-                                    }`}>
-                                    {isCurrentInteger ? 'Integer Type' : 'Single Correct Type'}
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest ${isCurrentInteger
+                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                        : 'bg-background-light dark:bg-white/5 text-text-secondary-light'
+                                        }`}>
+                                        {isCurrentInteger ? 'Integer Type' : 'Single Correct Type'}
+                                    </div>
+                                    <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />
                                 </div>
 
                                 {/* analytical metadata */}

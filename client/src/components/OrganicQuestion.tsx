@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import QuestionViewer from './question/QuestionViewer';
+import ReportFlag from './ReportFlag';
 import { getQuestionBySlug, organicQuestions } from '../data/organicQuestions';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -95,12 +96,15 @@ const OrganicQuestion: React.FC = () => {
                             <span className="text-text-light dark:text-text-dark font-medium shrink-0">Q{currentIndex + 1}</span>
                         </nav>
 
-                        {/* Tags */}
+                        {/* Tags + Report */}
+                        <div className="flex items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
                             {examSource && <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-wide bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">{examSource}</span>}
                             {year && <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">{year}</span>}
                             {tag1 && <span className="hidden sm:inline-flex items-center px-2 md:px-2.5 py-0.5 rounded text-[10px] md:text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">{tag1}</span>}
                             <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-wide bg-lime-100 dark:bg-lime-900/30 text-lime-700 dark:text-lime-400">Free Access</span>
+                        </div>
+                        <ReportFlag questionId={question.uuid} />
                         </div>
 
                         {/* Question Card */}

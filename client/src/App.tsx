@@ -31,6 +31,7 @@ import ResponseUpload from './components/ResponseUpload';
 import ResponseResult from './components/ResponseResult';
 import AIPTPage from './components/AIPTPage';
 import AIPTAnnouncementModal from './components/AIPTAnnouncementModal';
+import FeedbackModal from './components/FeedbackModal';
 import Waitlist from './components/Waitlist';
 import WaitlistSuccess from './components/WaitlistSuccess';
 import RegisterSuccess from './components/RegisterSuccess';
@@ -42,6 +43,7 @@ import DeleteAccount from './components/DeleteAccount';
 import InAppBrowserOverlay from './components/InAppBrowserOverlay';
 import ExamTypeModal from './components/ExamTypeModal';
 import { isInAppBrowser, getIsIOS } from './utils/inAppBrowserRedirect';
+import { supabase } from './utils/supabaseClient';
 
 /**
  * HomeRoute - Handles the root "/" route
@@ -76,35 +78,57 @@ const HomeRoute: React.FC = () => {
 };
 
 export const AppContent: React.FC = () => {
-  const { isAuthenticated, examType, loading } = useAuth();
+  const { isAuthenticated, examType, loading, subscriptionType, user } = useAuth();
   const location = useLocation();
   const [showAIPTModal, setShowAIPTModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const prevAuthRef = useRef(false);
+  const feedbackCheckedRef = useRef(false);
 
-  // Show AIPT announcement modal when user logs in (every login, not on refresh)
+  const isLiteUser = subscriptionType?.toLowerCase() === 'lite';
+
+  // Show appropriate modal when user logs in
   useEffect(() => {
     if (!loading && isAuthenticated && !prevAuthRef.current) {
-      const dismissed = sessionStorage.getItem('aipt_announcement_dismissed');
-      if (!dismissed) {
-        setShowAIPTModal(true);
-        sessionStorage.setItem('aipt_announcement_dismissed', 'true');
+      if (isLiteUser && user) {
+        // Lite users: show feedback modal if not yet submitted
+        if (!feedbackCheckedRef.current) {
+          feedbackCheckedRef.current = true;
+          supabase
+            .from('user_feedback')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle()
+            .then(({ data }) => {
+              if (!data) setShowFeedbackModal(true);
+            });
+        }
+      } else {
+        // Non-lite users: show AIPT announcement (once per session)
+        const dismissed = sessionStorage.getItem('aipt_announcement_dismissed');
+        if (!dismissed) {
+          setShowAIPTModal(true);
+          sessionStorage.setItem('aipt_announcement_dismissed', 'true');
+        }
       }
     }
-    // Clear dismissed flag on logout so it shows again on next login
+    // Clear flags on logout
     if (!loading && !isAuthenticated && prevAuthRef.current) {
       sessionStorage.removeItem('aipt_announcement_dismissed');
+      feedbackCheckedRef.current = false;
     }
     if (!loading) {
       prevAuthRef.current = isAuthenticated;
     }
-  }, [isAuthenticated, loading]);
+  }, [isAuthenticated, loading, isLiteUser, user]);
 
   const handleCloseAIPTModal = () => {
     setShowAIPTModal(false);
   };
 
-  // TEMPORARY: Mocking lite user for verification
-  const isLiteUser = true; // subscriptionType?.toLowerCase() === 'lite';
+  const handleFeedbackSubmitted = () => {
+    setShowFeedbackModal(false);
+  };
 
   // Check if user is on a test-taking route (hide sidebar during test)
   // Matches /tests/:testId but not /tests (the list page)
@@ -129,8 +153,10 @@ export const AppContent: React.FC = () => {
       {isInAppBrowser() && getIsIOS() && <InAppBrowserOverlay />}
       {/* Background layer: color + grid image */}
       <div className="absolute inset-0 bg-background-light dark:bg-background-dark grid-bg-light dark:grid-bg-dark -z-10"></div>
-      {/* AIPT Announcement Modal */}
+      {/* AIPT Announcement Modal (non-lite users) */}
       <AIPTAnnouncementModal isOpen={showAIPTModal} onClose={handleCloseAIPTModal} />
+      {/* Feedback Modal (lite users, once per user) */}
+      <FeedbackModal isOpen={showFeedbackModal} onSubmitted={handleFeedbackSubmitted} />
       {/* Exam Type Selection Modal — shown when authenticated user has no exam type */}
       {!loading && isAuthenticated && examType === null && (
         <ExamTypeModal onComplete={() => {}} />

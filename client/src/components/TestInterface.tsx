@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
 import { RenderMath } from './question';
+import ReportFlag from './ReportFlag';
 
 type QuestionStatus = 'answered' | 'notAnswered' | 'markedForReview' | 'notVisited';
 
@@ -721,9 +722,12 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                 <h2 className="text-base sm:text-lg font-semibold text-text-light dark:text-text-dark">
                   Question {currentQuestionIndex + 1} of {testData?.questions?.length}
                 </h2>
-                <span className="text-xs sm:text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-2 sm:px-3 py-1 rounded-full ml-2 flex-shrink-0">
-                  {currentQuestion.section}
-                </span>
+                <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                  <span className="text-xs sm:text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-2 sm:px-3 py-1 rounded-full">
+                    {currentQuestion.section}
+                  </span>
+                  <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />
+                </div>
               </div>
               <p className="math-text-scope text-base sm:text-xl text-text-light dark:text-text-dark leading-relaxed mb-5 sm:mb-8 break-words whitespace-pre-wrap">
                 {renderMixedMath(currentQuestion.text)}

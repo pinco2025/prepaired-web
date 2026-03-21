@@ -8,6 +8,7 @@ import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
 import JEELoader from './JEELoader';
 import { SolutionDisplay } from './question';
+import ReportFlag from './ReportFlag';
 
 // Interfaces
 interface AttemptComparison {
@@ -329,7 +330,8 @@ const TestReview: React.FC = () => {
 
                             {/* Question Header */}
                             <div className="mb-4">
-                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <div className="flex items-start justify-between gap-2 mb-3">
+                                <div className="flex flex-wrap items-center gap-2">
                                     {currentAnswer.status === 'Correct' && (
                                         <span className="px-2.5 py-0.5 rounded-full bg-success-light/10 text-success-light text-xs font-bold uppercase tracking-wide flex items-center gap-1">
                                             <span className="material-icons-outlined text-sm">check_circle</span> Correct
@@ -345,6 +347,8 @@ const TestReview: React.FC = () => {
                                             Unattempted
                                         </span>
                                     )}
+                                </div>
+                                <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />
                                 </div>
 
                                 {/* Question Text */}

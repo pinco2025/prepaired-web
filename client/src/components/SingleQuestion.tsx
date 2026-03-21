@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { MCQOptions, SolutionDisplay, RenderMath } from './question';
+import ReportFlag from './ReportFlag';
 
 interface Question {
     uuid: string;
@@ -139,10 +140,13 @@ const SingleQuestion: React.FC = () => {
                     </nav>
 
                     <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-5 md:p-8">
-                        {/* Tags */}
-                        <div className="flex flex-wrap items-center gap-2 mb-6">
-                            {tag1 && <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">{tag1}</span>}
-                            {tag2 && <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] md:text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">Chapter Code: {tag2}</span>}
+                        {/* Tags + Report */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+                            <div className="flex flex-wrap items-center gap-2">
+                                {tag1 && <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">{tag1}</span>}
+                                {tag2 && <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] md:text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">Chapter Code: {tag2}</span>}
+                            </div>
+                            <ReportFlag questionId={question.uuid} />
                         </div>
 
                         {/* Question Text */}
