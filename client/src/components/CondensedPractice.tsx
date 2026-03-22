@@ -106,13 +106,6 @@ interface LocalQuestion {
     type?: string;
 }
 
-interface QuestionsJsonResponse {
-    setId: string;
-    subject: string;
-    totalQuestions: number;
-    exportedAt: string;
-    questions: LocalQuestion[];
-}
 
 interface ChapterInfo {
     code: string;
