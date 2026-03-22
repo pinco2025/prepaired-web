@@ -138,6 +138,12 @@ export default async function handler(req, res) {
     }
 
     try {
+        // Guard: env vars must be set in Vercel
+        if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+            console.error('[api/questions] Missing env vars: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+            return res.status(500).json({ error: 'Server misconfiguration: missing env vars' });
+        }
+
         // ── 1. Authenticate & determine tier ────────────────────────────
         let isPaid = false;
         const authHeader = req.headers['authorization'] || '';
@@ -263,7 +269,7 @@ export default async function handler(req, res) {
         });
 
     } catch (err) {
-        console.error('[api/questions] Error:', err);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('[api/questions] Error:', err?.message || err);
+        return res.status(500).json({ error: err?.message || 'Internal server error' });
     }
 }
