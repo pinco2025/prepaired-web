@@ -101,6 +101,76 @@ const SubscriptionModal: React.FC<{ onClose: () => void; onUpgrade: () => void }
     </div>
 );
 
+// ── NTA Mode Dialog ──────────────────────────────────────────────────────────
+const NTAModeDialog: React.FC<{
+    onSelectNTA: () => void;
+    onSelectStandard: () => void;
+}> = ({ onSelectNTA, onSelectStandard }) => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="relative bg-surface-light dark:bg-surface-dark rounded-2xl p-6 sm:p-8 max-w-sm w-full mx-4 shadow-2xl border border-border-light dark:border-border-dark">
+            <div className="flex flex-col items-center text-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-2xl">computer</span>
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold text-text-light dark:text-text-dark mb-1">Attempt in NTA Mode?</h2>
+                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark leading-relaxed">
+                        NTA mode replicates the official JEE exam portal interface — same layout, same buttons, same experience.
+                    </p>
+                </div>
+                <div className="w-full flex flex-col gap-2 mt-1">
+                    <button
+                        onClick={onSelectNTA}
+                        className="w-full py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:opacity-90 transition-opacity"
+                    >
+                        Yes, Open in NTA Mode
+                    </button>
+                    <button
+                        onClick={onSelectStandard}
+                        className="w-full py-2 text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                    >
+                        Continue in Standard Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+// ── NTA Back Warning Dialog ───────────────────────────────────────────────────
+const NTABackWarningDialog: React.FC<{
+    onStay: () => void;
+    onLeave: () => void;
+}> = ({ onStay, onLeave }) => (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="relative bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-slate-200">
+            <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-amber-600 text-2xl">warning</span>
+                </div>
+                <div>
+                    <h2 className="text-base font-bold text-slate-800 mb-1">Leave the test?</h2>
+                    <p className="text-sm text-slate-600">Your saved progress might get lost if you navigate away from the test.</p>
+                </div>
+                <div className="w-full flex gap-2 mt-1">
+                    <button
+                        onClick={onStay}
+                        className="flex-1 py-2 rounded-lg bg-blue-600 text-white font-bold text-sm hover:bg-blue-700"
+                    >
+                        Stay on Test
+                    </button>
+                    <button
+                        onClick={onLeave}
+                        className="flex-1 py-2 rounded-lg border border-slate-300 text-slate-600 font-medium text-sm hover:bg-slate-50"
+                    >
+                        Leave
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 // ── AIPT Test Selection Screen ───────────────────────────────────────────────
 const testPositions = [
     { top: 0, left: 50 },
@@ -403,6 +473,9 @@ const AIPTPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+    const [ntaMode, setNtaMode] = useState(false);
+    const [showNtaDialog, setShowNtaDialog] = useState(false);
+    const [ntaBackWarning, setNtaBackWarning] = useState(false);
 
     // Track which fetch is the "current" one so stale fetches can't update state
     const fetchIdRef = React.useRef(0);
@@ -521,32 +594,56 @@ const AIPTPage: React.FC = () => {
 
     // Handle back button during test
     useEffect(() => {
-        const handlePopState = () => setPageState('instructions');
+        const handlePopState = () => {
+            if (ntaMode && pageState === 'inProgress') {
+                setNtaBackWarning(true);
+            } else {
+                setPageState('instructions');
+            }
+        };
         if (pageState === 'inProgress' || pageState === 'submitted') {
             window.history.pushState({ state: pageState }, '');
             window.addEventListener('popstate', handlePopState);
         }
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [pageState]);
+    }, [pageState, ntaMode]);
 
     const handleSelectTest = (test: AIPTTest) => {
         setSelectedTest(test as Test);
+        setNtaMode(false);
         setPageState('instructions');
     };
 
     const handleStartTest = () => {
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile && examType?.toUpperCase() === 'JEE') {
+            setShowNtaDialog(true);
+        } else {
+            setPageState('inProgress');
+            document.documentElement.requestFullscreen?.().catch(() => {});
+        }
+    };
+
+    const handleConfirmNtaMode = (useNta: boolean) => {
+        setShowNtaDialog(false);
+        setNtaMode(useNta);
         setPageState('inProgress');
+        window.dispatchEvent(new CustomEvent('ntamodechange', { detail: useNta }));
         document.documentElement.requestFullscreen?.().catch(() => {});
     };
 
     const handleSubmitSuccess = () => {
         invalidateCache('all');
+        setNtaMode(false);
         setPageState('submitted');
+        window.dispatchEvent(new CustomEvent('ntamodechange', { detail: false }));
     };
 
     const handleBackToSelection = () => {
         setSelectedTest(null);
+        setNtaMode(false);
         setPageState('selection');
+        window.dispatchEvent(new CustomEvent('ntamodechange', { detail: false }));
     };
 
     const isTestInProgress = pageState === 'inProgress';
@@ -610,6 +707,27 @@ const AIPTPage: React.FC = () => {
 
     // ── Test in progress ──
     if (isTestInProgress && selectedTest) {
+        if (ntaMode) {
+            return (
+                <>
+                    <TestInterface test={selectedTest} onSubmitSuccess={handleSubmitSuccess} exam={selectedTest.exam} ntaMode={true} />
+                    {ntaBackWarning && (
+                        <NTABackWarningDialog
+                            onStay={() => {
+                                setNtaBackWarning(false);
+                                window.history.pushState({ state: 'inProgress' }, '');
+                            }}
+                            onLeave={() => {
+                                setNtaBackWarning(false);
+                                setNtaMode(false);
+                                setPageState('instructions');
+                                window.dispatchEvent(new CustomEvent('ntamodechange', { detail: false }));
+                            }}
+                        />
+                    )}
+                </>
+            );
+        }
         return (
             <main className="flex-grow h-screen overflow-hidden">
                 <div className="w-full h-full p-4 bg-background-light dark:bg-background-dark">
@@ -644,6 +762,13 @@ const AIPTPage: React.FC = () => {
                     </button>
                     <JEEMInstructions test={selectedTest} onStartTest={handleStartTest} />
                 </div>
+
+                {showNtaDialog && (
+                    <NTAModeDialog
+                        onSelectNTA={() => handleConfirmNtaMode(true)}
+                        onSelectStandard={() => handleConfirmNtaMode(false)}
+                    />
+                )}
             </main>
         );
     }
@@ -684,6 +809,13 @@ const AIPTPage: React.FC = () => {
                 <SubscriptionModal
                     onClose={() => setShowSubscriptionModal(false)}
                     onUpgrade={() => navigate('/pricing')}
+                />
+            )}
+
+            {showNtaDialog && (
+                <NTAModeDialog
+                    onSelectNTA={() => handleConfirmNtaMode(true)}
+                    onSelectStandard={() => handleConfirmNtaMode(false)}
                 />
             )}
         </main>

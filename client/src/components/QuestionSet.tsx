@@ -59,19 +59,12 @@ const QuestionSet: React.FC = () => {
                 const { data, error } = await supabase
                     .from('question_set')
                     .select('set_id, url, tier, exam')
-                    .in('set_id', ['condensed', 'super-30', 'sufficient', 'anr', 'last-resort', 'neet-phy']);
+                    .eq('type', 'SET');
 
                 if (fetchIdRef.current !== id) return;
                 if (error) throw error;
 
-                const map: Record<string, { url: string | null; tier: string | null; exam: string | null }> = {
-                    condensed: { url: null, tier: null, exam: null },
-                    'super-30': { url: null, tier: null, exam: null },
-                    sufficient: { url: null, tier: null, exam: null },
-                    anr: { url: null, tier: null, exam: null },
-                    'last-resort': { url: null, tier: null, exam: null },
-                    'neet-phy': { url: null, tier: null, exam: null },
-                };
+                const map: Record<string, { url: string | null; tier: string | null; exam: string | null }> = {};
                 (data || []).forEach((row: any) => {
                     map[row.set_id] = { url: row.url ?? null, tier: row.tier ?? null, exam: row.exam ?? null };
                 });

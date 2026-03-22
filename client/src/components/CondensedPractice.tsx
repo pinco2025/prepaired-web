@@ -403,7 +403,7 @@ const CondensedPractice: React.FC = () => {
             <header className="h-14 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark flex items-center justify-between px-4 md:px-8 z-30 shrink-0">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate('/question-set', { state: { viewState: 'subject_selection', selectedSet: targetSetId === 'condensed' ? 'condensed_main' : targetSetId === 'sufficient' ? 'accuracy' : targetSetId === 'last-resort' ? 'level2' : targetSetId === 'neet-phy' ? 'neet_phy' : 'statement' } })}
+                        onClick={() => targetSetId.startsWith('ch-') ? navigate(-1) : navigate('/question-set', { state: { viewState: 'subject_selection', selectedSet: targetSetId === 'condensed' ? 'condensed_main' : targetSetId === 'sufficient' ? 'accuracy' : targetSetId === 'last-resort' ? 'level2' : targetSetId === 'neet-phy' ? 'neet_phy' : 'statement' } })}
                         className="p-2 hover:bg-background-light dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                         <span className="material-symbols-outlined text-text-secondary-light">arrow_back</span>

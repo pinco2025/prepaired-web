@@ -4,7 +4,6 @@ import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
 import JEELoader from './JEELoader';
 
-// Define interfaces for the result data based on sample_result.json
 interface SectionScore {
   score: number;
   correct: number;
@@ -13,12 +12,26 @@ interface SectionScore {
   total_questions: number;
 }
 
+interface AttemptEntry {
+  question_uuid: string;
+  question_id: string;
+  section: string;
+  chapter_tag: string;
+  user_response: string | null;
+  correct_response: string;
+  status: string;
+  marks_awarded: number;
+  blunder?: boolean;
+}
+
 interface TestResultData {
   testId: string;
   totalMarks: number;
   totalQuestions: number;
   sections: { name: string; marksPerQuestion: number }[];
   section_scores: Record<string, SectionScore>;
+  chapter_scores?: Record<string, unknown>;
+  attempt_comparison?: AttemptEntry[];
   total_stats: {
     total_score: number;
     total_attempted: number;
@@ -28,34 +41,41 @@ interface TestResultData {
   };
 }
 
-const subjectStyles: Record<string, { bg: string; text: string; bar: string }> = {
+
+const SUBJECT_COLORS = {
   Physics: {
-    bg: 'bg-blue-50 dark:bg-blue-900/20',
-    text: 'text-blue-600 dark:text-blue-400',
-    bar: 'bg-blue-500',
+    text: 'text-primary',
+    icon: 'text-primary',
+    bar: 'bg-primary',
+    tile: 'bg-primary text-white',
+    glow: 'bg-primary/5',
+    border: 'border-primary/20',
+    label: 'text-primary',
   },
   Chemistry: {
-    bg: 'bg-purple-50 dark:bg-purple-900/20',
-    text: 'text-purple-600 dark:text-purple-400',
-    bar: 'bg-purple-500',
+    text: 'text-green-500',
+    icon: 'text-green-500',
+    bar: 'bg-green-500',
+    tile: 'bg-green-500 text-white',
+    glow: 'bg-green-500/5',
+    border: 'border-green-500/20',
+    label: 'text-green-500',
   },
   Mathematics: {
-    bg: 'bg-orange-50 dark:bg-orange-900/20',
-    text: 'text-orange-600 dark:text-orange-400',
+    text: 'text-orange-500',
+    icon: 'text-orange-500',
     bar: 'bg-orange-500',
+    tile: 'bg-orange-500 text-white',
+    glow: 'bg-orange-500/5',
+    border: 'border-orange-500/20',
+    label: 'text-orange-500',
   },
 };
 
-const defaultSubjectStyle = {
-  bg: 'bg-gray-50 dark:bg-gray-900/20',
-  text: 'text-gray-600 dark:text-gray-400',
-  bar: 'bg-gray-500',
-};
-
-const subjectIcons: Record<string, string> = {
-  Physics: 'science',
+const SUBJECT_ICONS: Record<string, string> = {
+  Physics: 'flare',
   Chemistry: 'biotech',
-  Mathematics: 'calculate',
+  Mathematics: 'functions',
 };
 
 const TestResult: React.FC = () => {
@@ -69,16 +89,13 @@ const TestResult: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [polling, setPolling] = useState(false);
   const pollCountRef = useRef(0);
-
   useEffect(() => {
     let pollTimer: ReturnType<typeof setTimeout> | null = null;
     let cancelled = false;
 
     const fetchResultData = async (isRetry = false) => {
       if (!submissionId) return;
-
       if (!isRetry) setLoading(true);
-
       try {
         const { data: submissionData, error } = await supabase
           .from('student_tests')
@@ -111,7 +128,6 @@ const TestResult: React.FC = () => {
           setResult(data as TestResultData);
           setPolling(false);
         } else {
-          // Result not ready — poll every 5s, up to 24 times (~2 min)
           setResult(null);
           pollCountRef.current += 1;
           if (pollCountRef.current < 24 && !cancelled) {
@@ -121,7 +137,6 @@ const TestResult: React.FC = () => {
             setPolling(false);
           }
         }
-
       } catch (error) {
         console.error('Error fetching result data:', error);
       } finally {
@@ -130,16 +145,13 @@ const TestResult: React.FC = () => {
     };
 
     fetchResultData();
-
     return () => {
       cancelled = true;
       if (pollTimer) clearTimeout(pollTimer);
     };
   }, [submissionId]);
 
-  if (loading) {
-    return <JEELoader message="Loading results..." />;
-  }
+  if (loading) return <JEELoader message="Loading results..." />;
 
   if (!result) {
     return (
@@ -168,11 +180,34 @@ const TestResult: React.FC = () => {
     );
   }
 
-  const { total_stats, totalMarks, section_scores } = result;
-  const accuracy = total_stats.total_attempted > 0 ? (total_stats.total_correct / total_stats.total_attempted) * 100 : 0;
-  const scorePercentage = (total_stats.total_score / totalMarks) * 100;
+  const { total_stats, section_scores } = result;
+  const accuracy = total_stats.total_attempted > 0
+    ? (total_stats.total_correct / total_stats.total_attempted) * 100
+    : 0;
+  const scorePercentage = (total_stats.total_score / 300) * 100;
+  const circumference = 2 * Math.PI * 54;
 
-  let timeTakenFormatted = "??";
+  const isJEEFormat = result.sections.some(s => / [AB]$/.test(s.name));
+
+  const subjectBreakdown = ['Physics', 'Chemistry', 'Mathematics'].map(subject => {
+    const secA = section_scores[`${subject} A`];
+    const secB = section_scores[`${subject} B`];
+    const secSingle = section_scores[subject];
+    const secs = [
+      secA ? { label: 'Sec A', key: `${subject} A`, data: secA } : null,
+      secB ? { label: 'Sec B', key: `${subject} B`, data: secB } : null,
+      secSingle ? { label: subject, key: subject, data: secSingle } : null,
+    ].filter((s): s is { label: string; key: string; data: SectionScore } => s !== null);
+    const totalScore = secs.reduce((sum, s) => sum + s.data.score, 0);
+    const totalMax = secs.reduce((sum, s) => {
+      const info = result.sections.find(si => si.name === s.key);
+      return sum + s.data.total_questions * (info?.marksPerQuestion ?? 0);
+    }, 0);
+    const pct = totalMax > 0 ? (totalScore / totalMax) * 100 : 0;
+    return { subject, secs, totalScore, totalMax, pct };
+  }).filter(s => s.secs.length > 0);
+
+  let timeTakenFormatted = '--';
   if (startTime && submissionTime) {
     const start = new Date(startTime).getTime();
     const end = new Date(submissionTime).getTime();
@@ -181,177 +216,249 @@ const TestResult: React.FC = () => {
       const hours = Math.floor(diff / 3600000);
       const minutes = Math.floor((diff % 3600000) / 60000);
       const parts = [];
-      if (hours > 0) parts.push(`${hours} H`);
-      if (minutes > 0 || hours === 0) parts.push(`${minutes} Min`);
+      if (hours > 0) parts.push(`${hours}h`);
+      if (minutes > 0 || hours === 0) parts.push(`${minutes}m`);
       timeTakenFormatted = parts.join(' ');
     }
   }
 
+  let percentileValue: number | null = null;
+  if (percentile99Score != null && percentile99Score > 0) {
+    const raw = (total_stats.total_score / percentile99Score) * 99;
+    percentileValue = raw < 0 ? Math.abs(raw) / 10 : raw;
+  }
+
+  const blundersBySubject = (['Physics', 'Chemistry', 'Mathematics'] as const).reduce<Record<string, AttemptEntry[]>>((acc, subject) => {
+    acc[subject] = (result.attempt_comparison ?? []).filter(
+      q => q.blunder === true && q.section.startsWith(subject)
+    );
+    return acc;
+  }, {});
+  const hasBlunders = Object.values(blundersBySubject).some(arr => arr.length > 0);
+
   return (
     <main className="flex-grow container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 pb-8 sm:pb-10 md:pb-12">
-      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
+
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-          <div className="min-w-0 w-full sm:w-auto">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark truncate">Test Result: {result.testId}</h1>
-            <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
-              <span className="material-icons-outlined text-xs sm:text-sm">event</span>
-              {submissionTime ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}` : ''}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <nav className="flex items-center gap-1.5 text-text-secondary-light dark:text-text-secondary-dark text-xs mb-2">
+              <span>Tests</span>
+              <span className="material-icons-outlined text-[13px]">chevron_right</span>
+              <span>{result.testId}</span>
+              <span className="material-icons-outlined text-[13px]">chevron_right</span>
+              <span className="text-primary">Results</span>
+            </nav>
+            <h1 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark">
+              {result.testId} <span className="text-primary">Results</span>
+            </h1>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1 text-sm flex items-center gap-1.5">
+              <span className="material-icons-outlined text-sm">event</span>
+              {submissionTime
+                ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`
+                : ''}
             </p>
           </div>
+          <button
+            onClick={() => navigate(`/review/${submissionId}`)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-primary hover:opacity-90 transition-opacity shadow-sm text-sm self-start md:self-auto"
+          >
+            <span className="material-icons-outlined text-base">rate_review</span>
+            Start Review
+          </button>
+        </header>
 
-          <div className="flex items-center gap-2 sm:gap-3 bg-surface-light/50 dark:bg-surface-dark/50 p-1.5 sm:p-2 pl-3 sm:pl-4 rounded-xl border border-border-light dark:border-border-dark backdrop-blur-sm w-full sm:w-auto">
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-text-light dark:text-text-dark">Analysis</p>
-              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Compare with key</p>
-            </div>
-            <p className="sm:hidden text-sm font-medium text-text-light dark:text-text-dark">Review answers</p>
-            <button
-              onClick={() => navigate(`/review/${submissionId}`)}
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity shadow-sm text-sm sm:text-base ml-auto sm:ml-0"
-            >
-              Start Review
-              <span className="material-icons-outlined text-base sm:text-lg">arrow_forward</span>
-            </button>
-          </div>
-        </div>
+        {/* Top Row: Hero Score + Quick Stats */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* Score Overview Card */}
-        <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-4 sm:p-6 md:p-8">
-          <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-6 md:gap-12">
-            <div className="flex-shrink-0 relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 flex items-center justify-center">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
-                <circle className="text-border-light dark:text-border-dark" cx="80" cy="80" fill="none" r="70" stroke="currentColor" strokeWidth="12"></circle>
-                <circle className="text-primary" cx="80" cy="80" fill="none" r="70" stroke="currentColor" strokeDasharray="440" strokeDashoffset={440 - (440 * scorePercentage) / 100} strokeLinecap="round" strokeWidth="12"></circle>
-              </svg>
-              <div className="absolute text-center">
-                <span className="block text-2xl sm:text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark">{total_stats.total_score}</span>
-                <span className="block text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">/ {totalMarks}</span>
+          {/* Hero Score Card */}
+          <section className="lg:col-span-5 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute -top-20 -left-20 w-56 h-56 bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+            <div>
+              <div className="flex items-center mb-1">
+                <h3 className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold uppercase tracking-widest">Total Score</h3>
               </div>
-            </div>
-            <div className="flex-grow w-full grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-              <div className="space-y-1">
-                <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">Accuracy</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">{accuracy.toFixed(0)}%</p>
-                <div className="w-full bg-border-light dark:bg-border-dark rounded-full h-1.5 mt-1 sm:mt-2">
-                  <div className="bg-primary h-1.5 rounded-full" style={{ width: `${accuracy}%` }}></div>
+              <div className="flex items-center gap-6 mt-4">
+                {/* Donut ring */}
+                <div className="relative flex-shrink-0 w-28 h-28 flex items-center justify-center">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="10" className="text-border-light dark:text-border-dark" />
+                    <circle
+                      cx="60" cy="60" r="54" fill="none"
+                      stroke="#0066ff"
+                      strokeWidth="10"
+                      strokeLinecap="round"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={circumference - (circumference * Math.min(scorePercentage, 100)) / 100}
+                    />
+                  </svg>
+                  <div className="absolute text-center">
+                    <span className="block text-2xl font-extrabold text-text-light dark:text-text-dark leading-none">{total_stats.total_score}</span>
+                    <span className="block text-xs text-text-secondary-light dark:text-text-secondary-dark">/300</span>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">Time Taken</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-text-light dark:text-text-dark">{timeTakenFormatted}</p>
-                <p className="text-[10px] sm:text-xs text-text-secondary-light dark:text-text-secondary-dark">Avg: --</p>
-              </div>
-              <div className="col-span-2 md:col-span-2 flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/15 border border-indigo-200 dark:border-indigo-800/30">
-                <span className="material-icons-outlined text-primary text-xl sm:text-2xl flex-shrink-0">leaderboard</span>
+                {/* Percentile */}
                 <div>
-                  <p className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">PrepAIred Percentile</p>
-                  {percentile99Score != null && percentile99Score > 0 ? (() => {
-                    const raw = (total_stats.total_score / percentile99Score) * 99;
-                    const percentile = raw < 0 ? Math.abs(raw) / 10 : raw;
-                    return (
-                      <p className="text-lg sm:text-xl md:text-2xl font-bold text-primary">{percentile.toFixed(2)}</p>
-                    );
-                  })() : (
-                    <p className="text-sm sm:text-base font-semibold text-text-light dark:text-text-dark">Available at 9 PM</p>
+                  <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs uppercase tracking-wider font-medium mb-1">PrepAIred Percentile</p>
+                  {percentileValue != null ? (
+                    <p className="text-5xl font-extrabold text-primary leading-none">
+                      {percentileValue < 90 ? '<90' : percentileValue.toFixed(1)}<span className="text-2xl font-bold">%ile</span>
+                    </p>
+                  ) : (
+                    <p className="text-lg font-semibold text-text-light dark:text-text-dark">At 9 PM</p>
                   )}
                 </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Quick Stats Grid */}
+          <section className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {/* Time */}
+            <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-5 flex flex-col justify-between">
+              <span className="material-icons-outlined text-primary mb-3">timer</span>
+              <div>
+                <span className="block text-2xl font-bold text-text-light dark:text-text-dark">{timeTakenFormatted}</span>
+                <span className="text-[11px] text-text-secondary-light dark:text-text-secondary-dark font-medium uppercase tracking-wider">Time Taken</span>
+              </div>
+            </div>
+            {/* Accuracy */}
+            <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-5 flex flex-col justify-between">
+              <span className="material-icons-outlined text-success-light dark:text-success-dark mb-3">track_changes</span>
+              <div>
+                <span className="block text-2xl font-bold text-text-light dark:text-text-dark">{accuracy.toFixed(0)}%</span>
+                <span className="text-[11px] text-text-secondary-light dark:text-text-secondary-dark font-medium uppercase tracking-wider">Accuracy</span>
+              </div>
+            </div>
+            {/* Attempted */}
+            <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-5 flex flex-col justify-between">
+              <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark mb-3">edit_note</span>
+              <div>
+                <span className="block text-2xl font-bold text-text-light dark:text-text-dark">{total_stats.total_attempted}<span className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-normal"> / {result.totalQuestions}</span></span>
+                <span className="text-[11px] text-text-secondary-light dark:text-text-secondary-dark font-medium uppercase tracking-wider">Attempted</span>
+              </div>
+            </div>
+
+            {/* Generate Insights CTA — spans 2 or 3 cols */}
+            <div className="col-span-2 sm:col-span-3 bg-gradient-to-br from-surface-light to-border-light/30 dark:from-surface-dark dark:to-border-dark/30 rounded-2xl border border-primary/20 p-5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center relative flex-shrink-0">
+                  <span className="material-icons-outlined text-3xl text-primary">auto_awesome</span>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-base text-text-light dark:text-text-dark">PrepAIred Analysis</h4>
+                  <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">Deep insights into your weak areas and cognitive patterns.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate(`/insights/${submissionId}`)}
+                className="flex-shrink-0 bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-sm"
+              >
+                Generate Insights
+              </button>
+            </div>
+          </section>
         </div>
 
-        {/* Analysis & Subject Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Question Analysis */}
-          <div className="lg:col-span-1 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-text-light dark:text-text-dark mb-4 sm:mb-6 flex items-center gap-2">
-              <span className="material-icons-outlined text-primary text-xl sm:text-[24px]">analytics</span>
-              Question Analysis
-            </h3>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/20 transition-transform hover:scale-[1.02]">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="material-icons-outlined text-success-light dark:text-success-dark text-xl sm:text-[24px]">check_circle</span>
-                  <span className="text-sm sm:text-base font-medium text-text-light dark:text-text-dark">Correct</span>
-                </div>
-                <span className="text-lg sm:text-xl font-bold text-success-light dark:text-success-dark">{total_stats.total_correct}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 transition-transform hover:scale-[1.02]">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="material-icons-outlined text-error-light dark:text-error-dark text-xl sm:text-[24px]">cancel</span>
-                  <span className="text-sm sm:text-base font-medium text-text-light dark:text-text-dark">Incorrect</span>
-                </div>
-                <span className="text-lg sm:text-xl font-bold text-error-light dark:text-error-dark">{total_stats.total_wrong}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-700/30 transition-transform hover:scale-[1.02]">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="material-icons-outlined text-text-secondary-light dark:text-text-secondary-dark text-xl sm:text-[24px]">remove_circle</span>
-                  <span className="text-sm sm:text-base font-medium text-text-light dark:text-text-dark">Skipped</span>
-                </div>
-                <span className="text-lg sm:text-xl font-bold text-text-secondary-light dark:text-text-secondary-dark">{total_stats.total_unattempted}</span>
-              </div>
-            </div>
-            <div className="mt-5 sm:mt-8 pt-4 sm:pt-6 border-t border-border-light dark:border-border-dark">
-              <div className="flex justify-between items-end mb-2">
-                <span className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Attempted</span>
-                <span className="text-base sm:text-lg font-bold text-text-light dark:text-text-dark">{total_stats.total_attempted}<span className="text-xs sm:text-sm text-text-secondary-light dark:text-text-secondary-dark font-normal">/{result.totalQuestions}</span></span>
-              </div>
-              <div className="w-full bg-border-light dark:bg-border-dark rounded-full h-2 overflow-hidden flex">
-                <div className="bg-success-light dark:bg-success-dark h-full" style={{ width: `${(total_stats.total_correct / result.totalQuestions) * 100}%` }}></div>
-                <div className="bg-error-light dark:bg-error-dark h-full" style={{ width: `${(total_stats.total_wrong / result.totalQuestions) * 100}%` }}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Subject Breakdown */}
-          <div className="lg:col-span-2 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-text-light dark:text-text-dark mb-4 sm:mb-6 flex items-center gap-2">
-              <span className="material-icons-outlined text-primary text-xl sm:text-[24px]">subject</span>
-              Subject Breakdown
-            </h3>
-            <div className="space-y-4 sm:space-y-6">
-              {Object.entries(section_scores).map(([sectionName, data]) => {
-                const subjectName = sectionName.replace(/ (A|B)$/, '').trim();
-                const style = subjectStyles[subjectName] || defaultSubjectStyle;
-                const sectionInfo = result.sections.find(s => s.name === sectionName);
-                const sectionMaxScore = data.total_questions * (sectionInfo?.marksPerQuestion || 0);
-                return (
-                  <div className="group" key={sectionName}>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-1.5 sm:gap-0">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                        <div className={`p-1.5 sm:p-2 rounded-lg ${style.bg} ${style.text} flex-shrink-0`}>
-                          <span className="material-icons-outlined text-[18px] sm:text-[20px]">{subjectIcons[subjectName] || 'subject'}</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-sm sm:text-base font-medium text-text-light dark:text-text-dark">{sectionName}</h4>
-                          <p className="text-[10px] sm:text-xs text-text-secondary-light dark:text-text-secondary-dark">Score: {data.score}/{sectionMaxScore}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm flex-shrink-0 ml-9 sm:ml-2">
-                        <div className="flex items-center gap-1 sm:gap-1.5 text-green-600 dark:text-green-400 font-medium">
-                          <span className="material-icons-outlined text-[16px] sm:text-[18px]">check_circle</span>
-                          <span>{data.correct}</span>
-                        </div>
-                        <div className="flex items-center gap-1 sm:gap-1.5 text-red-600 dark:text-red-400 font-medium">
-                          <span className="material-icons-outlined text-[16px] sm:text-[18px]">cancel</span>
-                          <span>{data.incorrect}</span>
-                        </div>
-                        <div className="flex items-center gap-1 sm:gap-1.5 text-gray-500 dark:text-gray-400 font-medium">
-                          <span className="material-icons-outlined text-[16px] sm:text-[18px]">remove_circle</span>
-                          <span>{data.unattempted}</span>
-                        </div>
-                      </div>
+        {/* Subject Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {subjectBreakdown.map(({ subject, secs, totalScore, totalMax, pct }) => {
+            const colors = SUBJECT_COLORS[subject as keyof typeof SUBJECT_COLORS] ?? SUBJECT_COLORS.Physics;
+            const icon = SUBJECT_ICONS[subject] ?? 'subject';
+            return (
+              <div
+                key={subject}
+                className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-6 relative overflow-hidden"
+              >
+                <div className={`absolute top-0 right-0 w-32 h-32 ${colors.glow} rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none`} />
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-border-light dark:bg-border-dark/50 flex items-center justify-center">
+                      <span className={`material-icons-outlined text-[20px] ${colors.icon}`}>{icon}</span>
                     </div>
-                    <div className="relative w-full h-2 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
-                      <div className={`absolute top-0 left-0 h-full rounded-full ${style.bar}`} style={{ width: `${Math.max(0, (data.score / sectionMaxScore) * 100)}%` }}></div>
-                    </div>
+                    <h3 className="font-bold text-text-light dark:text-text-dark">{subject}</h3>
                   </div>
-                )
-              })}
+                  <span className={`font-bold ${colors.text}`}>{totalScore}/{totalMax}</span>
+                </div>
+                <div className="space-y-3">
+                  {secs.map(sec => {
+                    const attempted = sec.data.correct + sec.data.incorrect;
+                    const attemptPct = sec.data.total_questions > 0 ? (attempted / sec.data.total_questions) * 100 : 0;
+                    return (
+                      <div key={sec.key}>
+                        <div className="flex justify-between text-[11px] mb-1.5">
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark">
+                            {isJEEFormat && secs.length > 1 ? (sec.label === 'Sec A' ? 'Section A (MCQ)' : 'Section B (Numerical)') : sec.label}
+                          </span>
+                          <span className="text-text-light dark:text-text-dark font-semibold">{attempted}/{sec.data.total_questions}</span>
+                        </div>
+                        <div className="h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                          <div className={`h-full ${colors.bar} rounded-full transition-all duration-500`} style={{ width: `${Math.max(0, attemptPct)}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 pt-4 border-t border-border-light dark:border-border-dark flex gap-4 text-xs">
+                  <span className="text-success-light dark:text-success-dark font-medium">✓ {secs.reduce((s, sec) => s + sec.data.correct, 0)}</span>
+                  <span className="text-error-light dark:text-error-dark font-medium">✗ {secs.reduce((s, sec) => s + sec.data.incorrect, 0)}</span>
+                  <span className="text-text-secondary-light dark:text-text-secondary-dark font-medium">− {secs.reduce((s, sec) => s + sec.data.unattempted, 0)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Blunder Analysis */}
+        <section className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark overflow-hidden">
+          <div className="p-6 border-b border-border-light dark:border-border-dark flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h3 className="font-bold text-lg text-text-light dark:text-text-dark">Blunder Analysis</h3>
+              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5">Easy questions you got wrong — guaranteed marks left on the table</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-orange-400" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-text-secondary-light dark:text-text-secondary-dark">Blunder</span>
             </div>
           </div>
-        </div>
+          <div className="p-6">
+            {!hasBlunders ? (
+              <div className="text-center py-6">
+                <span className="material-icons-outlined text-success-light dark:text-success-dark text-3xl mb-2">emoji_events</span>
+                <p className="text-sm font-medium text-text-light dark:text-text-dark">No blunders!</p>
+                <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5">You didn't drop any easy questions.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {(['Physics', 'Chemistry', 'Mathematics'] as const).map(subject => {
+                  const blunders = blundersBySubject[subject];
+                  if (!blunders || blunders.length === 0) return null;
+                  const colors = SUBJECT_COLORS[subject];
+                  return (
+                    <div key={subject}>
+                      <h4 className={`text-xs font-bold uppercase tracking-widest mb-3 ${colors.label}`}>{subject}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {blunders.map(q => (
+                          <button
+                            key={q.question_uuid}
+                            onClick={() => navigate(`/review/${submissionId}?q=${q.question_uuid}`)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold bg-orange-400/20 text-orange-500 border border-orange-400/40 hover:scale-110 hover:bg-orange-400/30 transition-all cursor-pointer"
+                            title={`${q.section} · ${q.chapter_tag}`}
+                          >
+                            {q.question_id.replace(/\D/g, '')}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+
 
       </div>
     </main>

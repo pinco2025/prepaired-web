@@ -18,6 +18,7 @@ import Tests from './components/Tests';
 import TestPage from './components/TestPage';
 import TestSubmitted from './components/TestSubmitted';
 import TestResult from './components/TestResult';
+import AIInsightsPage from './components/AIInsightsPage';
 import TestReview from './components/TestReview';
 import Super30 from './components/Super30';
 import Pyq2026 from './components/Pyq2026';
@@ -84,6 +85,7 @@ export const AppContent: React.FC = () => {
   const location = useLocation();
   const [showAIPTModal, setShowAIPTModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [ntaModeActive, setNtaModeActive] = useState(false);
   const prevAuthRef = useRef(false);
   const feedbackCheckedRef = useRef(false);
 
@@ -134,6 +136,13 @@ export const AppContent: React.FC = () => {
     setShowFeedbackModal(false);
   };
 
+  // Listen for NTA mode activation from AIPTPage
+  useEffect(() => {
+    const handler = (e: Event) => setNtaModeActive((e as CustomEvent<boolean>).detail);
+    window.addEventListener('ntamodechange', handler);
+    return () => window.removeEventListener('ntamodechange', handler);
+  }, []);
+
   // Check if user is on a test-taking route (hide sidebar during test)
   // Matches /tests/:testId but not /tests (the list page)
   const isTestRoute = /^\/tests\/[^/]+$/.test(location.pathname);
@@ -149,7 +158,7 @@ export const AppContent: React.FC = () => {
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
   const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
-  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute && !isReviewRoute;
+  const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute && !isReviewRoute && !ntaModeActive;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -354,6 +363,11 @@ export const AppContent: React.FC = () => {
             <Route path="/review/:submissionId" element={
               <RequireAuth allowFree>
                 <TestReview />
+              </RequireAuth>
+            } />
+            <Route path="/insights/:submissionId" element={
+              <RequireAuth allowFree>
+                <AIInsightsPage />
               </RequireAuth>
             } />
 

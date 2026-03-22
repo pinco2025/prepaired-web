@@ -48,11 +48,12 @@ interface TestInterfaceProps {
   test: Test;
   onSubmitSuccess: () => void;
   exam?: 'Normal' | 'JEE' | 'NEET';
+  ntaMode?: boolean;
 }
 
 // escapeLatex removed - was unused
 
-const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam }) => {
+const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam, ntaMode = false }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -67,6 +68,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
   const [isLoading, setIsLoading] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
   const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
+  const [candidateName, setCandidateName] = useState<string>('Candidate');
+  const [candidatePhoto, setCandidatePhoto] = useState<string | null>(null);
   const navigate = useNavigate();
   const isSubmittingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -80,6 +83,13 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // Format time as MM:SS for NTA mode
+  const formatTimeMinutes = (seconds: number): string => {
+    const totalMinutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(totalMinutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
   // renderMixedMath now uses shared RenderMath component
@@ -279,6 +289,19 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
           console.error('User not logged in. Cannot fetch test start time.');
           return;
         }
+
+        // Set candidate display name and photo for NTA header
+        const displayName =
+          user?.user_metadata?.full_name ||
+          user?.user_metadata?.name ||
+          user?.email?.split('@')[0] ||
+          'Candidate';
+        setCandidateName(displayName);
+        const photoUrl =
+          user?.user_metadata?.avatar_url ||
+          user?.user_metadata?.picture ||
+          null;
+        setCandidatePhoto(photoUrl);
 
         let testStartTimeISO: string | null = null;
         try {
@@ -594,6 +617,48 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
     setQuestionStatuses(newQuestionStatuses);
   };
 
+  // NTA action handlers
+  const handleClear = () => {
+    if (!currentQuestion) return;
+    const newAnswers = { ...answers };
+    delete newAnswers[currentQuestion.uuid];
+    setAnswers(newAnswers);
+    setSelectedOption(null);
+    setNumericalAnswer('');
+    const newStatuses = [...questionStatuses];
+    newStatuses[currentQuestionIndex] = 'notAnswered';
+    setQuestionStatuses(newStatuses);
+  };
+
+  const handleNTASaveAndNext = () => {
+    if (currentQuestion) {
+      const newStatuses = [...questionStatuses];
+      if (newStatuses[currentQuestionIndex] === 'notVisited') {
+        newStatuses[currentQuestionIndex] = answers[currentQuestion.uuid] ? 'answered' : 'notAnswered';
+        setQuestionStatuses(newStatuses);
+      }
+    }
+    handleNext();
+  };
+
+  const handleNTASaveAndMarkForReview = () => {
+    if (currentQuestion) {
+      const newStatuses = [...questionStatuses];
+      newStatuses[currentQuestionIndex] = 'markedForReview';
+      setQuestionStatuses(newStatuses);
+    }
+    handleNext();
+  };
+
+  const handleNTAMarkForReviewAndNext = () => {
+    if (currentQuestion) {
+      const newStatuses = [...questionStatuses];
+      newStatuses[currentQuestionIndex] = 'markedForReview';
+      setQuestionStatuses(newStatuses);
+    }
+    handleNext();
+  };
+
   // Show loading state during initialization
   if (isLoading) {
     return (
@@ -624,6 +689,421 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
       </div>
     );
   }
+
+  // ── NTA MODE UI ────────────────────────────────────────────────────────────
+  if (ntaMode && testData) {
+    const ntaStatusCounts = {
+      notVisited: questionStatuses.filter(s => s === 'notVisited').length,
+      notAnswered: questionStatuses.filter(s => s === 'notAnswered').length,
+      answered: questionStatuses.filter(s => s === 'answered').length,
+      markedOnly: questionStatuses.filter((s, i) => s === 'markedForReview' && !answers[testData.questions[i]?.uuid]).length,
+      markedAnswered: questionStatuses.filter((s, i) => s === 'markedForReview' && !!answers[testData.questions[i]?.uuid]).length,
+    };
+
+    const getNTAShapeStyle = (index: number): React.CSSProperties => {
+      const status = questionStatuses[index];
+      if (status === 'notVisited') return { backgroundColor: '#e2e8f0', color: '#475569', borderRadius: '4px' };
+      if (status === 'notAnswered') return { backgroundColor: '#d93025', clipPath: 'polygon(10% 0, 90% 0, 100% 100%, 0% 100%)' };
+      if (status === 'answered') return { backgroundColor: '#2e8b57', clipPath: 'polygon(0 0, 100% 0, 90% 100%, 10% 100%)' };
+      if (status === 'markedForReview') return { backgroundColor: '#3f51b5', borderRadius: '50%' };
+      return { backgroundColor: '#e2e8f0', color: '#475569', borderRadius: '4px' };
+    };
+
+    return (
+      <div style={{ fontFamily: 'Inter, sans-serif', height: '100vh', overflow: 'hidden', background: '#f1f5f9' }}>
+
+        {/* ── NTA Header ── */}
+        <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'white', borderBottom: '1px solid #e2e8f0', padding: '8px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+            <div style={{ width: '64px', height: '64px', background: '#f1f5f9', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', flexShrink: 0, overflow: 'hidden' }}>
+              {candidatePhoto
+                ? <img src={candidatePhoto} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <span className="material-symbols-outlined" style={{ fontSize: '36px', color: '#94a3b8' }}>person</span>
+              }
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', fontSize: '13px', lineHeight: '1.6' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <span style={{ color: '#64748b', width: '112px' }}>Candidate Name</span>
+                <span style={{ color: '#0f172a', fontWeight: 500 }}>: {candidateName}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <span style={{ color: '#64748b', width: '112px' }}>Exam Name</span>
+                <span style={{ color: '#0f172a', fontWeight: 500 }}>: {test.title}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                <span style={{ color: '#64748b', width: '112px' }}>Remaining Time</span>
+                <span style={{ color: '#0f172a', fontWeight: 500 }}>:
+                  <span style={{ background: '#2563eb', color: 'white', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', marginLeft: '4px' }}>
+                    {timeLeft !== null ? formatTimeMinutes(timeLeft) : '--:--'}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div style={{ marginTop: '8px' }}>
+            <select style={{ background: 'white', border: '1px solid #cbd5e1', fontSize: '13px', borderRadius: '4px', padding: '4px 16px', outline: 'none', minWidth: '150px' }}>
+              <option>English</option>
+              <option>Hindi</option>
+            </select>
+          </div>
+        </header>
+
+        {/* ── Main area ── */}
+        <main style={{ paddingTop: '88px', paddingBottom: '64px', display: 'flex', height: '100vh', overflow: 'hidden' }}>
+
+          {/* Left: Question workspace */}
+          <section style={{ flex: 1, background: 'white', display: 'flex', flexDirection: 'column', overflowY: 'hidden', borderRight: '1px solid #e2e8f0' }}>
+
+            {/* Question header */}
+            <div style={{ padding: '12px 32px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#1e293b' }}>
+                Question {currentQuestionIndex + 1}:
+              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {testData.sections.length > 1 && (
+                  <span style={{ fontSize: '11px', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '4px' }}>
+                    {currentQuestion?.section}
+                  </span>
+                )}
+                {currentQuestion && <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />}
+              </div>
+            </div>
+
+            {/* Section tabs */}
+            {testData.sections.length > 1 && (
+              <div style={{ padding: '8px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', gap: '8px', flexShrink: 0 }}>
+                {testData.sections.map((section, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSectionSwitch(idx)}
+                    style={{
+                      padding: '2px 12px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      borderRadius: '4px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: currentSectionIndex === idx ? '#2563eb' : '#f1f5f9',
+                      color: currentSectionIndex === idx ? 'white' : '#475569',
+                    }}
+                  >
+                    {section.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Question body */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px' }}>
+              {currentQuestion && (
+                <>
+                  <div style={{ fontSize: '15px', lineHeight: '1.7', color: '#1e293b', marginBottom: '24px' }} className="math-text-scope">
+                    {renderMixedMath(currentQuestion.text)}
+                  </div>
+
+                  {currentQuestion.image && (
+                    <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+                      <ImageWithProgress
+                        src={currentQuestion.image}
+                        alt="Question Illustration"
+                        className="max-w-full max-h-[35vh] w-auto h-auto rounded"
+                      />
+                    </div>
+                  )}
+
+                  {isNumericalQuestion() ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                      <label style={{ fontSize: '13px', fontWeight: 500, color: '#334155' }}>Enter Numerical Answer:</label>
+                      <input
+                        type="text"
+                        value={numericalAnswer}
+                        readOnly
+                        placeholder="Use keypad below"
+                        style={{ padding: '12px', border: '2px solid #e2e8f0', borderRadius: '4px', fontSize: '16px', color: '#1e293b', background: 'white', cursor: 'default', outline: 'none', width: '240px' }}
+                      />
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', width: '240px' }}>
+                        {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'backspace'].map(key => (
+                          <button
+                            key={key}
+                            onClick={() => handleKeypadClick(key)}
+                            style={{
+                              padding: '12px',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '4px',
+                              fontSize: '14px',
+                              fontWeight: 700,
+                              background: 'white',
+                              cursor: 'pointer',
+                              color: key === 'backspace' ? '#dc2626' : '#1e293b',
+                            }}
+                          >
+                            {key === 'backspace' ? '⌫' : key}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {currentQuestion.options.map((option) => (
+                        <label
+                          key={option.id}
+                          onClick={() => handleSelectOption(option.id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: '10px',
+                            padding: '10px 14px',
+                            border: `1.5px solid ${selectedOption === option.id ? '#2563eb' : '#e2e8f0'}`,
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            background: selectedOption === option.id ? '#eff6ff' : 'white',
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            name={`nta-q-${currentQuestion.id}`}
+                            checked={selectedOption === option.id}
+                            onChange={() => handleSelectOption(option.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ marginTop: '3px', width: '16px', height: '16px', flexShrink: 0 }}
+                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 }} className="math-text-scope">
+                            <span style={{ fontSize: '15px', color: '#1e293b' }}>{renderMixedMath(option.text)}</span>
+                            {option.image && (
+                              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                <ImageWithProgress
+                                  src={option.image}
+                                  alt={`Option ${option.id}`}
+                                  className="max-w-full max-h-48 w-auto h-auto rounded"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* NTA Action buttons */}
+            <div style={{ borderTop: '1px solid #e2e8f0', padding: '12px 16px', background: '#f8fafc', display: 'flex', flexWrap: 'wrap', gap: '8px', flexShrink: 0 }}>
+              <button
+                onClick={handleNTASaveAndNext}
+                style={{ background: '#2e8b57', color: 'white', padding: '8px 16px', borderRadius: '2px', border: 'none', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}
+              >
+                SAVE &amp; NEXT
+              </button>
+              <button
+                onClick={handleClear}
+                style={{ background: 'white', border: '1px solid #cbd5e1', color: '#475569', padding: '8px 16px', borderRadius: '2px', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}
+              >
+                CLEAR
+              </button>
+              <button
+                onClick={handleNTASaveAndMarkForReview}
+                style={{ background: '#d19a66', color: 'white', padding: '8px 16px', borderRadius: '2px', border: 'none', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}
+              >
+                SAVE &amp; MARK FOR REVIEW
+              </button>
+              <button
+                onClick={handleNTAMarkForReviewAndNext}
+                style={{ background: '#1e88e5', color: 'white', padding: '8px 16px', borderRadius: '2px', border: 'none', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}
+              >
+                MARK FOR REVIEW &amp; NEXT
+              </button>
+            </div>
+          </section>
+
+          {/* Right: Question Palette */}
+          <aside style={{ width: '288px', background: 'white', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+
+            {/* Legend */}
+            <div style={{ margin: '8px', padding: '12px', border: '2px dashed #cbd5e1', borderRadius: '4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 4px' }}>
+                {/* Not Visited */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '28px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, backgroundColor: '#e2e8f0', color: '#475569', borderRadius: '4px', flexShrink: 0 }}>
+                    {ntaStatusCounts.notVisited}
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#475569', lineHeight: 1.3 }}>Not Visited</span>
+                </div>
+                {/* Not Answered */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '28px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', backgroundColor: '#d93025', clipPath: 'polygon(10% 0, 90% 0, 100% 100%, 0% 100%)', flexShrink: 0 }}>
+                    {ntaStatusCounts.notAnswered}
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#475569', lineHeight: 1.3 }}>Not Answered</span>
+                </div>
+                {/* Answered */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '28px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', backgroundColor: '#2e8b57', clipPath: 'polygon(0 0, 100% 0, 90% 100%, 10% 100%)', flexShrink: 0 }}>
+                    {ntaStatusCounts.answered}
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#475569', lineHeight: 1.3 }}>Answered</span>
+                </div>
+                {/* Marked for Review */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', backgroundColor: '#3f51b5', borderRadius: '50%', flexShrink: 0 }}>
+                    {ntaStatusCounts.markedOnly}
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#475569', lineHeight: 1.3 }}>Marked for Review</span>
+                </div>
+                {/* Answered & Marked */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', gridColumn: '1 / -1' }}>
+                  <div style={{ width: '28px', height: '28px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', backgroundColor: '#3f51b5', borderRadius: '50%', flexShrink: 0 }}>
+                    {ntaStatusCounts.markedAnswered}
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '8px', height: '8px', backgroundColor: '#2e8b57', borderRadius: '50%', border: '1px solid white' }} />
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#475569', lineHeight: 1.3 }}>Answered &amp; Marked for Review (will be considered for evaluation)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section tabs in palette */}
+            {testData.sections.length > 1 && (
+              <div style={{ padding: '4px 12px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                {testData.sections.map((section, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSectionSwitch(idx)}
+                    style={{
+                      padding: '1px 8px',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      borderRadius: '4px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: currentSectionIndex === idx ? '#2563eb' : '#f1f5f9',
+                      color: currentSectionIndex === idx ? 'white' : '#475569',
+                    }}
+                  >
+                    {section.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Question grid */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px 12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+                {filteredQuestions.map((question, idx) => {
+                  const origIdx = question.originalIndex;
+                  const status = questionStatuses[origIdx];
+                  const hasAns = !!answers[question.uuid];
+                  const isMarkedAnswered = status === 'markedForReview' && hasAns;
+                  const shapeStyle = getNTAShapeStyle(origIdx);
+
+                  return (
+                    <div
+                      key={question.id}
+                      onClick={() => handlePaletteClick(origIdx)}
+                      style={{
+                        width: '100%',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: status === 'notVisited' ? '#475569' : 'white',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        outline: origIdx === currentQuestionIndex ? '2px solid #2563eb' : 'none',
+                        outlineOffset: '1px',
+                        ...shapeStyle
+                      }}
+                    >
+                      {String(idx + 1).padStart(2, '0')}
+                      {isMarkedAnswered && (
+                        <div style={{ position: 'absolute', bottom: 0, right: 0, width: '8px', height: '8px', backgroundColor: '#2e8b57', borderRadius: '50%', border: '1px solid white' }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </aside>
+        </main>
+
+        {/* ── NTA Footer ── */}
+        <footer style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, height: '64px', background: '#f1f5f9', borderTop: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+              style={{ color: '#475569', fontWeight: 700, fontSize: '11px', padding: '6px 24px', border: '1px solid #94a3b8', borderRadius: '2px', background: 'white', cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer', opacity: currentQuestionIndex === 0 ? 0.4 : 1 }}
+            >
+              &lt;&lt; BACK
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={!testData.questions || currentQuestionIndex === testData.questions.length - 1}
+              style={{ color: '#475569', fontWeight: 700, fontSize: '11px', padding: '6px 24px', border: '1px solid #94a3b8', borderRadius: '2px', background: 'white', cursor: (!testData.questions || currentQuestionIndex === testData.questions.length - 1) ? 'not-allowed' : 'pointer', opacity: (!testData.questions || currentQuestionIndex === testData.questions.length - 1) ? 0.4 : 1 }}
+            >
+              NEXT &gt;&gt;
+            </button>
+          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            disabled={isSubmittingRef.current}
+            style={{ background: '#2e8b57', color: 'white', padding: '8px 32px', borderRadius: '2px', border: 'none', fontWeight: 700, fontSize: '12px', cursor: 'pointer', opacity: isSubmittingRef.current ? 0.5 : 1 }}
+          >
+            SUBMIT
+          </button>
+        </footer>
+
+        {/* ── Submit confirmation modal ── */}
+        {isModalOpen && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} />
+            <div style={{ position: 'relative', width: '100%', maxWidth: '400px', background: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <div style={{ marginBottom: '16px', borderRadius: '50%', background: '#dbeafe', padding: '16px' }}>
+                  <span className="material-icons-outlined" style={{ fontSize: '36px', color: '#2563eb' }}>assignment_turned_in</span>
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>Submit Test</h3>
+                <p style={{ color: '#64748b', marginBottom: '24px' }}>Are you sure you want to submit the test?</p>
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  style={{ flex: 1, padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontWeight: 500, color: '#1e293b', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { setIsModalOpen(false); isSubmittingRef.current = false; handleSubmit(); }}
+                  style={{ flex: 1, padding: '10px', border: 'none', borderRadius: '6px', background: '#2563eb', color: 'white', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Submitting overlay ── */}
+        {isSubmitting && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} />
+            <div style={{ position: 'relative', width: '100%', maxWidth: '400px', background: 'white', borderRadius: '8px', padding: '24px', boxShadow: '0 25px 50px rgba(0,0,0,0.25)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <div style={{ marginBottom: '16px', borderRadius: '50%', background: '#dbeafe', padding: '16px' }}>
+                  <span className="material-icons-outlined" style={{ fontSize: '36px', color: '#2563eb', animation: 'spin 1s linear infinite' }}>autorenew</span>
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>Submitting Test...</h3>
+                <p style={{ color: '#64748b' }}>Please wait. Do not close the browser.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  // ── END NTA MODE UI ────────────────────────────────────────────────────────
 
   // Shared question palette content used in both desktop sidebar and mobile drawer
   const questionPaletteContent = (

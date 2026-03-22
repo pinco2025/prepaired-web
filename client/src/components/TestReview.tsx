@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { Test, Question } from '../data';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -31,6 +31,8 @@ const TestReview: React.FC = () => {
     usePageTitle('Test Review');
     const { submissionId } = useParams<{ submissionId: string }>();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const initialQuestionUuid = searchParams.get('q');
 
     const [testData, setTestData] = useState<Test | null>(null);
     const [userAnswers, setUserAnswers] = useState<AttemptComparison[]>([]);
@@ -146,6 +148,13 @@ const TestReview: React.FC = () => {
             }
         }
     }, [currentQuestionIndex, allQuestions, sections]);
+
+    // Jump to a specific question when arriving from blunder analysis
+    useEffect(() => {
+        if (!initialQuestionUuid || allQuestions.length === 0) return;
+        const idx = allQuestions.findIndex(q => q.uuid === initialQuestionUuid || q.id === initialQuestionUuid);
+        if (idx !== -1) setCurrentQuestionIndex(idx);
+    }, [initialQuestionUuid, allQuestions]);
 
     const handleQuestionSelect = (questionIndex: number) => {
         const question = questionsBySection[currentSectionIndex][questionIndex];
