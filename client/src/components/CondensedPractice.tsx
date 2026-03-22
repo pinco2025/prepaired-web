@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
 import ReportFlag from './ReportFlag';
-import { fetchEncryptedJson } from '../utils/cryptoUtils';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -195,114 +194,36 @@ const CondensedPractice: React.FC = () => {
         const fetchData = async () => {
             if (!subject) return;
 
-            // Capitalize subject name for file lookup (e.g., 'physics' -> 'Physics')
-            const capitalizedSubject = subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
-
             try {
                 setLoading(true);
 
-                // Fetch base URL from Supabase question_set table
-                const { data: setData, error: setError } = await supabase
-                    .from('question_set')
-                    .select('url')
-                    .eq('set_id', targetSetId)
-                    .single();
-
-                if (setError) throw new Error('Failed to load question set configuration');
-                if (!setData?.url) throw new Error('Question set is not available');
-
-                // Convert GitHub tree URL to raw URL if needed
-                // e.g. https://github.com/owner/repo/tree/branch/path
-                //   -> https://raw.githubusercontent.com/owner/repo/branch/path
-                let baseUrl = setData.url.replace(/\/$/, '');
-                if (baseUrl.includes('github.com') && baseUrl.includes('/tree/')) {
-                    baseUrl = baseUrl
-                        .replace('https://github.com/', 'https://raw.githubusercontent.com/')
-                        .replace('/tree/', '/');
-                }
-                const isCondensed = targetSetId === 'condensed';
-                const fileExt = isCondensed ? '.enc' : '.json';
-                let questionUrl = `${baseUrl}/${capitalizedSubject}_questions${fileExt}`;
-                let solutionUrl = `${baseUrl}/${capitalizedSubject}_solutions${fileExt}`;
-
-                if (targetSetId === 'neet-phy') {
-                    questionUrl = `${baseUrl}/${subject}/exported_questions.json`;
-                    solutionUrl = `${baseUrl}/${subject}/exported_solutions.json`;
+                // Get auth token so the server can verify subscription tier
+                const { data: { session } } = await supabase.auth.getSession();
+                const headers: Record<string, string> = {};
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
                 }
 
-                // Fetch Questions
-                console.log(`Fetching ${isCondensed ? 'encrypted ' : ''}questions from:`, questionUrl);
-                const rawQuestions = isCondensed
-                    ? await fetchEncryptedJson<any>(questionUrl)
-                    : await (await fetch(questionUrl)).json();
+                // Fetch questions via server-side proxy (hides GitHub URL + enforces limit)
+                const res = await fetch(
+                    `/api/questions?setId=${encodeURIComponent(targetSetId)}&subject=${encodeURIComponent(subject)}`,
+                    { headers }
+                );
 
-                let questionsData: QuestionsJsonResponse;
-                if (targetSetId === 'neet-phy') {
-                    questionsData = {
-                        setId: targetSetId,
-                        subject: subject,
-                        totalQuestions: rawQuestions.length,
-                        exportedAt: new Date().toISOString(),
-                        questions: rawQuestions.map((q: any, index: number) => ({
-                            id: q.uuid || `q${index}`,
-                            uuid: q.uuid || `q${index}`,
-                            text: q.question,
-                            image: q.question_image_url || null,
-                            options: [
-                                { id: 'a', text: q.option_a, image: q.option_a_image_url || null },
-                                { id: 'b', text: q.option_b, image: q.option_b_image_url || null },
-                                { id: 'c', text: q.option_c, image: q.option_c_image_url || null },
-                                { id: 'd', text: q.option_d, image: q.option_d_image_url || null }
-                            ].filter(opt => opt.text || opt.image),
-                            correctAnswer: q.answer?.toLowerCase(),
-                            chapterCode: q.tag_2 || null,
-                            year: q.year || null,
-                            type: q.type || null
-                        }))
-                    };
-                } else {
-                    questionsData = rawQuestions as QuestionsJsonResponse;
+                if (!res.ok) {
+                    const errBody = await res.json().catch(() => ({}));
+                    throw new Error(errBody.error || 'Failed to load practice data');
                 }
 
-                // Fetch Solutions (Non-blocking)
-                try {
-                    console.log(`Fetching ${isCondensed ? 'encrypted ' : ''}solutions from:`, solutionUrl);
-                    const rawSolutions = isCondensed
-                        ? await fetchEncryptedJson<any>(solutionUrl)
-                        : await (await fetch(solutionUrl)).json();
-                    
-                    const solMap: { [key: string]: { text: string; image: string | null } } = {};
-                    
-                    if (targetSetId === 'neet-phy') {
-                        rawSolutions.forEach((sol: any) => {
-                            if (sol.uuid) {
-                                solMap[sol.uuid] = {
-                                    text: sol.solution_text || '',
-                                    image: sol.solution_image_url || null
-                                };
-                            }
-                        });
-                    } else if (rawSolutions.questions) {
-                        rawSolutions.questions.forEach((sol: any) => {
-                            solMap[sol.id] = {
-                                text: sol.solution_text || '',
-                                image: sol.solution_image_url || null
-                            };
-                        });
-                    }
-                    setSolutions(solMap);
-                } catch (solErr) {
-                    console.warn('Error loading solutions:', solErr);
-                }
+                const { questions: fetchedQuestions, solutions: solMap, totalCount } = await res.json();
 
-                // Apply randomization
-                let randomizedQuestions = shuffleArray(questionsData.questions || []);
+                setSolutions(solMap || {});
 
-                // Shuffle options for each MCQ question (not integer type)
-                randomizedQuestions = randomizedQuestions.map(q => {
+                // Shuffle options for each MCQ question (questions already shuffled server-side)
+                const processedQuestions = fetchedQuestions.map((q: LocalQuestion) => {
                     const hasValidOptions = q.options &&
                         q.options.length > 0 &&
-                        q.options.some(opt => opt.text?.trim() || opt.image);
+                        q.options.some((opt: { text: string; image: string | null }) => opt.text?.trim() || opt.image);
 
                     if (hasValidOptions) {
                         return {
@@ -313,8 +234,8 @@ const CondensedPractice: React.FC = () => {
                     return q;
                 });
 
-                setTotalQuestionsCount(randomizedQuestions.length);
-                setQuestions(isPaidUser ? randomizedQuestions : randomizedQuestions.slice(0, FREE_QUESTION_LIMIT));
+                setTotalQuestionsCount(totalCount);
+                setQuestions(processedQuestions);
 
                 // Reset state for new subject
                 setCurrentQuestionIndex(0);

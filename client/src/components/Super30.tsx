@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import Super30Feedback from './Super30Feedback';
 import { supabase } from '../utils/supabaseClient';
-import { withTimeout } from '../utils/promiseUtils';
 import JEELoader from './JEELoader';
 import 'katex/dist/katex.min.css';
 import ImageWithProgress from './ImageWithProgress';
@@ -167,45 +166,11 @@ const Super30: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch the GitHub folder URL from Supabase
-                const { data: setRow, error: setFetchError } = await supabase
-                    .from('question_set')
-                    .select('url')
-                    .eq('set_id', 'super-30')
-                    .single();
+                // Fetch all 4 JSON files via server-side proxy (hides GitHub URL)
+                const res = await fetch('/api/questions?setId=super-30');
+                if (!res.ok) throw new Error('Failed to load Super 30 content');
 
-                if (setFetchError || !setRow) throw new Error('No URL found for Super 30 set');
-                if (!setRow?.url) throw new Error('No URL found for Super 30 set');
-
-                // 2. Transform the GitHub URL to a Raw Content URL
-                // Example Input: https://github.com/user/repo/tree/main/path/to/folder
-                // Example Output: https://raw.githubusercontent.com/user/repo/main/path/to/folder
-
-                let rawBaseUrl = setRow.url
-                    .replace('github.com', 'raw.githubusercontent.com')
-                    .replace('/tree/', '/');
-
-                // Ensure no trailing slash for cleaner concatenation
-                if (rawBaseUrl.endsWith('/')) {
-                    rawBaseUrl = rawBaseUrl.slice(0, -1);
-                }
-
-                // 3. Fetch all 4 JSON files using the raw base URL
-                const [pyqRes, ipqRes, solRes, pyqSolRes] = await Promise.all([
-                    withTimeout(fetch(`${rawBaseUrl}/PYQ.json`)),
-                    withTimeout(fetch(`${rawBaseUrl}/IPQ.json`)),
-                    withTimeout(fetch(`${rawBaseUrl}/IPQ_sol.json`)),
-                    withTimeout(fetch(`${rawBaseUrl}/PYQ_sol.json`))
-                ]);
-
-                if (!pyqRes.ok || !ipqRes.ok || !solRes.ok || !pyqSolRes.ok) {
-                    throw new Error('Failed to load content from GitHub');
-                }
-
-                const pyqJson = await pyqRes.json();
-                const ipqJson = await ipqRes.json();
-                const solJson = await solRes.json();
-                const pyqSolJson = await pyqSolRes.json();
+                const { pyq: pyqJson, ipq: ipqJson, ipqSol: solJson, pyqSol: pyqSolJson } = await res.json();
 
                 const pyqQuestions = pyqJson.questions as QuestionData[];
                 const ipqQuestions = ipqJson.questions as QuestionData[];
