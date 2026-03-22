@@ -103,34 +103,34 @@ const DonutChart: React.FC<DonutProps> = ({ correct, incorrect, unattempted, tot
   )`;
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-row sm:flex-col items-center gap-4 sm:gap-5">
       <div
-        className="relative w-40 h-40 rounded-full flex items-center justify-center"
+        className="relative w-24 h-24 sm:w-40 sm:h-40 flex-shrink-0 rounded-full flex items-center justify-center"
         style={{ background: gradient }}
       >
         {/* Inner hole */}
-        <div className="w-24 h-24 bg-surface-light dark:bg-surface-dark rounded-full flex items-center justify-center border border-border-light dark:border-border-dark shadow-inner">
-          <span className="text-sm font-bold text-text-light dark:text-text-dark uppercase tracking-tight">{label}</span>
+        <div className="w-14 h-14 sm:w-24 sm:h-24 bg-surface-light dark:bg-surface-dark rounded-full flex items-center justify-center border border-border-light dark:border-border-dark shadow-inner">
+          <span className="text-[9px] sm:text-sm font-bold text-text-light dark:text-text-dark uppercase tracking-tight">{label}</span>
         </div>
       </div>
-      <div className="text-center space-y-1">
-        <p className="text-lg font-bold text-text-light dark:text-text-dark">{correctPct.toFixed(0)}% Correct</p>
-        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+      <div className="space-y-1 sm:text-center">
+        <p className="text-base sm:text-lg font-bold text-text-light dark:text-text-dark">{correctPct.toFixed(0)}% Correct</p>
+        <p className="text-[10px] sm:text-xs text-text-secondary-light dark:text-text-secondary-dark">
           {correct} correct · {incorrect} wrong · {unattempted} skipped
         </p>
-      </div>
-      <div className="flex gap-3 text-[10px] font-bold uppercase tracking-widest">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full" style={{ background: color }} />
-          <span className="text-text-secondary-light dark:text-text-secondary-dark">Correct</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500" />
-          <span className="text-text-secondary-light dark:text-text-secondary-dark">Wrong</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-border-dark" />
-          <span className="text-text-secondary-light dark:text-text-secondary-dark">Skipped</span>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-widest sm:justify-center">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full" style={{ background: color }} />
+            <span className="text-text-secondary-light dark:text-text-secondary-dark">Correct</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-500" />
+            <span className="text-text-secondary-light dark:text-text-secondary-dark">Wrong</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-border-dark" />
+            <span className="text-text-secondary-light dark:text-text-secondary-dark">Skipped</span>
+          </div>
         </div>
       </div>
     </div>
@@ -293,7 +293,7 @@ const AIInsightsPage: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="max-w-6xl mx-auto space-y-10">
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-10">
 
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -321,11 +321,11 @@ const AIInsightsPage: React.FC = () => {
 
         {/* Weak Chapters per Subject */}
         <section>
-          <div className="mb-8">
+          <div className="mb-4 md:mb-8">
             <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-1">Weak Areas per Subject</h2>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">Focus on these topics to maximise your score improvement.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
             {SUBJECT_WEAKNESS_CONFIG.map(({ subject, icon, iconColor, chapters }) => (
               <div key={subject} className="space-y-4">
                 <div className="flex items-center gap-3 px-1">
@@ -371,15 +371,15 @@ const AIInsightsPage: React.FC = () => {
 
         {/* Difficulty Analysis */}
         <section>
-          <div className="mb-8">
+          <div className="mb-4 md:mb-8">
             <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-1">Difficulty Analysis</h2>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">Deep dive into accuracy levels across different complexity tiers.</p>
           </div>
           {md ? (
-            <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl border border-border-light dark:border-border-dark p-10 relative overflow-hidden">
+            <div className="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl border border-border-light dark:border-border-dark p-5 sm:p-10 relative overflow-hidden">
               <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
               <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/5 blur-[100px] rounded-full pointer-events-none" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-10 relative z-10">
                 {DIFFICULTY_CONFIG.map(({ label, color, correct, incorrect, unattempted, total }) => (
                   <DonutChart
                     key={label}

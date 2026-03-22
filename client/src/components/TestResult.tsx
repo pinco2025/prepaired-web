@@ -273,7 +273,7 @@ const TestResult: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* Hero Score Card */}
-          <section className="lg:col-span-5 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-8 flex flex-col justify-between relative overflow-hidden">
+          <section className="lg:col-span-5 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm rounded-2xl shadow-card-light dark:shadow-card-dark border border-border-light dark:border-border-dark p-5 sm:p-8 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute -top-20 -left-20 w-56 h-56 bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
             <div>
               <div className="flex items-center mb-1">
@@ -341,20 +341,20 @@ const TestResult: React.FC = () => {
             </div>
 
             {/* Generate Insights CTA — spans 2 or 3 cols */}
-            <div className="col-span-2 sm:col-span-3 bg-gradient-to-br from-surface-light to-border-light/30 dark:from-surface-dark dark:to-border-dark/30 rounded-2xl border border-primary/20 p-5 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center relative flex-shrink-0">
-                  <span className="material-icons-outlined text-3xl text-primary">auto_awesome</span>
+            <div className="col-span-2 sm:col-span-3 bg-gradient-to-br from-surface-light to-border-light/30 dark:from-surface-dark dark:to-border-dark/30 rounded-2xl border border-primary/20 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 flex items-center justify-center relative flex-shrink-0">
+                  <span className="material-icons-outlined text-2xl sm:text-3xl text-primary">auto_awesome</span>
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
                 </div>
                 <div>
                   <h4 className="font-bold text-base text-text-light dark:text-text-dark">PrepAIred Analysis</h4>
-                  <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">Deep insights into your weak areas and cognitive patterns.</p>
+                  <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs sm:text-sm">Deep insights into your weak areas and cognitive patterns.</p>
                 </div>
               </div>
               <button
                 onClick={() => navigate(`/insights/${submissionId}`)}
-                className="flex-shrink-0 bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                className="w-full sm:w-auto bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-sm text-center"
               >
                 Generate Insights
               </button>
