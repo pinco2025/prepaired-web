@@ -15,6 +15,7 @@ interface SidebarContentProps {
   darkMode: boolean;
   toggleDarkMode: (e: React.MouseEvent) => void;
   user: any;
+  subscriptionType: string | null;
   userMenuRef: React.RefObject<HTMLDivElement | null>;
   isUserMenuOpen: boolean;
   toggleUserMenu: () => void;
@@ -34,6 +35,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   darkMode,
   toggleDarkMode,
   user,
+  subscriptionType,
   userMenuRef,
   isUserMenuOpen,
   toggleUserMenu,
@@ -45,12 +47,20 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 }) => {
   const location = useLocation();
 
-  const menuItems = [
-    { to: "/question-set", icon: "bolt", label: "Question Set", highlight: true },
-    { to: "/aipt", icon: "psychology", label: "AIPT" },
-    { to: "/pyq-2026", icon: "calendar_today", label: "2026 PYQ" },
-    { to: "/response-upload", icon: "upload_file", label: "Response Analysis" },
-  ];
+  const isAdmin = subscriptionType === 'admin';
+
+  const menuItems = isAdmin
+    ? [
+        { to: "/admin", icon: "calculate", label: "Score Calculator", end: true },
+        { to: "/admin/feedbacks", icon: "feedback", label: "Feedbacks" },
+        { to: "/admin/question-reports", icon: "flag", label: "Q. Reports" },
+      ]
+    : [
+        { to: "/question-set", icon: "bolt", label: "Question Set", highlight: true },
+        { to: "/aipt", icon: "psychology", label: "AIPT" },
+        { to: "/pyq-2026", icon: "calendar_today", label: "2026 PYQ" },
+        { to: "/response-upload", icon: "upload_file", label: "Response Analysis" },
+      ];
 
   return (
     <div className={`flex flex-col h-full bg-surface-light dark:bg-surface-dark transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${!mobile ? 'rounded-[2.5rem]' : ''}`}>
@@ -91,6 +101,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <NavLink
               key={item.label}
               to={item.to}
+              end={(item as any).end}
               onClick={() => mobile && setIsMobileMenuOpen(false)}
               onMouseEnter={(e) => handleMouseEnter(e, item.label)}
               onMouseLeave={handleMouseLeave}
@@ -151,13 +162,15 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
                       <p className="text-sm font-bold text-text-light dark:text-text-dark truncate">{user?.user_metadata?.full_name || 'User'}</p>
                       <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">{user?.email}</p>
                     </div>
-                    <button
-                      onClick={onSwitchExam}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary active:bg-primary/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
-                    >
-                      <span className="material-symbols-outlined text-lg">swap_horiz</span>
-                      <span>Switch Exam</span>
-                    </button>
+                    {!isAdmin && (
+                      <button
+                        onClick={onSwitchExam}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary active:bg-primary/20 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+                      >
+                        <span className="material-symbols-outlined text-lg">swap_horiz</span>
+                        <span>Switch Exam</span>
+                      </button>
+                    )}
                     <button
                       onClick={handleSignOut}
                       disabled={isSigningOut}
@@ -206,7 +219,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, subscriptionType } = useAuth();
   const [darkMode, setDarkMode] = useState(true); // Default to dark mode
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -458,6 +471,7 @@ const Sidebar: React.FC = () => {
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
           user={user}
+          subscriptionType={subscriptionType}
           userMenuRef={userMenuRef}
           isUserMenuOpen={isUserMenuOpen}
           toggleUserMenu={toggleUserMenu}
@@ -493,6 +507,7 @@ const Sidebar: React.FC = () => {
                 darkMode={darkMode}
                 toggleDarkMode={toggleDarkMode}
                 user={user}
+                subscriptionType={subscriptionType}
                 userMenuRef={userMenuRef}
                 isUserMenuOpen={isUserMenuOpen}
                 toggleUserMenu={toggleUserMenu}

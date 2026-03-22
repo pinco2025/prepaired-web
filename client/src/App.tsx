@@ -10,6 +10,8 @@ import ComingSoon from './components/ComingSoon';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataCacheProvider } from './contexts/DataCacheContext';
 import AdminPlaceholder from './components/AdminPlaceholder';
+import AdminFeedbacks from './components/AdminFeedbacks';
+import AdminQuestionReports from './components/AdminQuestionReports';
 import LandingPage from './components/LandingPage';
 import ChapterDetails from './components/ChapterDetails';
 import Tests from './components/Tests';
@@ -90,7 +92,9 @@ export const AppContent: React.FC = () => {
   // Show appropriate modal when user logs in
   useEffect(() => {
     if (!loading && isAuthenticated && !prevAuthRef.current) {
-      if (isLiteUser && user) {
+      if (subscriptionType === 'admin') {
+        // Admin users: no modals
+      } else if (isLiteUser && user) {
         // Lite users: show feedback modal if not yet submitted
         if (!feedbackCheckedRef.current) {
           feedbackCheckedRef.current = true;
@@ -120,7 +124,7 @@ export const AppContent: React.FC = () => {
     if (!loading) {
       prevAuthRef.current = isAuthenticated;
     }
-  }, [isAuthenticated, loading, isLiteUser, user]);
+  }, [isAuthenticated, loading, isLiteUser, user, subscriptionType]);
 
   const handleCloseAIPTModal = () => {
     setShowAIPTModal(false);
@@ -157,8 +161,8 @@ export const AppContent: React.FC = () => {
       <AIPTAnnouncementModal isOpen={showAIPTModal} onClose={handleCloseAIPTModal} />
       {/* Feedback Modal (lite users, once per user) */}
       <FeedbackModal isOpen={showFeedbackModal} onSubmitted={handleFeedbackSubmitted} />
-      {/* Exam Type Selection Modal — shown when authenticated user has no exam type */}
-      {!loading && isAuthenticated && examType === null && (
+      {/* Exam Type Selection Modal — shown when authenticated user has no exam type (not for admins) */}
+      {!loading && isAuthenticated && examType === null && subscriptionType !== 'admin' && (
         <ExamTypeModal onComplete={() => {}} />
       )}
       {showSidebar && <Sidebar />}
@@ -204,8 +208,18 @@ export const AppContent: React.FC = () => {
               </RequireAuth>
             } />
             <Route path="/admin" element={
-              <RequireAuth>
+              <RequireAuth allowFree>
                 <AdminPlaceholder />
+              </RequireAuth>
+            } />
+            <Route path="/admin/feedbacks" element={
+              <RequireAuth allowFree>
+                <AdminFeedbacks />
+              </RequireAuth>
+            } />
+            <Route path="/admin/question-reports" element={
+              <RequireAuth allowFree>
+                <AdminQuestionReports />
               </RequireAuth>
             } />
             <Route path="/subjects" element={
