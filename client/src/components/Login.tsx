@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -7,14 +7,17 @@ const Login: React.FC = () => {
   usePageTitle('Login');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const [password, setPassword] = useState('');
+
+  const returnTo = (location.state as any)?.from || '/question-set';
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate('/question-set');
+      navigate(returnTo);
     } catch (error: any) {
       alert(error.message);
     }
@@ -22,9 +25,11 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      // Persist return path for after OAuth redirect
+      localStorage.setItem('authReturnTo', returnTo);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin + '/question-set' }
+        options: { redirectTo: window.location.origin + '/auth/callback' }
       });
       if (error) throw error;
     } catch (err: any) {
@@ -132,7 +137,7 @@ const Login: React.FC = () => {
         <div className="mt-8 text-center">
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
             Don't have an account?
-            <a className="font-bold text-primary hover:text-primary-light link-hover transition-colors ml-1" href="/register">
+            <a className="font-bold text-primary hover:text-primary-light link-hover transition-colors ml-1" href="/register" onClick={(e) => { e.preventDefault(); navigate('/register', { state: { from: returnTo } }); }}>
               Sign Up
             </a>
           </p>

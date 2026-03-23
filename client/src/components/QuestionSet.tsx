@@ -481,7 +481,7 @@ const QuestionSet: React.FC = () => {
 
     const handleStartPractice = (subjectId: string) => {
         if (!isAuthenticated) {
-            navigate('/login');
+            navigate('/login', { state: { from: location.pathname } });
             return;
         }
         if (!selectedSet) return;

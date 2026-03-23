@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -9,16 +9,19 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const returnTo = (location.state as any)?.from || '/question-set';
 
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        navigate('/question-set', { replace: true });
+        navigate(returnTo, { replace: true });
       }
     };
     checkSession();
-  }, [navigate]);
+  }, [navigate, returnTo]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,12 +34,12 @@ const SignUp: React.FC = () => {
       if (error) {
         if (error.message?.includes('already registered')) {
           alert('An account with this email already exists. Please log in instead.');
-          navigate('/login');
+          navigate('/login', { state: { from: returnTo } });
           return;
         }
         throw error;
       }
-      navigate('/question-set');
+      navigate(returnTo);
     } catch (error: any) {
       alert(error.message);
     }
@@ -44,7 +47,12 @@ const SignUp: React.FC = () => {
 
   const handleGoogleSignUp = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      // Persist return path for after OAuth redirect
+      localStorage.setItem('authReturnTo', returnTo);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin + '/auth/callback' }
+      });
       if (error) throw error;
     } catch (error: any) {
       alert(error.message);
@@ -163,7 +171,7 @@ const SignUp: React.FC = () => {
         <div className="mt-8 text-center">
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
             Already have an account?
-            <a className="font-bold text-primary hover:text-primary-light link-hover transition-colors ml-1" href="/login">
+            <a className="font-bold text-primary hover:text-primary-light link-hover transition-colors ml-1" href="/login" onClick={(e) => { e.preventDefault(); navigate('/login', { state: { from: returnTo } }); }}>
               Log In
             </a>
           </p>

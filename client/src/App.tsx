@@ -45,6 +45,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import DeleteAccount from './components/DeleteAccount';
 import InAppBrowserOverlay from './components/InAppBrowserOverlay';
 import ExamTypeModal from './components/ExamTypeModal';
+import AuthCallback from './components/AuthCallback';
 import { isInAppBrowser, getIsIOS } from './utils/inAppBrowserRedirect';
 import { supabase } from './utils/supabaseClient';
 
@@ -192,6 +193,9 @@ export const AppContent: React.FC = () => {
                 <SignUp />
               </PublicOnlyRoute>
             } />
+
+            {/* OAuth callback - redirects to saved return path */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Protected routes - require IPFT-01-2026 subscription */}
             <Route path="/dashboard" element={

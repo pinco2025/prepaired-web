@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRazorpay } from '../hooks/useRazorpay';
 import PaymentSuccessOverlay from './PaymentSuccessOverlay';
 
 const PricingPlans: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, subscriptionType, refreshSubscription, isAuthenticated } = useAuth();
     const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
@@ -32,7 +33,7 @@ const PricingPlans: React.FC = () => {
     const handleUpgrade = async () => {
         if (!isAuthenticated || !user) {
             // Redirect to login if not authenticated
-            navigate('/login');
+            navigate('/login', { state: { from: location.pathname } });
             return;
         }
 
