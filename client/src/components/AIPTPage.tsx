@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { Test } from '../data';
@@ -170,6 +171,73 @@ const NTABackWarningDialog: React.FC<{
         </div>
     </div>
 );
+
+// ── Guest Exam Type Modal (no DB save, for unauthenticated visitors) ──────────
+const GuestExamTypeModal: React.FC<{ onSelect: (examType: 'JEE' | 'NEET') => void }> = ({ onSelect }) => {
+    const [selected, setSelected] = useState<'JEE' | 'NEET' | null>(null);
+
+    const handleSelect = (examType: 'JEE' | 'NEET') => {
+        setSelected(examType);
+        onSelect(examType);
+    };
+
+    const modal = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <div className="relative z-10 w-full max-w-3xl mx-4 sm:mx-6">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="relative text-center mb-8 sm:mb-10">
+                    <h1 className="font-grotesk text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-text-dark mb-3 sm:mb-4">
+                        Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">Path</span>
+                    </h1>
+                    <p className="font-display text-sm sm:text-base text-text-secondary-dark max-w-md mx-auto leading-relaxed px-4">
+                        Select your exam to see the right tests for you.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 relative">
+                    <button
+                        onClick={() => handleSelect('JEE')}
+                        disabled={!!selected}
+                        className={`group relative flex flex-col items-center justify-center p-8 sm:p-10 min-h-[220px] sm:min-h-[320px] bg-surface-dark/90 backdrop-blur-sm rounded-2xl sm:rounded-[2rem] border transition-all duration-500 overflow-hidden active:scale-[0.98]
+                            ${selected === 'JEE' ? 'border-primary shadow-[0_0_30px_rgba(0,102,255,0.3)]' : 'border-border-dark/30 hover:border-primary/40'}
+                            ${selected && selected !== 'JEE' ? 'opacity-40 pointer-events-none' : ''}`}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="relative flex flex-col items-center">
+                            <div className="font-grotesk text-[6rem] sm:text-[8rem] font-extrabold leading-none tracking-tighter text-surface-dark group-hover:text-primary/10 transition-colors duration-500 select-none">J</div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-grotesk text-4xl sm:text-5xl font-bold text-text-dark group-hover:scale-110 transition-transform duration-500">
+                                {selected === 'JEE' ? <span className="inline-block w-8 h-8 border-[3px] border-primary border-t-transparent rounded-full animate-spin" /> : 'JEE'}
+                            </div>
+                        </div>
+                        <div className="relative text-center mt-4 sm:mt-6">
+                            <p className="font-display text-[10px] sm:text-xs tracking-widest text-text-secondary-dark group-hover:text-text-dark transition-colors duration-300 uppercase">Engineering Entrance</p>
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => handleSelect('NEET')}
+                        disabled={!!selected}
+                        className={`group relative flex flex-col items-center justify-center p-8 sm:p-10 min-h-[220px] sm:min-h-[320px] bg-surface-dark/90 backdrop-blur-sm rounded-2xl sm:rounded-[2rem] border transition-all duration-500 overflow-hidden active:scale-[0.98]
+                            ${selected === 'NEET' ? 'border-accent shadow-[0_0_30px_rgba(53,178,255,0.3)]' : 'border-border-dark/30 hover:border-accent/40'}
+                            ${selected && selected !== 'NEET' ? 'opacity-40 pointer-events-none' : ''}`}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="relative flex flex-col items-center">
+                            <div className="font-grotesk text-[6rem] sm:text-[8rem] font-extrabold leading-none tracking-tighter text-surface-dark group-hover:text-accent/10 transition-colors duration-500 select-none">N</div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-grotesk text-4xl sm:text-5xl font-bold text-text-dark group-hover:scale-110 transition-transform duration-500">
+                                {selected === 'NEET' ? <span className="inline-block w-8 h-8 border-[3px] border-accent border-t-transparent rounded-full animate-spin" /> : 'NEET'}
+                            </div>
+                        </div>
+                        <div className="relative text-center mt-4 sm:mt-6">
+                            <p className="font-display text-[10px] sm:text-xs tracking-widest text-text-secondary-dark group-hover:text-text-dark transition-colors duration-300 uppercase">Medical Entrance</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    return createPortal(modal, document.body);
+};
 
 // ── AIPT Test Selection Screen ───────────────────────────────────────────────
 const testPositions = [
@@ -462,7 +530,7 @@ const SelectionScreen: React.FC<SelectionScreenProps> = ({ tests, onSelectTest, 
 // ── Main AIPTPage ────────────────────────────────────────────────────────────
 const AIPTPage: React.FC = () => {
     usePageTitle('AIPT');
-    const { user, isPaidUser, examType } = useAuth();
+    const { user, isPaidUser, examType, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const { invalidateCache } = useDataCache();
 
@@ -477,17 +545,28 @@ const AIPTPage: React.FC = () => {
     const [showNtaDialog, setShowNtaDialog] = useState(false);
     const [ntaBackWarning, setNtaBackWarning] = useState(false);
 
+    // Guest exam type (for unauthenticated visitors)
+    const [guestExamType, setGuestExamType] = useState<'JEE' | 'NEET' | null>(() => {
+        const stored = sessionStorage.getItem('aipt_guest_exam_type');
+        return (stored === 'JEE' || stored === 'NEET') ? stored : null;
+    });
+    const [showGuestExamModal, setShowGuestExamModal] = useState(false);
+
+    // Show guest exam type modal for unauthenticated visitors without a stored selection
+    useEffect(() => {
+        if (authLoading) return;
+        if (user) return;
+        if (!guestExamType) setShowGuestExamModal(true);
+    }, [authLoading, user, guestExamType]);
+
     // Track which fetch is the "current" one so stale fetches can't update state
     const fetchIdRef = React.useRef(0);
     // Track whether we've done the initial load (avoids referencing rawTests in effect)
     const hasLoadedRef = React.useRef(false);
 
-    // Fetch raw data — only depends on user, NOT isPaidUser
+    // Fetch raw data — works for both authenticated users and guests
     useEffect(() => {
-        if (!user?.id) {
-            setIsLoading(false);
-            return;
-        }
+        if (authLoading) return; // wait for auth state to settle
 
         const id = ++fetchIdRef.current;
         // Only show loading skeleton on first fetch — not on re-fetches
@@ -505,29 +584,32 @@ const AIPTPage: React.FC = () => {
                 if (fetchIdRef.current !== id) return;
                 if (testsError) throw testsError;
 
-                const testIds = (testsData || []).map((t: any) => String(t.testID));
-
-                const { data: submissionsData, error: submissionsError } = await supabase
-                    .from('student_tests')
-                    .select('id, test_id, result_url, submitted_at')
-                    .eq('user_id', user.id)
-                    .in('test_id', testIds.length > 0 ? testIds : ['__none__'])
-                    .not('submitted_at', 'is', null);
-
-                if (fetchIdRef.current !== id) return;
-                if (submissionsError) throw submissionsError;
-
-                // If tests query returned nothing, session may be stale — retry
-                if ((testsData || []).length === 0 && attempt < 2) {
-                    await new Promise(r => setTimeout(r, 800));
-                    if (fetchIdRef.current === id) return fetchTests(attempt + 1);
-                    return;
-                }
-
                 const sMap = new Map<string, { id: string; hasResult: boolean }>();
-                (submissionsData || []).forEach((s: any) => {
-                    sMap.set(s.test_id, { id: s.id, hasResult: !!s.result_url });
-                });
+
+                if (user?.id) {
+                    const testIds = (testsData || []).map((t: any) => String(t.testID));
+
+                    const { data: submissionsData, error: submissionsError } = await supabase
+                        .from('student_tests')
+                        .select('id, test_id, result_url, submitted_at')
+                        .eq('user_id', user.id)
+                        .in('test_id', testIds.length > 0 ? testIds : ['__none__'])
+                        .not('submitted_at', 'is', null);
+
+                    if (fetchIdRef.current !== id) return;
+                    if (submissionsError) throw submissionsError;
+
+                    // If tests query returned nothing, session may be stale — retry
+                    if ((testsData || []).length === 0 && attempt < 2) {
+                        await new Promise(r => setTimeout(r, 800));
+                        if (fetchIdRef.current === id) return fetchTests(attempt + 1);
+                        return;
+                    }
+
+                    (submissionsData || []).forEach((s: any) => {
+                        sMap.set(s.test_id, { id: s.id, hasResult: !!s.result_url });
+                    });
+                }
 
                 if (fetchIdRef.current === id) {
                     setRawTests(testsData || []);
@@ -546,16 +628,19 @@ const AIPTPage: React.FC = () => {
         };
 
         fetchTests();
-    }, [user?.id]);
+    }, [user?.id, authLoading]);
 
-    // Compute test statuses from raw data + isPaidUser + examType (no refetch needed)
+    // For guests use their locally-selected type; for logged-in users use context
+    const effectiveExamType = user ? examType : guestExamType;
+
+    // Compute test statuses from raw data + isPaidUser + effectiveExamType (no refetch needed)
     const tests: AIPTTest[] = React.useMemo(() => {
         if (!rawTests) return [];
 
-        // Filter to only tests matching the user's exam type.
-        // If examType is null or the test has no exam field, include it.
-        const examFilteredTests = examType
-            ? rawTests.filter((t: any) => !t.exam || t.exam.toUpperCase() === examType.toUpperCase())
+        // Filter to only tests matching the effective exam type.
+        // If effectiveExamType is null or the test has no exam field, include it.
+        const examFilteredTests = effectiveExamType
+            ? rawTests.filter((t: any) => !t.exam || t.exam.toUpperCase() === effectiveExamType.toUpperCase())
             : rawTests;
 
         let firstFreeUnlocked = false;
@@ -590,7 +675,7 @@ const AIPTPage: React.FC = () => {
 
             return { ...test, tier: testTier, status: 'locked' as TestStatus };
         });
-    }, [rawTests, submissionsMap, isPaidUser, examType]);
+    }, [rawTests, submissionsMap, isPaidUser, effectiveExamType]);
 
     // Handle back button during test
     useEffect(() => {
@@ -609,6 +694,10 @@ const AIPTPage: React.FC = () => {
     }, [pageState, ntaMode]);
 
     const handleSelectTest = (test: AIPTTest) => {
+        if (!user) {
+            navigate('/login', { state: { from: '/aipt' } });
+            return;
+        }
         setSelectedTest(test as Test);
         setNtaMode(false);
         setPageState('instructions');
@@ -616,7 +705,7 @@ const AIPTPage: React.FC = () => {
 
     const handleStartTest = () => {
         const isMobile = window.innerWidth < 768;
-        if (!isMobile && examType?.toUpperCase() === 'JEE') {
+        if (!isMobile && effectiveExamType?.toUpperCase() === 'JEE') {
             setShowNtaDialog(true);
         } else {
             setPageState('inProgress');
@@ -648,9 +737,20 @@ const AIPTPage: React.FC = () => {
 
     const isTestInProgress = pageState === 'inProgress';
 
+    const guestModal = !authLoading && !user && showGuestExamModal ? (
+        <GuestExamTypeModal
+            onSelect={(type) => {
+                sessionStorage.setItem('aipt_guest_exam_type', type);
+                setGuestExamType(type);
+                setShowGuestExamModal(false);
+            }}
+        />
+    ) : null;
+
     // ── Loading skeleton ──
     if (isLoading) {
         return (
+            <>
             <main className="flex-grow">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="max-w-6xl mx-auto">
@@ -682,6 +782,8 @@ const AIPTPage: React.FC = () => {
                     </div>
                 </div>
             </main>
+            {guestModal}
+            </>
         );
     }
 
@@ -774,7 +876,7 @@ const AIPTPage: React.FC = () => {
     }
 
     // ── No tests available for this exam type ──
-    if (!isLoading && !error && tests.length === 0 && examType) {
+    if (!isLoading && !error && tests.length === 0 && effectiveExamType) {
         return (
             <main className="flex-grow">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center">
@@ -783,10 +885,10 @@ const AIPTPage: React.FC = () => {
                             <span className="material-symbols-outlined text-primary text-3xl">science</span>
                         </div>
                         <h2 className="text-text-light dark:text-text-dark text-xl font-bold">
-                            {examType.toUpperCase()} AIPTs are on their way!
+                            {effectiveExamType.toUpperCase()} AIPTs are on their way!
                         </h2>
                         <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm leading-relaxed">
-                            We're building AI-powered tests specifically for {examType.toUpperCase()} aspirants. Till then, stay consistent with your practice and check back soon!
+                            We're building AI-powered tests specifically for {effectiveExamType.toUpperCase()} aspirants. Till then, stay consistent with your practice and check back soon!
                         </p>
                     </div>
                 </div>
@@ -796,6 +898,7 @@ const AIPTPage: React.FC = () => {
 
     // ── Selection screen ──
     return (
+        <>
         <main className="flex-grow">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <SelectionScreen
@@ -819,6 +922,8 @@ const AIPTPage: React.FC = () => {
                 />
             )}
         </main>
+        {guestModal}
+        </>
     );
 };
 

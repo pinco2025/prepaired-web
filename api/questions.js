@@ -46,10 +46,11 @@ function shuffleArray(array) {
 
 function transformGitHubUrl(url) {
     let baseUrl = url.replace(/\/$/, '');
-    if (baseUrl.includes('github.com') && baseUrl.includes('/tree/')) {
+    if (baseUrl.includes('github.com')) {
         baseUrl = baseUrl
             .replace('https://github.com/', 'https://raw.githubusercontent.com/')
-            .replace('/tree/', '/');
+            .replace('/tree/', '/')
+            .replace('/blob/', '/');
     }
     return baseUrl;
 }
@@ -57,7 +58,12 @@ function transformGitHubUrl(url) {
 async function fetchJson(url) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Fetch failed: ${url} (${res.status})`);
-    return res.json();
+    const text = await res.text();
+    try {
+        return JSON.parse(text);
+    } catch {
+        throw new Error(`Response from ${url} is not valid JSON (got HTML or empty body)`);
+    }
 }
 
 async function fetchAndDecrypt(url) {
@@ -182,6 +188,64 @@ export default async function handler(req, res) {
                     isPaid = PAID_TIERS.includes(tier);
                 }
             }
+        }
+
+        // ── 2a. Chapter-specific sets (from AI Insights weak chapters) ──
+        if (setId.startsWith('ch-')) {
+            const chapterCode = setId.slice(3);
+
+            const recRes = await fetch(
+                `${SUPABASE_URL}/rest/v1/question_set?set_id=eq.recommend&select=url`,
+                {
+                    headers: {
+                        'apikey': SUPABASE_SERVICE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+                    },
+                }
+            );
+            if (!recRes.ok) {
+                return res.status(500).json({ error: 'Failed to look up recommend set' });
+            }
+            const recSets = await recRes.json();
+            if (!recSets.length || !recSets[0].url) {
+                return res.status(404).json({ error: 'Recommend set not configured' });
+            }
+            const baseUrl = transformGitHubUrl(recSets[0].url);
+            const cap = subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
+            const qUrl = `${baseUrl}/${cap}/${chapterCode}/${chapterCode}_${cap}_questions.json`;
+            const sUrl = `${baseUrl}/${cap}/${chapterCode}/${chapterCode}_${cap}_solutions.json`;
+
+            // Existence check — GET the file and verify it parses as JSON
+            if (req.query.check === '1') {
+                const checkRes = await fetch(qUrl);
+                if (!checkRes.ok) {
+                    return res.status(404).json({ exists: false });
+                }
+                try {
+                    const text = await checkRes.text();
+                    JSON.parse(text);
+                    return res.status(200).json({ exists: true });
+                } catch {
+                    return res.status(404).json({ exists: false });
+                }
+            }
+
+            const [rawQ, rawS] = await Promise.all([
+                fetchJson(qUrl),
+                fetchJson(sUrl).catch(() => null),
+            ]);
+
+            const allQs = rawQ.questions || [];
+            const allowedIds = new Set(allQs.map(q => q.id));
+            const solutions = rawS ? buildSolutionMap(rawS, setId, allowedIds) : {};
+
+            res.setHeader('Cache-Control', 'no-store');
+            return res.status(200).json({
+                questions: allQs,
+                solutions,
+                totalCount: allQs.length,
+                isPaid: true,
+            });
         }
 
         // ── 2. Fetch question-set URL from Supabase ─────────────────────

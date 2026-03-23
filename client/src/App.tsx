@@ -305,11 +305,7 @@ export const AppContent: React.FC = () => {
               <SingleQuestion />
             } />
 
-            <Route path="/aipt" element={
-              <RequireAuth allowFree>
-                <AIPTPage />
-              </RequireAuth>
-            } />
+            <Route path="/aipt" element={<AIPTPage />} />
             <Route path="/tests" element={
               isLiteUser ? (
                 <RequireAuth allowFree>
