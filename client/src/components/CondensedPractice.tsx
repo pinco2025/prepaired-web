@@ -142,6 +142,15 @@ const CondensedPractice: React.FC = () => {
     // Mobile: closed by default, Desktop (>=1024px): open by default
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
+    // Resume-previous-attempt modal
+    const [showResumeModal, setShowResumeModal] = useState(false);
+    const [pendingSession, setPendingSession] = useState<{
+        id: string;
+        answers: Record<number, string>;
+        checked: Record<number, boolean>;
+        dbAnswers: Record<string, string>;
+    } | null>(null);
+
     // Session tracking for student_sets (like super-30)
     const sessionIdRef = React.useRef<string | null>(null);
     const sessionAnswersRef = React.useRef<{ [questionUuid: string]: string }>({});
@@ -312,27 +321,70 @@ const CondensedPractice: React.FC = () => {
                 setUserAnswers({});
                 setCheckedQuestions({});
 
-                // Create a session in student_sets for attempt tracking
+                // Check for an existing session to resume
                 if (user?.id) {
                     try {
-                        const { data: newSession, error: sessErr } = await supabase
+                        const { data: existingSessions } = await supabase
                             .from('student_sets')
-                            .insert({
-                                user_id: user.id,
-                                set_id: targetSetId,
-                                answers: {},
-                            })
-                            .select('id')
-                            .single();
+                            .select('id, answers')
+                            .eq('user_id', user.id)
+                            .eq('set_id', targetSetId)
+                            .order('created_at', { ascending: false })
+                            .limit(1);
 
-                        if (sessErr) throw sessErr;
-                        if (newSession) {
-                            sessionIdRef.current = newSession.id;
-                            sessionAnswersRef.current = {};
-                            setSessionClosed(false);
+                        const latestSession = existingSessions?.[0];
+                        const storedAnswers = (latestSession?.answers ?? {}) as Record<string, string>;
+                        const answerKeys = Object.keys(storedAnswers);
+
+                        // Build UUID → index map from fetched questions
+                        const uuidToIdx: Record<string, number> = {};
+                        processedQuestions.forEach((q: LocalQuestion, idx: number) => {
+                            uuidToIdx[q.uuid || q.id] = idx;
+                        });
+
+                        // Check if any stored answer belongs to the current question set
+                        let hasMatch = false;
+                        const matchingAnswers: Record<number, string> = {};
+                        const matchingChecked: Record<number, boolean> = {};
+
+                        for (const uuid of answerKeys) {
+                            if (uuid in uuidToIdx) {
+                                hasMatch = true;
+                                matchingAnswers[uuidToIdx[uuid]] = storedAnswers[uuid];
+                                matchingChecked[uuidToIdx[uuid]] = true;
+                            }
+                        }
+
+                        if (hasMatch && latestSession) {
+                            // Existing attempt found — ask user what to do
+                            setPendingSession({
+                                id: latestSession.id,
+                                answers: matchingAnswers,
+                                checked: matchingChecked,
+                                dbAnswers: storedAnswers,
+                            });
+                            setShowResumeModal(true);
+                        } else {
+                            // No resumable session — create a fresh one
+                            const { data: newSession, error: sessErr } = await supabase
+                                .from('student_sets')
+                                .insert({
+                                    user_id: user.id,
+                                    set_id: targetSetId,
+                                    answers: {},
+                                })
+                                .select('id')
+                                .single();
+
+                            if (sessErr) throw sessErr;
+                            if (newSession) {
+                                sessionIdRef.current = newSession.id;
+                                sessionAnswersRef.current = {};
+                                setSessionClosed(false);
+                            }
                         }
                     } catch (e) {
-                        console.error('Error creating set session:', e);
+                        console.error('Error checking/creating set session:', e);
                     }
                 }
 
@@ -482,6 +534,63 @@ const CondensedPractice: React.FC = () => {
         setShowSolution(false);
         if (window.innerWidth < 1024) setIsPaletteOpen(false);
     }
+
+    // Resume previous attempt
+    const handleResume = () => {
+        if (!pendingSession) return;
+        sessionIdRef.current = pendingSession.id;
+        sessionAnswersRef.current = pendingSession.dbAnswers;
+        setUserAnswers(pendingSession.answers);
+        setCheckedQuestions(pendingSession.checked);
+        setSessionClosed(false);
+        setShowResumeModal(false);
+
+        // Navigate to the first unanswered question
+        const answeredIndices = Object.keys(pendingSession.answers).map(Number);
+        const firstUnanswered = questions.findIndex((_, idx) => !answeredIndices.includes(idx));
+        const resumeIdx = firstUnanswered >= 0 ? firstUnanswered : 0;
+        setCurrentQuestionIndex(resumeIdx);
+
+        const q = questions[resumeIdx];
+        if (q && isIntegerTypeQuestion(q)) {
+            setNumericAnswer(pendingSession.answers[resumeIdx] || '');
+            setSelectedOption(null);
+        } else {
+            setSelectedOption(pendingSession.answers[resumeIdx] || null);
+            setNumericAnswer('');
+        }
+
+        setPendingSession(null);
+    };
+
+    // Start fresh attempt
+    const handleFreshStart = async () => {
+        setShowResumeModal(false);
+        setPendingSession(null);
+
+        if (user?.id) {
+            try {
+                const { data: newSession, error: sessErr } = await supabase
+                    .from('student_sets')
+                    .insert({
+                        user_id: user.id,
+                        set_id: targetSetId,
+                        answers: {},
+                    })
+                    .select('id')
+                    .single();
+
+                if (sessErr) throw sessErr;
+                if (newSession) {
+                    sessionIdRef.current = newSession.id;
+                    sessionAnswersRef.current = {};
+                    setSessionClosed(false);
+                }
+            } catch (e) {
+                console.error('Error creating set session:', e);
+            }
+        }
+    };
 
     const currentQuestion = questions[currentQuestionIndex];
     if (loading) return <div className="flex h-full items-center justify-center"><div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div></div>;
@@ -829,6 +938,48 @@ const CondensedPractice: React.FC = () => {
                     )}
                 </div>
             </footer>
+
+            {/* Resume Attempt Modal */}
+            {showResumeModal && pendingSession && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                >
+                    <div
+                        className="relative bg-surface-light dark:bg-surface-dark rounded-2xl p-5 sm:p-8 max-w-sm w-full mx-4 shadow-2xl border border-border-light dark:border-border-dark"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary text-xl">history</span>
+                            </div>
+
+                            <div>
+                                <h2 className="text-lg font-bold text-text-light dark:text-text-dark mb-1">
+                                    Previous Attempt Found
+                                </h2>
+                                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                                    You answered {Object.keys(pendingSession.answers).length} of {questions.length} questions last time. Would you like to continue?
+                                </p>
+                            </div>
+
+                            <div className="w-full flex flex-col gap-2">
+                                <button
+                                    onClick={handleResume}
+                                    className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:bg-primary-dark hover:scale-[1.02] transition-all"
+                                >
+                                    Continue Last Attempt
+                                </button>
+                                <button
+                                    onClick={handleFreshStart}
+                                    className="w-full py-2.5 rounded-xl border border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark font-medium text-sm hover:bg-background-light dark:hover:bg-white/5 transition-colors"
+                                >
+                                    Start Fresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Paywall Modal */}
             {showPaywallModal && (
