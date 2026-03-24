@@ -123,7 +123,7 @@ const CondensedPractice: React.FC = () => {
     const { setId, subject } = useParams<{ setId?: string; subject: string }>();
     const targetSetId = setId || 'condensed';
     const navigate = useNavigate();
-    const { isPaidUser, loading: authLoading } = useAuth();
+    const { user, isPaidUser, loading: authLoading } = useAuth();
 
     const [questions, setQuestions] = useState<LocalQuestion[]>([]);
     const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
@@ -137,8 +137,82 @@ const CondensedPractice: React.FC = () => {
     const [showSolution, setShowSolution] = useState(false);
     const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
     const [showPaywallModal, setShowPaywallModal] = useState(false);
+    // Track which questions have been checked (answer locked)
+    const [checkedQuestions, setCheckedQuestions] = useState<{ [key: number]: boolean }>({});
     // Mobile: closed by default, Desktop (>=1024px): open by default
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+
+    // Session tracking for student_sets (like super-30)
+    const sessionIdRef = React.useRef<string | null>(null);
+    const sessionAnswersRef = React.useRef<{ [questionUuid: string]: string }>({});
+    const [sessionClosed, setSessionClosed] = useState(false);
+    const inactivityTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Close the current session in student_sets
+    const closeSession = React.useCallback(async () => {
+        const sid = sessionIdRef.current;
+        if (!sid || sessionClosed) return;
+        setSessionClosed(true);
+        if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+
+        await supabase
+            .from('student_sets')
+            .update({ time_elapsed: -1 })
+            .eq('id', sid);
+        sessionIdRef.current = null;
+    }, [sessionClosed]);
+
+    // Reset inactivity timer on any user interaction
+    const resetInactivityTimer = React.useCallback(() => {
+        if (sessionClosed) return;
+        if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+        const timeout = 20 * 60 * 1000; // 20min inactivity timeout
+        inactivityTimerRef.current = setTimeout(() => {
+            closeSession();
+        }, timeout);
+    }, [sessionClosed, closeSession]);
+
+    // Start/restart inactivity timer whenever user interacts
+    useEffect(() => {
+        if (!sessionIdRef.current || sessionClosed) return;
+
+        const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+        const handler = () => resetInactivityTimer();
+
+        events.forEach(e => window.addEventListener(e, handler));
+        resetInactivityTimer(); // kick off initial timer
+
+        return () => {
+            events.forEach(e => window.removeEventListener(e, handler));
+            if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+        };
+    }, [resetInactivityTimer, sessionClosed]);
+
+    // Close session on page unload / tab close
+    useEffect(() => {
+        const handleUnload = () => {
+            const sid = sessionIdRef.current;
+            if (sid) {
+                const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://eznxtdzsvnfclgcavvhp.supabase.co';
+                const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bnh0ZHpzdm5mY2xnY2F2dmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MDA5MDcsImV4cCI6MjA3ODE3NjkwN30.uxkZPGvN9-KXqulS-KguoFAvR33RluyNR-O3SNH8iwI';
+                const url = `${supabaseUrl}/rest/v1/student_sets?id=eq.${sid}`;
+                // Use fetch with keepalive for reliable fire-and-forget on unload
+                fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Prefer': 'return=minimal',
+                    },
+                    body: JSON.stringify({ time_elapsed: -1 }),
+                    keepalive: true,
+                }).catch(() => {});
+            }
+        };
+        window.addEventListener('beforeunload', handleUnload);
+        return () => window.removeEventListener('beforeunload', handleUnload);
+    }, []);
 
     // Set initial palette state based on window width (run once on mount)
     useEffect(() => {
@@ -236,6 +310,31 @@ const CondensedPractice: React.FC = () => {
                 setNumericAnswer('');
                 setShowSolution(false);
                 setUserAnswers({});
+                setCheckedQuestions({});
+
+                // Create a session in student_sets for attempt tracking
+                if (user?.id) {
+                    try {
+                        const { data: newSession, error: sessErr } = await supabase
+                            .from('student_sets')
+                            .insert({
+                                user_id: user.id,
+                                set_id: targetSetId,
+                                answers: {},
+                            })
+                            .select('id')
+                            .single();
+
+                        if (sessErr) throw sessErr;
+                        if (newSession) {
+                            sessionIdRef.current = newSession.id;
+                            sessionAnswersRef.current = {};
+                            setSessionClosed(false);
+                        }
+                    } catch (e) {
+                        console.error('Error creating set session:', e);
+                    }
+                }
 
             } catch (err: any) {
                 console.error(err);
@@ -246,10 +345,30 @@ const CondensedPractice: React.FC = () => {
         };
 
         fetchData();
-    }, [subject, targetSetId, authLoading, isPaidUser]);
+    }, [subject, targetSetId, authLoading, isPaidUser, user?.id]);
+
+    // Persist answer to student_sets in DB
+    const updateAnswerInDB = async (questionUuid: string, answer: string | null) => {
+        const sid = sessionIdRef.current;
+        if (!sid) return;
+
+        const updated = { ...sessionAnswersRef.current };
+        if (answer) {
+            updated[questionUuid] = answer;
+        } else {
+            delete updated[questionUuid];
+        }
+        sessionAnswersRef.current = updated;
+
+        await supabase
+            .from('student_sets')
+            .update({ answers: updated })
+            .eq('id', sid);
+    };
 
     const handleOptionSelect = (optionId: string) => {
-        if (showSolution) return; // Prevent changing answer after proper check
+        // Prevent changing answer after check
+        if (checkedQuestions[currentQuestionIndex]) return;
 
         const newSelection = selectedOption === optionId ? null : optionId;
         setSelectedOption(newSelection);
@@ -263,9 +382,17 @@ const CondensedPractice: React.FC = () => {
             }
             return next;
         });
+
+        // Sync to DB
+        if (currentQuestion) {
+            updateAnswerInDB(currentQuestion.uuid || currentQuestion.id, newSelection);
+        }
     };
 
     const handleNumericAnswerChange = (value: string) => {
+        // Prevent changing answer after check
+        if (checkedQuestions[currentQuestionIndex]) return;
+
         setNumericAnswer(value);
         setUserAnswers(prev => {
             const next = { ...prev };
@@ -276,6 +403,11 @@ const CondensedPractice: React.FC = () => {
             }
             return next;
         });
+
+        // Sync to DB
+        if (currentQuestion) {
+            updateAnswerInDB(currentQuestion.uuid || currentQuestion.id, value || null);
+        }
     };
 
     const handleNext = () => {
@@ -291,6 +423,7 @@ const CondensedPractice: React.FC = () => {
                 setSelectedOption(userAnswers[nextIdx] || null);
                 setNumericAnswer('');
             }
+            // Hide solution when navigating, but checked state persists
             setShowSolution(false);
         } else if (!isPaidUser && totalQuestionsCount > FREE_QUESTION_LIMIT) {
             // Last free question — more exist behind the paywall
@@ -482,7 +615,7 @@ const CondensedPractice: React.FC = () => {
                                     <NumericKeypad
                                         value={numericAnswer}
                                         onChange={handleNumericAnswerChange}
-                                        disabled={showSolution}
+                                        disabled={!!checkedQuestions[currentQuestionIndex]}
                                         showResult={showSolution}
                                         isCorrect={isNumericAnswerCorrect}
                                         correctAnswer={currentQuestion.correctAnswer}
@@ -494,7 +627,7 @@ const CondensedPractice: React.FC = () => {
                                     options={currentQuestion.options}
                                     selectedId={selectedOption}
                                     onSelect={handleOptionSelect}
-                                    disabled={showSolution}
+                                    disabled={!!checkedQuestions[currentQuestionIndex]}
                                     showResult={showSolution}
                                     correctAnswerId={currentQuestion.correctAnswer}
                                     layout="grid"
@@ -535,13 +668,27 @@ const CondensedPractice: React.FC = () => {
                         </h3>
                         <div className="relative">
                             <div className="grid grid-cols-5 gap-2">
-                                {questions.map((_, idx) => {
+                                {questions.map((q, idx) => {
                                     const isCurrent = currentQuestionIndex === idx;
-                                    const isAnswered = !!userAnswers[idx];
+                                    const isChecked = !!checkedQuestions[idx];
+                                    const answer = userAnswers[idx];
+                                    let isCorrect = false;
+                                    let isWrong = false;
+
+                                    if (isChecked && answer) {
+                                        if (isIntegerTypeQuestion(q)) {
+                                            isCorrect = answer.trim() === q.correctAnswer?.trim();
+                                        } else {
+                                            isCorrect = answer === q.correctAnswer;
+                                        }
+                                        isWrong = !isCorrect;
+                                    }
+
                                     let btnClass = "w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all ";
 
                                     if (isCurrent) btnClass += "bg-primary text-white shadow-md shadow-primary/30";
-                                    else if (isAnswered) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
+                                    else if (isCorrect) btnClass += "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
+                                    else if (isWrong) btnClass += "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800";
                                     else btnClass += "border border-border-light dark:border-border-dark text-text-secondary-light hover:border-primary/50";
 
                                     return (
@@ -617,7 +764,13 @@ const CondensedPractice: React.FC = () => {
                     {/* Check Answer (Center on Mobile & Desktop) */}
                     <div className="flex-1 flex justify-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto">
                         <button
-                            onClick={() => setShowSolution(!showSolution)}
+                            onClick={() => {
+                                if (!showSolution) {
+                                    // Lock the answer permanently when checking
+                                    setCheckedQuestions(prev => ({ ...prev, [currentQuestionIndex]: true }));
+                                }
+                                setShowSolution(!showSolution);
+                            }}
                             className={`flex items-center justify-center w-14 h-14 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl font-bold transition-all shadow-md md:shadow-sm ${showSolution
                                 ? 'bg-background-light dark:bg-white/5 text-text-secondary-light border border-border-light dark:border-border-dark'
                                 : 'bg-green-600 text-white hover:bg-green-700 shadow-green-600/30'
@@ -629,7 +782,7 @@ const CondensedPractice: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Next Button */}
+                    {/* Next / Submit / Unlock Button */}
                     {isLastQuestion && !isPaidUser && totalQuestionsCount > FREE_QUESTION_LIMIT ? (
                         // Soft paywall nudge on the last free question
                         <button
@@ -645,11 +798,27 @@ const CondensedPractice: React.FC = () => {
                             </span>
                             <span className="hidden md:inline text-sm">Unlock</span>
                         </button>
+                    ) : isLastQuestion ? (
+                        // Submit button on last question
+                        <button
+                            onClick={closeSession}
+                            disabled={sessionClosed}
+                            className={`flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl font-bold shadow-md transition-all ${
+                                sessionClosed
+                                    ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+                                    : 'bg-green-600 text-white hover:bg-green-700 shadow-green-600/20'
+                            }`}
+                            title={sessionClosed ? "Session Submitted" : "Submit Set"}
+                        >
+                            <span className="material-symbols-outlined text-2xl md:text-xl">
+                                {sessionClosed ? 'check_circle' : 'send'}
+                            </span>
+                            <span className="hidden md:inline ml-1">{sessionClosed ? 'Submitted' : 'Submit'}</span>
+                        </button>
                     ) : (
                         <button
                             onClick={handleNext}
-                            disabled={isLastQuestion}
-                            className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl bg-primary md:bg-primary text-white font-bold shadow-md shadow-primary/20 hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-2.5 rounded-full md:rounded-xl bg-primary md:bg-primary text-white font-bold shadow-md shadow-primary/20 hover:bg-blue-600 transition-all"
                             title="Next Question"
                         >
                             <span className="hidden md:inline mr-1">Next</span>

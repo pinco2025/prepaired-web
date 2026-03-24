@@ -45,6 +45,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import DeleteAccount from './components/DeleteAccount';
 import InAppBrowserOverlay from './components/InAppBrowserOverlay';
 import ExamTypeModal from './components/ExamTypeModal';
+import GuestExamTypeModal from './components/GuestExamTypeModal';
 import AuthCallback from './components/AuthCallback';
 import { isInAppBrowser, getIsIOS } from './utils/inAppBrowserRedirect';
 import { supabase } from './utils/supabaseClient';
@@ -82,7 +83,7 @@ const HomeRoute: React.FC = () => {
 };
 
 export const AppContent: React.FC = () => {
-  const { isAuthenticated, examType, loading, subscriptionType, user } = useAuth();
+  const { isAuthenticated, examType, loading, subscriptionType, user, guestExamType, setGuestExamType } = useAuth();
   const location = useLocation();
   const [showAIPTModal, setShowAIPTModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -174,6 +175,13 @@ export const AppContent: React.FC = () => {
       {/* Exam Type Selection Modal — shown when authenticated user has no exam type (not for admins) */}
       {!loading && isAuthenticated && examType === null && subscriptionType !== 'admin' && (
         <ExamTypeModal onComplete={() => {}} />
+      )}
+      {/* Guest Exam Type Modal — shown once for unauthenticated users on content pages */}
+      {!loading && !isAuthenticated && !guestExamType && ![
+        '/', '/login', '/register', '/auth/callback', '/privacy', '/delete-account',
+        '/waitlist', '/waitlist-success', '/register-success',
+      ].includes(location.pathname) && (
+        <GuestExamTypeModal onSelect={setGuestExamType} />
       )}
       {showSidebar && <Sidebar />}
       <main className="flex-1 w-full relative flex flex-col min-h-0">

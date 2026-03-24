@@ -12,6 +12,8 @@ type AuthContextValue = {
   isAuthenticated: boolean; // True if user is logged in
   isPaidUser: boolean; // True only if subscription is IPFT-01-2026
   examType: string | null;
+  guestExamType: 'JEE' | 'NEET' | null; // For unauthenticated users
+  setGuestExamType: (type: 'JEE' | 'NEET') => void;
   refreshSubscription: () => Promise<void>;
   refreshExamType: () => Promise<void>;
 };
@@ -23,6 +25,8 @@ const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
   isPaidUser: false,
   examType: null,
+  guestExamType: null,
+  setGuestExamType: () => { },
   refreshSubscription: async () => { },
   refreshExamType: async () => { },
 });
@@ -34,6 +38,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [examType, setExamType] = useState<string | null>(null);
+
+  // Guest exam type for unauthenticated users — persisted in localStorage
+  const [guestExamType, setGuestExamTypeState] = useState<'JEE' | 'NEET' | null>(() => {
+    try {
+      const stored = localStorage.getItem('guest_exam_type');
+      return (stored === 'JEE' || stored === 'NEET') ? stored : null;
+    } catch { return null; }
+  });
+
+  const setGuestExamType = useCallback((type: 'JEE' | 'NEET') => {
+    setGuestExamTypeState(type);
+    try { localStorage.setItem('guest_exam_type', type); } catch {}
+  }, []);
 
   // Track if initial load is done
   const initialLoadDone = useRef(false);
@@ -101,6 +118,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, fetchExamType]);
 
+  // Carry forward guest exam type to DB when user signs in without one
+  const carryForwardGuestExamType = useCallback(async (userId: string, dbExamType: string | null) => {
+    if (dbExamType) return dbExamType; // already has one in DB
+    try {
+      const stored = localStorage.getItem('guest_exam_type');
+      if (stored !== 'JEE' && stored !== 'NEET') return null;
+      const { error } = await supabase
+        .from('users')
+        .update({ exam_type: stored })
+        .eq('id', userId);
+      if (!error) {
+        localStorage.removeItem('guest_exam_type');
+        setGuestExamTypeState(null);
+        return stored;
+      }
+    } catch {}
+    return dbExamType;
+  }, []);
+
   // Initial auth check
   useEffect(() => {
     let mounted = true;
@@ -123,8 +159,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ]);
 
           if (mounted) {
+            // Carry forward guest exam type if user has none
+            const finalExam = await carryForwardGuestExamType(session.user.id, exam);
             setSubscriptionType(subscription);
-            setExamType(exam);
+            setExamType(finalExam);
           }
         } else {
           setUser(null);
@@ -176,8 +214,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ]);
 
           if (mounted) {
+            const finalExam = await carryForwardGuestExamType(session.user.id, exam);
             setSubscriptionType(subscription);
-            setExamType(exam);
+            setExamType(finalExam);
           }
         } else {
           setUser(null);
@@ -192,7 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       mounted = false;
       authListener.unsubscribe();
     };
-  }, [fetchSubscription, fetchExamType]); // These are stable due to useCallback with empty deps
+  }, [fetchSubscription, fetchExamType, carryForwardGuestExamType]); // These are stable due to useCallback with empty deps
 
   // Computed values
   const isAuthenticated = user !== null;
@@ -206,6 +245,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated,
     isPaidUser,
     examType,
+    guestExamType,
+    setGuestExamType,
     refreshSubscription,
     refreshExamType,
   };

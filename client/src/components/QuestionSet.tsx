@@ -37,7 +37,8 @@ const ITEM_SET_ID: Record<string, string> = {
 const QuestionSet: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isAuthenticated, examType } = useAuth();
+    const { isAuthenticated, examType: authExamType, guestExamType } = useAuth();
+    const examType = isAuthenticated ? authExamType : guestExamType;
     const [viewState, setViewState] = useState<'dashboard' | 'subject_selection'>(
         (location.state as any)?.viewState || 'dashboard'
     );
