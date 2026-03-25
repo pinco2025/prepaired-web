@@ -326,16 +326,26 @@ const TestResult: React.FC = () => {
                 className={`text-text-secondary-light dark:text-text-secondary-dark text-sm flex items-center gap-1.5 ${allAttempts.length > 1 ? 'cursor-pointer hover:text-primary transition-colors' : 'cursor-default'}`}
               >
                 <span className="material-icons-outlined text-sm">event</span>
-                {submissionTime
-                  ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`
-                  : ''}
-                {allAttempts.length > 1 && (
+                {/* On mobile with multiple attempts: show only attempt number */}
+                {allAttempts.length > 1 ? (
                   <>
-                    <span className="ml-1 text-xs text-primary font-medium">
-                      (Attempt {allAttempts.findIndex(a => a.id === (activeSubmissionId || submissionId)) + 1} of {allAttempts.length})
+                    <span className="hidden sm:inline">
+                      {submissionTime
+                        ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`
+                        : ''}
+                    </span>
+                    <span className="text-xs text-primary font-medium sm:ml-1">
+                      Attempt {allAttempts.findIndex(a => a.id === (activeSubmissionId || submissionId)) + 1}
+                      <span className="hidden sm:inline"> of {allAttempts.length}</span>
                     </span>
                     <span className={`material-icons-outlined text-sm transition-transform ${attemptDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
                   </>
+                ) : (
+                  <span>
+                    {submissionTime
+                      ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`
+                      : ''}
+                  </span>
                 )}
               </button>
 
@@ -482,7 +492,7 @@ const TestResult: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => navigate(`/insights/${submissionId}`)}
+                onClick={() => navigate(`/insights/${activeSubmissionId || submissionId}`)}
                 className="w-full sm:w-auto bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-sm text-center"
               >
                 Generate Insights

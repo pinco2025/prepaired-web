@@ -7,6 +7,7 @@ import TestInterface from './TestInterface';
 import TestSubmitted from './TestSubmitted';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useDataCache } from '../contexts/DataCacheContext';
+import { NTAModeDialog, NTABackWarningDialog } from './NTADialogs';
 
 type TestStatus = 'instructions' | 'inProgress' | 'submitted';
 
@@ -20,6 +21,9 @@ const TestPage: React.FC = () => {
   const [test, setTest] = useState<Test | null>(null);
   const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
   const [checkingAttempt, setCheckingAttempt] = useState(true);
+  const [ntaMode, setNtaMode] = useState(false);
+  const [showNtaDialog, setShowNtaDialog] = useState(false);
+  const [ntaBackWarning, setNtaBackWarning] = useState(false);
 
   useEffect(() => {
     const initPage = async () => {
@@ -70,6 +74,11 @@ const TestPage: React.FC = () => {
 
   useEffect(() => {
     const handlePopState = () => {
+      if (ntaMode && testStatus === 'inProgress') {
+        setNtaBackWarning(true);
+        window.history.pushState({ status: testStatus }, '');
+        return;
+      }
       // Ignore popstate events triggered by fullscreen exit — re-push the state
       // and keep the test running
       if (document.fullscreenElement === null && testStatus === 'inProgress') {
@@ -89,7 +98,7 @@ const TestPage: React.FC = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [testStatus]);
+  }, [testStatus, ntaMode]);
 
   if (checkingAttempt) {
     return (
@@ -104,35 +113,75 @@ const TestPage: React.FC = () => {
   }
 
   const handleStartTest = () => {
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile && test.exam?.toUpperCase() === 'JEE') {
+      setShowNtaDialog(true);
+    } else {
+      startTest(false);
+    }
+  };
+
+  const startTest = (useNta: boolean) => {
+    setShowNtaDialog(false);
+    setNtaMode(useNta);
     setTestStatus('inProgress');
-    // Only request fullscreen on desktop — mobile browsers handle it poorly
-    // and exiting fullscreen can interfere with navigation/submission
+    if (useNta) {
+      window.dispatchEvent(new CustomEvent('ntamodechange', { detail: true }));
+    }
+    // Only request fullscreen on desktop
     const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
     if (isDesktop) {
-      const element = document.documentElement;
-      if (element.requestFullscreen) {
-        element.requestFullscreen().catch((err) => {
-          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-        });
-      }
+      document.documentElement.requestFullscreen?.().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
     }
   };
 
   const handleSubmitSuccess = () => {
     // Invalidate all caches so Dashboard and Tests show fresh data
     invalidateCache('all');
+    setNtaMode(false);
     setTestStatus('submitted');
+    window.dispatchEvent(new CustomEvent('ntamodechange', { detail: false }));
   };
 
   const renderContent = () => {
     switch (testStatus) {
       case 'inProgress':
-        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} isReattempt={isReattempt} />;
+        return (
+          <>
+            <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} ntaMode={ntaMode} isReattempt={isReattempt} />
+            {ntaBackWarning && (
+              <NTABackWarningDialog
+                onStay={() => {
+                  setNtaBackWarning(false);
+                  window.history.pushState({ status: testStatus }, '');
+                }}
+                onLeave={() => {
+                  setNtaBackWarning(false);
+                  setNtaMode(false);
+                  setTestStatus('instructions');
+                  window.dispatchEvent(new CustomEvent('ntamodechange', { detail: false }));
+                }}
+              />
+            )}
+          </>
+        );
       case 'submitted':
         return <TestSubmitted />;
       case 'instructions':
       default:
-        return <TestInstructions test={test} onStartTest={handleStartTest} />;
+        return (
+          <>
+            <TestInstructions test={test} onStartTest={handleStartTest} />
+            {showNtaDialog && (
+              <NTAModeDialog
+                onSelectNTA={() => startTest(true)}
+                onSelectStandard={() => startTest(false)}
+              />
+            )}
+          </>
+        );
     }
   };
 

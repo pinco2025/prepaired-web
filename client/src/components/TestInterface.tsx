@@ -1038,6 +1038,13 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
         <footer style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, height: '64px', background: '#f1f5f9', borderTop: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
+              onClick={() => setIsModalOpen(true)}
+              disabled={isSubmittingRef.current}
+              style={{ background: '#2e8b57', color: 'white', padding: '8px 32px', borderRadius: '2px', border: 'none', fontWeight: 700, fontSize: '12px', cursor: 'pointer', opacity: isSubmittingRef.current ? 0.5 : 1 }}
+            >
+              SUBMIT
+            </button>
+            <button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
               style={{ color: '#475569', fontWeight: 700, fontSize: '11px', padding: '6px 24px', border: '1px solid #94a3b8', borderRadius: '2px', background: 'white', cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer', opacity: currentQuestionIndex === 0 ? 0.4 : 1 }}
@@ -1052,13 +1059,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
               NEXT &gt;&gt;
             </button>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            disabled={isSubmittingRef.current}
-            style={{ background: '#2e8b57', color: 'white', padding: '8px 32px', borderRadius: '2px', border: 'none', fontWeight: 700, fontSize: '12px', cursor: 'pointer', opacity: isSubmittingRef.current ? 0.5 : 1 }}
-          >
-            SUBMIT
-          </button>
         </footer>
 
         {/* ── Submit confirmation modal ── */}

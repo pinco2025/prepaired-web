@@ -336,7 +336,7 @@ export const AppContent: React.FC = () => {
               )
             } />
             <Route path="/tests/:testId" element={
-              isLiteUser ? (
+              isLiteUser && !new URLSearchParams(location.search).has('reattempt') ? (
                 <RequireAuth allowFree>
                   <ComingSoon
                     title="Test Interface for"
