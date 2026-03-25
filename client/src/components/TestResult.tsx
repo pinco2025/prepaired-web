@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../contexts/AuthContext';
+import { useRazorpay } from '../hooks/useRazorpay';
+import SubscriptionModal from './SubscriptionModal';
+import PaymentSuccessOverlay from './PaymentSuccessOverlay';
 import JEELoader from './JEELoader';
 
 interface SectionScore {
@@ -78,10 +82,17 @@ const SUBJECT_ICONS: Record<string, string> = {
   Mathematics: 'functions',
 };
 
+interface AttemptInfo {
+  id: string;
+  submitted_at: string;
+  started_at: string;
+}
+
 const TestResult: React.FC = () => {
   usePageTitle('Test Result');
   const { submissionId } = useParams<{ submissionId: string }>();
   const navigate = useNavigate();
+  const { user, isPaidUser, refreshSubscription } = useAuth();
   const [result, setResult] = useState<TestResultData | null>(null);
   const [submissionTime, setSubmissionTime] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<string | null>(null);
@@ -89,18 +100,70 @@ const TestResult: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [polling, setPolling] = useState(false);
   const pollCountRef = useRef(0);
+
+  // Multi-attempt state
+  const [allAttempts, setAllAttempts] = useState<AttemptInfo[]>([]);
+  const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(null);
+  const [attemptDropdownOpen, setAttemptDropdownOpen] = useState(false);
+  const [testId, setTestId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Payment modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const {
+    initiateSubscription,
+    showSuccess,
+    successPlanType,
+    handleSuccessComplete
+  } = useRazorpay({
+    refreshSubscription,
+    onPaymentSuccess: () => setShowPaymentModal(false),
+  });
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setAttemptDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch all attempts for this test
+  useEffect(() => {
+    if (!testId || !user?.id) return;
+    const fetchAttempts = async () => {
+      const { data } = await supabase
+        .from('student_tests')
+        .select('id, submitted_at, started_at')
+        .eq('test_id', testId)
+        .eq('user_id', user.id)
+        .not('submitted_at', 'is', null)
+        .order('submitted_at', { ascending: false });
+      if (data && data.length > 0) {
+        setAllAttempts(data as AttemptInfo[]);
+      }
+    };
+    fetchAttempts();
+  }, [testId, user?.id]);
+
   useEffect(() => {
     let pollTimer: ReturnType<typeof setTimeout> | null = null;
     let cancelled = false;
 
+    // Use activeSubmissionId if set (user switched attempt), otherwise use URL param
+    const currentId = activeSubmissionId || submissionId;
+
     const fetchResultData = async (isRetry = false) => {
-      if (!submissionId) return;
+      if (!currentId) return;
       if (!isRetry) setLoading(true);
       try {
         const { data: submissionData, error } = await supabase
           .from('student_tests')
           .select('submitted_at, started_at, result_url, test_id')
-          .eq('id', submissionId)
+          .eq('id', currentId)
           .single();
 
         if (cancelled) return;
@@ -108,6 +171,7 @@ const TestResult: React.FC = () => {
 
         setSubmissionTime(submissionData.submitted_at);
         setStartTime(submissionData.started_at);
+        if (submissionData.test_id) setTestId(submissionData.test_id);
 
         if (submissionData.test_id) {
           const { data: testMeta } = await supabase
@@ -144,12 +208,13 @@ const TestResult: React.FC = () => {
       }
     };
 
+    pollCountRef.current = 0;
     fetchResultData();
     return () => {
       cancelled = true;
       if (pollTimer) clearTimeout(pollTimer);
     };
-  }, [submissionId]);
+  }, [submissionId, activeSubmissionId]);
 
   if (loading) return <JEELoader message="Loading results..." />;
 
@@ -253,20 +318,84 @@ const TestResult: React.FC = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark">
               {result.testId} <span className="text-primary">Results</span>
             </h1>
-            <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1 text-sm flex items-center gap-1.5">
-              <span className="material-icons-outlined text-sm">event</span>
-              {submissionTime
-                ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`
-                : ''}
-            </p>
+
+            {/* Completed On — with attempt dropdown if multiple attempts */}
+            <div className="relative mt-1" ref={dropdownRef}>
+              <button
+                onClick={() => allAttempts.length > 1 && setAttemptDropdownOpen(prev => !prev)}
+                className={`text-text-secondary-light dark:text-text-secondary-dark text-sm flex items-center gap-1.5 ${allAttempts.length > 1 ? 'cursor-pointer hover:text-primary transition-colors' : 'cursor-default'}`}
+              >
+                <span className="material-icons-outlined text-sm">event</span>
+                {submissionTime
+                  ? `Completed on ${new Date(submissionTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`
+                  : ''}
+                {allAttempts.length > 1 && (
+                  <>
+                    <span className="ml-1 text-xs text-primary font-medium">
+                      (Attempt {allAttempts.findIndex(a => a.id === (activeSubmissionId || submissionId)) + 1} of {allAttempts.length})
+                    </span>
+                    <span className={`material-icons-outlined text-sm transition-transform ${attemptDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                  </>
+                )}
+              </button>
+
+              {/* Attempt Selector Dropdown */}
+              {attemptDropdownOpen && allAttempts.length > 1 && (
+                <div className="absolute top-full left-0 mt-1 z-50 w-72 sm:w-80 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark overflow-hidden">
+                  <div className="px-3 py-2 border-b border-border-light dark:border-border-dark">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-text-secondary-light dark:text-text-secondary-dark">Select Attempt</span>
+                  </div>
+                  <div className="max-h-48 overflow-y-auto">
+                    {allAttempts.map((attempt, idx) => {
+                      const isActive = attempt.id === (activeSubmissionId || submissionId);
+                      return (
+                        <button
+                          key={attempt.id}
+                          onClick={() => {
+                            setActiveSubmissionId(attempt.id);
+                            setAttemptDropdownOpen(false);
+                          }}
+                          className={`w-full px-3 py-2.5 flex items-center justify-between text-left text-sm transition-colors ${isActive ? 'bg-primary/10 text-primary font-medium' : 'text-text-light dark:text-text-dark hover:bg-border-light/50 dark:hover:bg-border-dark/50'}`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${isActive ? 'bg-primary text-white' : 'bg-border-light dark:bg-border-dark text-text-secondary-light dark:text-text-secondary-dark'}`}>
+                              {allAttempts.length - idx}
+                            </span>
+                            {new Date(attempt.submitted_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
+                          </span>
+                          {isActive && <span className="material-icons-outlined text-primary text-base">check</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          <button
-            onClick={() => navigate(`/review/${submissionId}`)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-primary hover:opacity-90 transition-opacity shadow-sm text-sm self-start md:self-auto"
-          >
-            <span className="material-icons-outlined text-base">rate_review</span>
-            Start Review
-          </button>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 self-start md:self-auto flex-wrap">
+            <button
+              onClick={() => navigate(`/review/${activeSubmissionId || submissionId}`)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-primary hover:opacity-90 transition-opacity shadow-sm text-sm"
+            >
+              <span className="material-icons-outlined text-base">rate_review</span>
+              Start Review
+            </button>
+            <button
+              onClick={() => {
+                if (isPaidUser) {
+                  navigate(`/tests/${testId}?reattempt=true`);
+                } else {
+                  setShowPaymentModal(true);
+                }
+              }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border-2 border-primary text-primary hover:bg-primary/10 transition-colors shadow-sm"
+            >
+              <span className="material-icons-outlined text-base">replay</span>
+              Re-attempt
+            </button>
+          </div>
         </header>
 
         {/* Top Row: Hero Score + Quick Stats */}
@@ -461,6 +590,29 @@ const TestResult: React.FC = () => {
 
 
       </div>
+
+      {/* Payment Modal for free users */}
+      <SubscriptionModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSubscribe={() => {
+          setShowPaymentModal(false);
+          if (user) {
+            initiateSubscription({
+              userId: user.id,
+              userEmail: user.email,
+              userName: user.user_metadata?.full_name || user.user_metadata?.name,
+            });
+          }
+        }}
+      />
+
+      {/* Payment Success Overlay */}
+      <PaymentSuccessOverlay
+        isVisible={showSuccess}
+        planType={successPlanType}
+        onComplete={handleSuccessComplete}
+      />
     </main>
   );
 };

@@ -43,22 +43,26 @@ const Tests: React.FC = () => {
 
                 if (!mounted) return;
 
-                // Fetch user's submitted tests with result info
+                // Fetch user's submitted tests with result info (ordered by most recent first)
                 const { data: submissionsData } = await supabase
                     .from('student_tests')
                     .select('id, test_id, result_url, submitted_at')
                     .eq('user_id', user.id)
-                    .not('submitted_at', 'is', null);
+                    .not('submitted_at', 'is', null)
+                    .order('submitted_at', { ascending: false });
 
                 if (!mounted) return;
 
-                // Create a map of test_id to submission info
+                // Create a map of test_id to latest submission info
                 const submissionsMap = new Map<string, { id: string; hasResult: boolean }>();
                 (submissionsData || []).forEach((s: any) => {
-                    submissionsMap.set(s.test_id, {
-                        id: s.id,
-                        hasResult: !!s.result_url
-                    });
+                    // Only keep the first (most recent) submission per test
+                    if (!submissionsMap.has(s.test_id)) {
+                        submissionsMap.set(s.test_id, {
+                            id: s.id,
+                            hasResult: !!s.result_url
+                        });
+                    }
                 });
 
                 let firstUnlockedFound = false;

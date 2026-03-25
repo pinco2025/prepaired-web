@@ -45,6 +45,7 @@ const TestReview: React.FC = () => {
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [isSolutionVisible, setIsSolutionVisible] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [sourceUrl, setSourceUrl] = useState<string>('');
 
     // Open sidebar by default on desktop
     useEffect(() => {
@@ -85,6 +86,7 @@ const TestReview: React.FC = () => {
                 if (testError || !testMeta) throw new Error('Test metadata not found.');
 
                 const { url: testUrl, solution_url } = testMeta;
+                setSourceUrl(testUrl || '');
 
                 // 3. Fetch data concurrently — solution_url is optional
                 const fetches: Promise<Response>[] = [
@@ -357,7 +359,7 @@ const TestReview: React.FC = () => {
                                         </span>
                                     )}
                                 </div>
-                                <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />
+                                <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} sourceUrl={sourceUrl} />
                                 </div>
 
                                 {/* Question Text */}

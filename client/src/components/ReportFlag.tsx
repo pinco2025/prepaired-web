@@ -17,10 +17,11 @@ const REPORT_PARTS = [
 
 interface ReportModalProps {
   questionId: string;
+  sourceUrl?: string;
   onClose: () => void;
 }
 
-const ReportModal: React.FC<ReportModalProps> = ({ questionId, onClose }) => {
+const ReportModal: React.FC<ReportModalProps> = ({ questionId, sourceUrl, onClose }) => {
   const { user } = useAuth();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
@@ -46,6 +47,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ questionId, onClose }) => {
           question_uuid: questionId,
           reported_parts: Array.from(selected),
           user_id: user?.id ?? null,
+          source_url: sourceUrl || 'internal',
         });
       if (insertError) throw insertError;
       setSubmitted(true);
@@ -167,6 +169,8 @@ const ReportModal: React.FC<ReportModalProps> = ({ questionId, onClose }) => {
 
 interface ReportFlagProps {
   questionId: string;
+  /** Raw GitHub URL of the JSON file this question came from (omit or leave empty for local/internal sources) */
+  sourceUrl?: string;
   /** Optional extra classes for the trigger button */
   className?: string;
 }
@@ -175,7 +179,7 @@ interface ReportFlagProps {
  * Self-contained report flag button + modal.
  * Drop in anywhere a question is rendered: <ReportFlag questionId={q.uuid} />
  */
-const ReportFlag: React.FC<ReportFlagProps> = ({ questionId, className = '' }) => {
+const ReportFlag: React.FC<ReportFlagProps> = ({ questionId, sourceUrl, className = '' }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -187,7 +191,7 @@ const ReportFlag: React.FC<ReportFlagProps> = ({ questionId, className = '' }) =
       >
         <span className="material-symbols-outlined text-[18px]">flag</span>
       </button>
-      {open && <ReportModal questionId={questionId} onClose={() => setOpen(false)} />}
+      {open && <ReportModal questionId={questionId} sourceUrl={sourceUrl} onClose={() => setOpen(false)} />}
     </>
   );
 };

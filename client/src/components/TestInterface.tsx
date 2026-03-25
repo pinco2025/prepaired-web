@@ -49,11 +49,12 @@ interface TestInterfaceProps {
   onSubmitSuccess: () => void;
   exam?: 'Normal' | 'JEE' | 'NEET';
   ntaMode?: boolean;
+  isReattempt?: boolean;
 }
 
 // escapeLatex removed - was unused
 
-const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam, ntaMode = false }) => {
+const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, exam, ntaMode = false, isReattempt = false }) => {
   const [testData, setTestData] = useState<LocalTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -305,28 +306,33 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
 
         let testStartTimeISO: string | null = null;
         try {
-          // First, try to find existing entry that hasn't been submitted
-          const { data: existingTests, error: fetchError } = await supabase
-            .from('student_tests')
-            .select('id, started_at, answers, submitted_at')
-            .eq('user_id', user.id)
-            .eq('test_id', data.testId)
-            .is('submitted_at', null) // Only get tests that haven't been submitted
-            .order('started_at', { ascending: false })
-            .limit(1);
+          let existingTest: any = null;
 
-          if (fetchError) {
-            console.error('Error fetching student test:', fetchError);
+          // For re-attempts, always create a fresh record
+          if (!isReattempt) {
+            // First, try to find existing entry that hasn't been submitted
+            const { data: existingTests, error: fetchError } = await supabase
+              .from('student_tests')
+              .select('id, started_at, answers, submitted_at')
+              .eq('user_id', user.id)
+              .eq('test_id', data.testId)
+              .is('submitted_at', null) // Only get tests that haven't been submitted
+              .order('started_at', { ascending: false })
+              .limit(1);
+
+            if (fetchError) {
+              console.error('Error fetching student test:', fetchError);
+            }
+
+            existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
           }
 
-          const existingTest = existingTests && existingTests.length > 0 ? existingTests[0] : null;
-
           if (existingTest) {
-            testStartTimeISO = (existingTest as any).started_at ?? new Date().toISOString();
-            setStudentTestId((existingTest as any).id);
+            testStartTimeISO = existingTest.started_at ?? new Date().toISOString();
+            setStudentTestId(existingTest.id);
             // Load answers from DB if available
-            if ((existingTest as any).answers) {
-              setAnswers((existingTest as any).answers);
+            if (existingTest.answers) {
+              setAnswers(existingTest.answers);
             }
           } else {
             const { data: newStudentTest, error: insertError } = await supabase
@@ -765,7 +771,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                     {currentQuestion?.section}
                   </span>
                 )}
-                {currentQuestion && <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />}
+                {currentQuestion && <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} sourceUrl={test?.url} />}
               </div>
             </div>
 
@@ -1206,7 +1212,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ test, onSubmitSuccess, ex
                   <span className="text-xs sm:text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark bg-background-light dark:bg-background-dark px-2 sm:px-3 py-1 rounded-full">
                     {currentQuestion.section}
                   </span>
-                  <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />
+                  <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} sourceUrl={test?.url} />
                 </div>
               </div>
               <p className="math-text-scope text-base sm:text-xl text-text-light dark:text-text-dark leading-relaxed mb-5 sm:mb-8 break-words whitespace-pre-wrap">

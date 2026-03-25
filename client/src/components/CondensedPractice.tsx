@@ -128,6 +128,7 @@ const CondensedPractice: React.FC = () => {
     const [questions, setQuestions] = useState<LocalQuestion[]>([]);
     const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
     const [solutions, setSolutions] = useState<{ [key: string]: { text: string; image: string | null } }>({});
+    const [sourceUrl, setSourceUrl] = useState<string>('');
     const [chapterMap, setChapterMap] = useState<{ [code: string]: string }>({});
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -291,9 +292,10 @@ const CondensedPractice: React.FC = () => {
                     throw new Error(errBody.error || 'Failed to load practice data');
                 }
 
-                const { questions: fetchedQuestions, solutions: solMap, totalCount } = await res.json();
+                const { questions: fetchedQuestions, solutions: solMap, totalCount, sourceUrl: srcUrl } = await res.json();
 
                 setSolutions(solMap || {});
+                setSourceUrl(srcUrl || '');
 
                 // Shuffle options for each MCQ question (questions already shuffled server-side)
                 const processedQuestions = fetchedQuestions.map((q: LocalQuestion) => {
@@ -686,7 +688,7 @@ const CondensedPractice: React.FC = () => {
                                     <div className="inline-block px-3 py-1 bg-background-light dark:bg-white/5 rounded-lg text-xs font-bold text-text-secondary-light uppercase tracking-widest">
                                         {isIntegerType ? 'Integer Type' : 'Single Correct Type'}
                                     </div>
-                                    <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} />
+                                    <ReportFlag questionId={currentQuestion.uuid || currentQuestion.id} sourceUrl={sourceUrl} />
                                 </div>
 
                                 {/* Metadata */}

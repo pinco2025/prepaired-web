@@ -9,6 +9,8 @@ type Report = {
   reported_parts: string[];
   user_id: string | null;
   reported_at: string | null;
+  is_resolved: boolean;
+  source_url: string | null;
 };
 
 const AdminQuestionReports: React.FC = () => {
@@ -17,6 +19,7 @@ const AdminQuestionReports: React.FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && subscriptionType !== 'admin') {
@@ -28,7 +31,7 @@ const AdminQuestionReports: React.FC = () => {
     if (loading || subscriptionType !== 'admin') return;
     supabase
       .from('question_reports')
-      .select('id, question_uuid, reported_parts, user_id, reported_at')
+      .select('id, question_uuid, reported_parts, user_id, reported_at, is_resolved, source_url')
       .order('reported_at', { ascending: false })
       .then(({ data, error: err }) => {
         if (err) setError(err.message);
@@ -37,7 +40,25 @@ const AdminQuestionReports: React.FC = () => {
       });
   }, [loading, subscriptionType]);
 
+  const toggleResolved = async (report: Report) => {
+    setTogglingId(report.id);
+    const newValue = !report.is_resolved;
+    const { error: err } = await supabase
+      .from('question_reports')
+      .update({ is_resolved: newValue })
+      .eq('id', report.id);
+
+    if (!err) {
+      setReports(prev =>
+        prev.map(r => (r.id === report.id ? { ...r, is_resolved: newValue } : r))
+      );
+    }
+    setTogglingId(null);
+  };
+
   if (loading || subscriptionType !== 'admin') return null;
+
+  const unresolvedCount = reports.filter(r => !r.is_resolved).length;
 
   return (
     <main className="flex-grow">
@@ -48,7 +69,7 @@ const AdminQuestionReports: React.FC = () => {
             <h1 className="text-3xl font-bold text-text-light dark:text-text-dark">Question Reports</h1>
           </div>
           <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">
-            {fetching ? 'Loading…' : `${reports.length} report${reports.length !== 1 ? 's' : ''}`}
+            {fetching ? 'Loading…' : `${reports.length} report${reports.length !== 1 ? 's' : ''} · ${unresolvedCount} unresolved`}
           </p>
         </div>
 
@@ -68,18 +89,27 @@ const AdminQuestionReports: React.FC = () => {
 
         <div className="space-y-3">
           {reports.map((r) => (
-            <div key={r.id} className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-2xl p-4">
+            <div
+              key={r.id}
+              className={`bg-surface-light dark:bg-surface-dark border rounded-2xl p-4 transition-colors ${
+                r.is_resolved
+                  ? 'border-green-500/20 opacity-60'
+                  : 'border-border-light dark:border-border-dark'
+              }`}
+            >
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-0.5">Question UUID</p>
                   <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">{r.question_uuid}</p>
                 </div>
-                <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark shrink-0">
-                  {r.reported_at ? new Date(r.reported_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                </p>
+                <div className="flex items-center gap-2 shrink-0">
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                    {r.reported_at ? new Date(r.reported_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mb-2">
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {(r.reported_parts ?? []).map((part) => (
                   <span
                     key={part}
@@ -90,9 +120,51 @@ const AdminQuestionReports: React.FC = () => {
                 ))}
               </div>
 
-              <p className="text-xs font-mono text-text-secondary-light dark:text-text-secondary-dark truncate">
-                {r.user_id ? `User: ${r.user_id}` : 'Anonymous'}
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-mono text-text-secondary-light dark:text-text-secondary-dark truncate">
+                  {r.user_id ? `User: ${r.user_id}` : 'Anonymous'}
+                </p>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* Navigate to JSON */}
+                  {r.source_url && r.source_url !== 'internal' ? (
+                    <a
+                      href={r.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                      JSON
+                    </a>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-gray-500/10 text-gray-500 dark:text-gray-400 border border-gray-500/20">
+                      <span className="material-symbols-outlined text-[14px]">folder</span>
+                      Internal
+                    </span>
+                  )}
+
+                  {/* Resolved toggle */}
+                  <button
+                    onClick={() => toggleResolved(r)}
+                    disabled={togglingId === r.id}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                      r.is_resolved
+                        ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 hover:bg-green-500/20'
+                        : 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20 hover:bg-orange-500/20'
+                    }`}
+                  >
+                    {togglingId === r.id ? (
+                      <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <span className="material-symbols-outlined text-[14px]">
+                        {r.is_resolved ? 'check_circle' : 'pending'}
+                      </span>
+                    )}
+                    {r.is_resolved ? 'Resolved' : 'Unresolved'}
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>

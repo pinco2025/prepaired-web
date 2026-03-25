@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Test } from '../data';
 import { supabase } from '../utils/supabaseClient';
 import TestInstructions from './TestInstructions';
@@ -14,6 +14,8 @@ const TestPage: React.FC = () => {
   usePageTitle('Test');
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isReattempt = searchParams.get('reattempt') === 'true';
   const { invalidateCache } = useDataCache();
   const [test, setTest] = useState<Test | null>(null);
   const [testStatus, setTestStatus] = useState<TestStatus>('instructions');
@@ -27,7 +29,7 @@ const TestPage: React.FC = () => {
         // 1. Check for existing attempt
         const { data: { user } } = await supabase.auth.getUser();
 
-        if (user) {
+        if (user && !isReattempt) {
           const { data: attempts } = await supabase
             .from('student_tests')
             .select('id')
@@ -64,7 +66,7 @@ const TestPage: React.FC = () => {
     };
 
     initPage();
-  }, [testId, navigate]);
+  }, [testId, navigate, isReattempt]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -125,7 +127,7 @@ const TestPage: React.FC = () => {
   const renderContent = () => {
     switch (testStatus) {
       case 'inProgress':
-        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} />;
+        return <TestInterface test={test} onSubmitSuccess={handleSubmitSuccess} exam={test.exam} isReattempt={isReattempt} />;
       case 'submitted':
         return <TestSubmitted />;
       case 'instructions':
