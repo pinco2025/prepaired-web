@@ -60,6 +60,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
         { to: "/aipt", icon: "psychology", label: "AIPT" },
         { to: "/pyq-2026", icon: "calendar_today", label: "2026 PYQ" },
         { to: "/response-upload", icon: "upload_file", label: "Response Analysis" },
+        { to: "/jee-predictor", icon: "trending_up", label: "April Predictor" },
       ];
 
   return (

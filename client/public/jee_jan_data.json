@@ -1,0 +1,2759 @@
+{
+  "shifts": [
+    "21S1",
+    "21S2",
+    "22S1",
+    "22S2",
+    "23S1",
+    "23S2",
+    "24S1",
+    "24S2",
+    "28S1",
+    "28S2"
+  ],
+  "overall": [
+    {
+      "percentile": 99.9,
+      "21S1": 227.0,
+      "21S2": 234.0,
+      "22S1": 224.0,
+      "22S2": 223.0,
+      "23S1": 221.0,
+      "23S2": 228.0,
+      "24S1": 219.0,
+      "24S2": 231.0,
+      "28S1": 228.0,
+      "28S2": 226.0,
+      "mean": 226,
+      "median": 227,
+      "variance": 20.54,
+      "sd": 4.53
+    },
+    {
+      "percentile": 99.8,
+      "21S1": 210.0,
+      "21S2": 220.0,
+      "22S1": 207.0,
+      "22S2": 203.0,
+      "23S1": 204.0,
+      "23S2": 209.0,
+      "24S1": 204.0,
+      "24S2": 213.0,
+      "28S1": 209.0,
+      "28S2": 209.0,
+      "mean": 209,
+      "median": 209,
+      "variance": 25.29,
+      "sd": 5.03
+    },
+    {
+      "percentile": 99.7,
+      "21S1": 201.0,
+      "21S2": 209.0,
+      "22S1": 196.0,
+      "22S2": 191.0,
+      "23S1": 194.0,
+      "23S2": 199.0,
+      "24S1": 194.0,
+      "24S2": 200.0,
+      "28S1": 198.0,
+      "28S2": 196.0,
+      "mean": 198,
+      "median": 197,
+      "variance": 24.84,
+      "sd": 4.98
+    },
+    {
+      "percentile": 99.6,
+      "21S1": 192.0,
+      "21S2": 200.0,
+      "22S1": 187.0,
+      "22S2": 182.0,
+      "23S1": 186.0,
+      "23S2": 191.0,
+      "24S1": 187.0,
+      "24S2": 190.0,
+      "28S1": 188.0,
+      "28S2": 189.0,
+      "mean": 189,
+      "median": 189,
+      "variance": 22.4,
+      "sd": 4.73
+    },
+    {
+      "percentile": 99.5,
+      "21S1": 188.0,
+      "21S2": 193.0,
+      "22S1": 180.0,
+      "22S2": 176.0,
+      "23S1": 180.0,
+      "23S2": 184.0,
+      "24S1": 180.0,
+      "24S2": 183.0,
+      "28S1": 181.0,
+      "28S2": 182.0,
+      "mean": 183,
+      "median": 182,
+      "variance": 22.9,
+      "sd": 4.79
+    },
+    {
+      "percentile": 99.4,
+      "21S1": 181.0,
+      "21S2": 187.0,
+      "22S1": 174.0,
+      "22S2": 170.0,
+      "23S1": 174.0,
+      "23S2": 179.0,
+      "24S1": 175.0,
+      "24S2": 177.0,
+      "28S1": 177.0,
+      "28S2": 177.0,
+      "mean": 177,
+      "median": 177,
+      "variance": 21.21,
+      "sd": 4.61
+    },
+    {
+      "percentile": 99.3,
+      "21S1": 177.0,
+      "21S2": 182.0,
+      "22S1": 169.0,
+      "22S2": 166.0,
+      "23S1": 169.0,
+      "23S2": 175.0,
+      "24S1": 171.0,
+      "24S2": 172.0,
+      "28S1": 172.0,
+      "28S2": 173.0,
+      "mean": 173,
+      "median": 172,
+      "variance": 20.71,
+      "sd": 4.55
+    },
+    {
+      "percentile": 99.2,
+      "21S1": 174.0,
+      "21S2": 178.0,
+      "22S1": 165.0,
+      "22S2": 162.0,
+      "23S1": 165.0,
+      "23S2": 171.0,
+      "24S1": 168.0,
+      "24S2": 168.0,
+      "28S1": 168.0,
+      "28S2": 169.0,
+      "mean": 169,
+      "median": 168,
+      "variance": 21.51,
+      "sd": 4.64
+    },
+    {
+      "percentile": 99.1,
+      "21S1": 171.0,
+      "21S2": 174.0,
+      "22S1": 161.0,
+      "22S2": 158.0,
+      "23S1": 161.0,
+      "23S2": 167.0,
+      "24S1": 165.0,
+      "24S2": 164.0,
+      "28S1": 165.0,
+      "28S2": 165.0,
+      "mean": 165,
+      "median": 165,
+      "variance": 22.54,
+      "sd": 4.75
+    },
+    {
+      "percentile": 99.0,
+      "21S1": 167.0,
+      "21S2": 171.0,
+      "22S1": 158.0,
+      "22S2": 155.0,
+      "23S1": 158.0,
+      "23S2": 163.0,
+      "24S1": 162.0,
+      "24S2": 160.0,
+      "28S1": 161.0,
+      "28S2": 162.0,
+      "mean": 162,
+      "median": 162,
+      "variance": 21.34,
+      "sd": 4.62
+    },
+    {
+      "percentile": 98.5,
+      "21S1": 154.0,
+      "21S2": 157.0,
+      "22S1": 144.0,
+      "22S2": 143.0,
+      "23S1": 145.0,
+      "23S2": 150.0,
+      "24S1": 150.0,
+      "24S2": 146.0,
+      "28S1": 149.0,
+      "28S2": 150.0,
+      "mean": 149,
+      "median": 150,
+      "variance": 19.73,
+      "sd": 4.44
+    },
+    {
+      "percentile": 98.0,
+      "21S1": 144.0,
+      "21S2": 147.0,
+      "22S1": 134.0,
+      "22S2": 131.0,
+      "23S1": 135.0,
+      "23S2": 139.0,
+      "24S1": 141.0,
+      "24S2": 137.0,
+      "28S1": 138.0,
+      "28S2": 140.0,
+      "mean": 139,
+      "median": 139,
+      "variance": 22.49,
+      "sd": 4.74
+    },
+    {
+      "percentile": 97.5,
+      "21S1": 137.0,
+      "21S2": 139.0,
+      "22S1": 126.0,
+      "22S2": 126.0,
+      "23S1": 127.0,
+      "23S2": 132.0,
+      "24S1": 134.0,
+      "24S2": 128.0,
+      "28S1": 132.0,
+      "28S2": 133.0,
+      "mean": 131,
+      "median": 132,
+      "variance": 20.93,
+      "sd": 4.58
+    },
+    {
+      "percentile": 97.0,
+      "21S1": 130.0,
+      "21S2": 132.0,
+      "22S1": 120.0,
+      "22S2": 120.0,
+      "23S1": 121.0,
+      "23S2": 126.0,
+      "24S1": 127.0,
+      "24S2": 121.0,
+      "28S1": 126.0,
+      "28S2": 126.0,
+      "mean": 125,
+      "median": 126,
+      "variance": 18.1,
+      "sd": 4.25
+    },
+    {
+      "percentile": 96.5,
+      "21S1": 124.0,
+      "21S2": 127.0,
+      "22S1": 115.0,
+      "22S2": 115.0,
+      "23S1": 116.0,
+      "23S2": 120.0,
+      "24S1": 123.0,
+      "24S2": 115.0,
+      "28S1": 121.0,
+      "28S2": 123.0,
+      "mean": 120,
+      "median": 121,
+      "variance": 19.43,
+      "sd": 4.41
+    },
+    {
+      "percentile": 96.0,
+      "21S1": 120.0,
+      "21S2": 122.0,
+      "22S1": 110.0,
+      "22S2": 111.0,
+      "23S1": 111.0,
+      "23S2": 115.0,
+      "24S1": 118.0,
+      "24S2": 110.0,
+      "28S1": 114.0,
+      "28S2": 116.0,
+      "mean": 115,
+      "median": 115,
+      "variance": 18.46,
+      "sd": 4.3
+    },
+    {
+      "percentile": 95.5,
+      "21S1": 115.0,
+      "21S2": 117.0,
+      "22S1": 106.0,
+      "22S2": 107.0,
+      "23S1": 107.0,
+      "23S2": 111.0,
+      "24S1": 113.0,
+      "24S2": 104.0,
+      "28S1": 112.0,
+      "28S2": 112.0,
+      "mean": 110,
+      "median": 112,
+      "variance": 17.82,
+      "sd": 4.22
+    },
+    {
+      "percentile": 95.0,
+      "21S1": 110.0,
+      "21S2": 113.0,
+      "22S1": 101.0,
+      "22S2": 104.0,
+      "23S1": 103.0,
+      "23S2": 106.0,
+      "24S1": 109.0,
+      "24S2": 101.0,
+      "28S1": 109.0,
+      "28S2": 108.0,
+      "mean": 106,
+      "median": 107,
+      "variance": 16.49,
+      "sd": 4.06
+    },
+    {
+      "percentile": 94.0,
+      "21S1": 105.0,
+      "21S2": 106.0,
+      "22S1": 93.0,
+      "22S2": 97.0,
+      "23S1": 96.0,
+      "23S2": 100.0,
+      "24S1": 102.0,
+      "24S2": 93.0,
+      "28S1": 102.0,
+      "28S2": 103.0,
+      "mean": 100,
+      "median": 101,
+      "variance": 22.23,
+      "sd": 4.72
+    },
+    {
+      "percentile": 93.0,
+      "21S1": 99.0,
+      "21S2": 100.0,
+      "22S1": 88.0,
+      "22S2": 92.0,
+      "23S1": 89.0,
+      "23S2": 94.0,
+      "24S1": 96.0,
+      "24S2": 88.0,
+      "28S1": 96.0,
+      "28S2": 95.0,
+      "mean": 94,
+      "median": 95,
+      "variance": 18.9,
+      "sd": 4.35
+    },
+    {
+      "percentile": 92.0,
+      "21S1": 94.0,
+      "21S2": 93.0,
+      "22S1": 84.0,
+      "22S2": 88.0,
+      "23S1": 86.0,
+      "23S2": 88.0,
+      "24S1": 92.0,
+      "24S2": 81.0,
+      "28S1": 91.0,
+      "28S2": 91.0,
+      "mean": 89,
+      "median": 90,
+      "variance": 17.51,
+      "sd": 4.18
+    },
+    {
+      "percentile": 91.0,
+      "21S1": 90.0,
+      "21S2": 89.0,
+      "22S1": 79.0,
+      "22S2": 84.0,
+      "23S1": 81.0,
+      "23S2": 83.0,
+      "24S1": 86.0,
+      "24S2": 77.0,
+      "28S1": 86.0,
+      "28S2": 86.0,
+      "mean": 84,
+      "median": 85,
+      "variance": 17.43,
+      "sd": 4.18
+    },
+    {
+      "percentile": 90.0,
+      "21S1": 85.0,
+      "21S2": 84.0,
+      "22S1": 74.0,
+      "22S2": 81.0,
+      "23S1": 77.0,
+      "23S2": 79.0,
+      "24S1": 80.0,
+      "24S2": 73.0,
+      "28S1": 82.0,
+      "28S2": 85.0,
+      "mean": 80,
+      "median": 81,
+      "variance": 18.44,
+      "sd": 4.29
+    }
+  ],
+  "physics": [
+    {
+      "percentile": 99.0,
+      "21S1": 70.0,
+      "21S2": 74.0,
+      "22S1": 70.0,
+      "22S2": 72.0,
+      "23S1": 71.0,
+      "23S2": 68.0,
+      "24S1": 69.0,
+      "24S2": 72.0,
+      "28S1": 73.0,
+      "28S2": 68.0,
+      "mean": 71,
+      "median": 71,
+      "variance": 4.23,
+      "sd": 2.06
+    },
+    {
+      "percentile": 98.5,
+      "21S1": 67.0,
+      "21S2": 70.0,
+      "22S1": 67.0,
+      "22S2": 71.0,
+      "23S1": 68.0,
+      "23S2": 64.0,
+      "24S1": 65.0,
+      "24S2": 67.0,
+      "28S1": 69.0,
+      "28S2": 64.0,
+      "mean": 67,
+      "median": 67,
+      "variance": 5.73,
+      "sd": 2.39
+    },
+    {
+      "percentile": 98.0,
+      "21S1": 62.0,
+      "21S2": 67.0,
+      "22S1": 64.0,
+      "22S2": 70.0,
+      "23S1": 66.0,
+      "23S2": 63.0,
+      "24S1": 62.0,
+      "24S2": 61.0,
+      "28S1": 66.0,
+      "28S2": 60.0,
+      "mean": 64,
+      "median": 64,
+      "variance": 9.66,
+      "sd": 3.11
+    },
+    {
+      "percentile": 97.5,
+      "21S1": 60.0,
+      "21S2": 64.0,
+      "22S1": 61.0,
+      "22S2": 63.0,
+      "23S1": 65.0,
+      "23S2": 59.0,
+      "24S1": 60.0,
+      "24S2": 60.0,
+      "28S1": 63.0,
+      "28S2": 58.0,
+      "mean": 61,
+      "median": 61,
+      "variance": 5.34,
+      "sd": 2.31
+    },
+    {
+      "percentile": 97.0,
+      "21S1": 58.0,
+      "21S2": 63.0,
+      "22S1": 60.0,
+      "22S2": 61.0,
+      "23S1": 60.0,
+      "23S2": 55.0,
+      "24S1": 59.0,
+      "24S2": 57.0,
+      "28S1": 60.0,
+      "28S2": 55.0,
+      "mean": 59,
+      "median": 60,
+      "variance": 6.62,
+      "sd": 2.57
+    },
+    {
+      "percentile": 96.5,
+      "21S1": 55.0,
+      "21S2": 59.0,
+      "22S1": 59.0,
+      "22S2": 60.0,
+      "23S1": 59.0,
+      "23S2": 53.0,
+      "24S1": 54.0,
+      "24S2": 55.0,
+      "28S1": 58.0,
+      "28S2": 53.0,
+      "mean": 57,
+      "median": 57,
+      "variance": 7.61,
+      "sd": 2.76
+    },
+    {
+      "percentile": 96.0,
+      "21S1": 53.0,
+      "21S2": 58.0,
+      "22S1": 58.0,
+      "22S2": 58.0,
+      "23S1": 58.0,
+      "23S2": 51.0,
+      "24S1": 52.0,
+      "24S2": 53.0,
+      "28S1": 56.0,
+      "28S2": 51.0,
+      "mean": 55,
+      "median": 55,
+      "variance": 9.51,
+      "sd": 3.08
+    },
+    {
+      "percentile": 95.5,
+      "21S1": 51.0,
+      "21S2": 55.0,
+      "22S1": 54.0,
+      "22S2": 57.0,
+      "23S1": 56.0,
+      "23S2": 49.0,
+      "24S1": 50.0,
+      "24S2": 52.0,
+      "28S1": 54.0,
+      "28S2": 49.0,
+      "mean": 53,
+      "median": 53,
+      "variance": 8.46,
+      "sd": 2.91
+    },
+    {
+      "percentile": 95.0,
+      "21S1": 49.0,
+      "21S2": 54.0,
+      "22S1": 51.0,
+      "22S2": 56.0,
+      "23S1": 55.0,
+      "23S2": 48.0,
+      "24S1": 48.0,
+      "24S2": 51.0,
+      "28S1": 52.0,
+      "28S2": 48.0,
+      "mean": 51,
+      "median": 51,
+      "variance": 9.07,
+      "sd": 3.01
+    },
+    {
+      "percentile": 94.0,
+      "21S1": 47.0,
+      "21S2": 49.0,
+      "22S1": 49.0,
+      "22S2": 52.0,
+      "23S1": 49.0,
+      "23S2": 44.0,
+      "24S1": 45.0,
+      "24S2": 46.0,
+      "28S1": 49.0,
+      "28S2": 45.0,
+      "mean": 48,
+      "median": 48,
+      "variance": 6.28,
+      "sd": 2.51
+    },
+    {
+      "percentile": 93.0,
+      "21S1": 44.0,
+      "21S2": 47.0,
+      "22S1": 45.0,
+      "22S2": 50.0,
+      "23S1": 47.0,
+      "23S2": 42.0,
+      "24S1": 42.0,
+      "24S2": 42.0,
+      "28S1": 45.0,
+      "28S2": 43.0,
+      "mean": 45,
+      "median": 45,
+      "variance": 7.12,
+      "sd": 2.67
+    },
+    {
+      "percentile": 92.0,
+      "21S1": 42.0,
+      "21S2": 44.0,
+      "22S1": 44.0,
+      "22S2": 49.0,
+      "23S1": 44.0,
+      "23S2": 40.0,
+      "24S1": 41.0,
+      "24S2": 41.0,
+      "28S1": 44.0,
+      "28S2": 41.0,
+      "mean": 43,
+      "median": 43,
+      "variance": 6.89,
+      "sd": 2.62
+    },
+    {
+      "percentile": 91.0,
+      "21S1": 40.0,
+      "21S2": 42.0,
+      "22S1": 40.0,
+      "22S2": 48.0,
+      "23S1": 41.0,
+      "23S2": 38.0,
+      "24S1": 37.0,
+      "24S2": 40.0,
+      "28S1": 41.0,
+      "28S2": 39.0,
+      "mean": 41,
+      "median": 40,
+      "variance": 8.93,
+      "sd": 2.99
+    },
+    {
+      "percentile": 90.0,
+      "21S1": 37.0,
+      "21S2": 39.0,
+      "22S1": 37.0,
+      "22S2": 43.0,
+      "23S1": 40.0,
+      "23S2": 37.0,
+      "24S1": 36.0,
+      "24S2": 39.0,
+      "28S1": 39.0,
+      "28S2": 37.0,
+      "mean": 38,
+      "median": 38,
+      "variance": 4.27,
+      "sd": 2.07
+    }
+  ],
+  "chemistry": [
+    {
+      "percentile": 99.0,
+      "21S1": 63.0,
+      "21S2": 66.0,
+      "22S1": 56.0,
+      "22S2": 58.0,
+      "23S1": 60.0,
+      "23S2": 69.0,
+      "24S1": 69.0,
+      "24S2": 59.0,
+      "28S1": 65.0,
+      "28S2": 67.0,
+      "mean": 63,
+      "median": 64,
+      "variance": 22.18,
+      "sd": 4.71
+    },
+    {
+      "percentile": 98.5,
+      "21S1": 60.0,
+      "21S2": 61.0,
+      "22S1": 51.0,
+      "22S2": 53.0,
+      "23S1": 55.0,
+      "23S2": 63.0,
+      "24S1": 66.0,
+      "24S2": 54.0,
+      "28S1": 59.0,
+      "28S2": 63.0,
+      "mean": 59,
+      "median": 60,
+      "variance": 24.94,
+      "sd": 4.99
+    },
+    {
+      "percentile": 98.0,
+      "21S1": 59.0,
+      "21S2": 60.0,
+      "22S1": 50.0,
+      "22S2": 50.0,
+      "23S1": 53.0,
+      "23S2": 60.0,
+      "24S1": 64.0,
+      "24S2": 52.0,
+      "28S1": 55.0,
+      "28S2": 60.0,
+      "mean": 56,
+      "median": 57,
+      "variance": 24.23,
+      "sd": 4.92
+    },
+    {
+      "percentile": 97.5,
+      "21S1": 55.0,
+      "21S2": 56.0,
+      "22S1": 46.0,
+      "22S2": 46.0,
+      "23S1": 48.0,
+      "23S2": 56.0,
+      "24S1": 60.0,
+      "24S2": 47.0,
+      "28S1": 53.0,
+      "28S2": 58.0,
+      "mean": 53,
+      "median": 54,
+      "variance": 28.06,
+      "sd": 5.3
+    },
+    {
+      "percentile": 97.0,
+      "21S1": 52.0,
+      "21S2": 54.0,
+      "22S1": 43.0,
+      "22S2": 45.0,
+      "23S1": 46.0,
+      "23S2": 55.0,
+      "24S1": 59.0,
+      "24S2": 45.0,
+      "28S1": 51.0,
+      "28S2": 57.0,
+      "mean": 51,
+      "median": 52,
+      "variance": 31.79,
+      "sd": 5.64
+    },
+    {
+      "percentile": 96.5,
+      "21S1": 51.0,
+      "21S2": 52.0,
+      "22S1": 41.0,
+      "22S2": 43.0,
+      "23S1": 43.0,
+      "23S2": 51.0,
+      "24S1": 56.0,
+      "24S2": 43.0,
+      "28S1": 49.0,
+      "28S2": 54.0,
+      "mean": 48,
+      "median": 50,
+      "variance": 28.68,
+      "sd": 5.36
+    },
+    {
+      "percentile": 96.0,
+      "21S1": 50.0,
+      "21S2": 51.0,
+      "22S1": 40.0,
+      "22S2": 41.0,
+      "23S1": 41.0,
+      "23S2": 48.0,
+      "24S1": 55.0,
+      "24S2": 41.0,
+      "28S1": 48.0,
+      "28S2": 53.0,
+      "mean": 47,
+      "median": 48,
+      "variance": 31.51,
+      "sd": 5.61
+    },
+    {
+      "percentile": 95.5,
+      "21S1": 48.0,
+      "21S2": 47.0,
+      "22S1": 38.0,
+      "22S2": 40.0,
+      "23S1": 40.0,
+      "23S2": 47.0,
+      "24S1": 53.0,
+      "24S2": 40.0,
+      "28S1": 46.0,
+      "28S2": 50.0,
+      "mean": 45,
+      "median": 47,
+      "variance": 25.66,
+      "sd": 5.07
+    },
+    {
+      "percentile": 95.0,
+      "21S1": 47.0,
+      "21S2": 46.0,
+      "22S1": 37.0,
+      "22S2": 38.0,
+      "23S1": 39.0,
+      "23S2": 45.0,
+      "24S1": 50.0,
+      "24S2": 38.0,
+      "28S1": 45.0,
+      "28S2": 49.0,
+      "mean": 43,
+      "median": 45,
+      "variance": 24.27,
+      "sd": 4.93
+    },
+    {
+      "percentile": 94.0,
+      "21S1": 44.0,
+      "21S2": 44.0,
+      "22S1": 34.0,
+      "22S2": 37.0,
+      "23S1": 35.0,
+      "23S2": 42.0,
+      "24S1": 49.0,
+      "24S2": 37.0,
+      "28S1": 42.0,
+      "28S2": 47.0,
+      "mean": 41,
+      "median": 42,
+      "variance": 26.32,
+      "sd": 5.13
+    },
+    {
+      "percentile": 93.0,
+      "21S1": 42.0,
+      "21S2": 41.0,
+      "22S1": 32.0,
+      "22S2": 34.0,
+      "23S1": 33.0,
+      "23S2": 40.0,
+      "24S1": 47.0,
+      "24S2": 36.0,
+      "28S1": 40.0,
+      "28S2": 43.0,
+      "mean": 39,
+      "median": 40,
+      "variance": 23.73,
+      "sd": 4.87
+    },
+    {
+      "percentile": 92.0,
+      "21S1": 40.0,
+      "21S2": 39.0,
+      "22S1": 30.0,
+      "22S2": 32.0,
+      "23S1": 32.0,
+      "23S2": 38.0,
+      "24S1": 45.0,
+      "24S2": 32.0,
+      "28S1": 39.0,
+      "28S2": 40.0,
+      "mean": 37,
+      "median": 39,
+      "variance": 23.79,
+      "sd": 4.88
+    },
+    {
+      "percentile": 91.0,
+      "21S1": 39.0,
+      "21S2": 37.0,
+      "22S1": 28.0,
+      "22S2": 31.0,
+      "23S1": 30.0,
+      "23S2": 36.0,
+      "24S1": 43.0,
+      "24S2": 31.0,
+      "28S1": 38.0,
+      "28S2": 39.0,
+      "mean": 35,
+      "median": 37,
+      "variance": 23.96,
+      "sd": 4.89
+    },
+    {
+      "percentile": 90.0,
+      "21S1": 37.0,
+      "21S2": 36.0,
+      "22S1": 27.0,
+      "22S2": 29.0,
+      "23S1": 27.0,
+      "23S2": 34.0,
+      "24S1": 41.0,
+      "24S2": 30.0,
+      "28S1": 35.0,
+      "28S2": 37.0,
+      "mean": 33,
+      "median": 35,
+      "variance": 22.9,
+      "sd": 4.79
+    }
+  ],
+  "math": [
+    {
+      "percentile": 99.0,
+      "21S1": 48.0,
+      "21S2": 47.0,
+      "22S1": 50.0,
+      "22S2": 38.0,
+      "23S1": 44.0,
+      "23S2": 43.0,
+      "24S1": 36.0,
+      "24S2": 47.0,
+      "28S1": 40.0,
+      "28S2": 43.0,
+      "mean": 44,
+      "median": 44,
+      "variance": 20.71,
+      "sd": 4.55
+    },
+    {
+      "percentile": 98.5,
+      "21S1": 43.0,
+      "21S2": 42.0,
+      "22S1": 43.0,
+      "22S2": 34.0,
+      "23S1": 39.0,
+      "23S2": 38.0,
+      "24S1": 34.0,
+      "24S2": 41.0,
+      "28S1": 35.0,
+      "28S2": 38.0,
+      "mean": 39,
+      "median": 39,
+      "variance": 12.46,
+      "sd": 3.53
+    },
+    {
+      "percentile": 98.0,
+      "21S1": 40.0,
+      "21S2": 36.0,
+      "22S1": 38.0,
+      "22S2": 32.0,
+      "23S1": 35.0,
+      "23S2": 33.0,
+      "24S1": 31.0,
+      "24S2": 38.0,
+      "28S1": 31.0,
+      "28S2": 37.0,
+      "mean": 35,
+      "median": 36,
+      "variance": 10.32,
+      "sd": 3.21
+    },
+    {
+      "percentile": 97.5,
+      "21S1": 37.0,
+      "21S2": 33.0,
+      "22S1": 34.0,
+      "22S2": 30.0,
+      "23S1": 33.0,
+      "23S2": 32.0,
+      "24S1": 28.0,
+      "24S2": 34.0,
+      "28S1": 30.0,
+      "28S2": 31.0,
+      "mean": 32,
+      "median": 33,
+      "variance": 6.62,
+      "sd": 2.57
+    },
+    {
+      "percentile": 97.0,
+      "21S1": 36.0,
+      "21S2": 32.0,
+      "22S1": 32.0,
+      "22S2": 29.0,
+      "23S1": 32.0,
+      "23S2": 31.0,
+      "24S1": 26.0,
+      "24S2": 31.0,
+      "28S1": 28.0,
+      "28S2": 29.0,
+      "mean": 31,
+      "median": 31,
+      "variance": 7.6,
+      "sd": 2.76
+    },
+    {
+      "percentile": 96.5,
+      "21S1": 34.0,
+      "21S2": 29.0,
+      "22S1": 29.0,
+      "22S2": 28.0,
+      "23S1": 29.0,
+      "23S2": 29.0,
+      "24S1": 25.0,
+      "24S2": 30.0,
+      "28S1": 27.0,
+      "28S2": 28.0,
+      "mean": 29,
+      "median": 29,
+      "variance": 5.29,
+      "sd": 2.3
+    },
+    {
+      "percentile": 96.0,
+      "21S1": 33.0,
+      "21S2": 28.0,
+      "22S1": 28.0,
+      "22S2": 27.0,
+      "23S1": 27.0,
+      "23S2": 28.0,
+      "24S1": 24.0,
+      "24S2": 28.0,
+      "28S1": 26.0,
+      "28S2": 27.0,
+      "mean": 28,
+      "median": 28,
+      "variance": 5.16,
+      "sd": 2.27
+    },
+    {
+      "percentile": 95.5,
+      "21S1": 31.0,
+      "21S2": 27.0,
+      "22S1": 26.0,
+      "22S2": 25.0,
+      "23S1": 26.0,
+      "23S2": 27.0,
+      "24S1": 23.0,
+      "24S2": 27.0,
+      "28S1": 25.0,
+      "28S2": 26.0,
+      "mean": 26,
+      "median": 26,
+      "variance": 4.23,
+      "sd": 2.06
+    },
+    {
+      "percentile": 95.0,
+      "21S1": 30.0,
+      "21S2": 24.0,
+      "22S1": 25.0,
+      "22S2": 24.0,
+      "23S1": 25.0,
+      "23S2": 26.0,
+      "24S1": 22.0,
+      "24S2": 26.0,
+      "28S1": 24.0,
+      "28S2": 25.0,
+      "mean": 25,
+      "median": 25,
+      "variance": 4.32,
+      "sd": 2.08
+    },
+    {
+      "percentile": 94.0,
+      "21S1": 27.0,
+      "21S2": 23.0,
+      "22S1": 23.0,
+      "22S2": 22.0,
+      "23S1": 24.0,
+      "23S2": 24.0,
+      "24S1": 20.0,
+      "24S2": 24.0,
+      "28S1": 23.0,
+      "28S2": 23.0,
+      "mean": 23,
+      "median": 23,
+      "variance": 3.12,
+      "sd": 1.77
+    },
+    {
+      "percentile": 93.0,
+      "21S1": 26.0,
+      "21S2": 21.0,
+      "22S1": 21.0,
+      "22S2": 21.0,
+      "23S1": 23.0,
+      "23S2": 22.0,
+      "24S1": 19.0,
+      "24S2": 23.0,
+      "28S1": 22.0,
+      "28S2": 22.0,
+      "mean": 22,
+      "median": 22,
+      "variance": 3.33,
+      "sd": 1.83
+    },
+    {
+      "percentile": 92.0,
+      "21S1": 24.0,
+      "21S2": 20.0,
+      "22S1": 20.0,
+      "22S2": 20.0,
+      "23S1": 21.0,
+      "23S2": 21.0,
+      "24S1": 18.0,
+      "24S2": 22.0,
+      "28S1": 21.0,
+      "28S2": 21.0,
+      "mean": 21,
+      "median": 21,
+      "variance": 2.4,
+      "sd": 1.55
+    },
+    {
+      "percentile": 91.0,
+      "21S1": 23.0,
+      "21S2": 19.0,
+      "22S1": 19.0,
+      "22S2": 19.0,
+      "23S1": 20.0,
+      "23S2": 20.0,
+      "24S1": 17.0,
+      "24S2": 20.0,
+      "28S1": 20.0,
+      "28S2": 19.0,
+      "mean": 20,
+      "median": 20,
+      "variance": 2.27,
+      "sd": 1.51
+    },
+    {
+      "percentile": 90.0,
+      "21S1": 22.0,
+      "21S2": 18.0,
+      "22S1": 18.0,
+      "22S2": 18.0,
+      "23S1": 19.0,
+      "23S2": 19.0,
+      "24S1": 16.0,
+      "24S2": 19.0,
+      "28S1": 19.0,
+      "28S2": 18.0,
+      "mean": 19,
+      "median": 19,
+      "variance": 2.27,
+      "sd": 1.51
+    }
+  ],
+  "per_shift": {
+    "21S1": [
+      {
+        "percentile": 99.9,
+        "overall": 227.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 210.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 201.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 192.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 188.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 181.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 177.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 174.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 171.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 167.0,
+        "math": 48.0,
+        "physics": 70.0,
+        "chemistry": 63.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 154.0,
+        "math": 43.0,
+        "physics": 67.0,
+        "chemistry": 60.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 144.0,
+        "math": 40.0,
+        "physics": 62.0,
+        "chemistry": 59.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 137.0,
+        "math": 37.0,
+        "physics": 60.0,
+        "chemistry": 55.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 130.0,
+        "math": 36.0,
+        "physics": 58.0,
+        "chemistry": 52.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 124.0,
+        "math": 34.0,
+        "physics": 55.0,
+        "chemistry": 51.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 120.0,
+        "math": 33.0,
+        "physics": 53.0,
+        "chemistry": 50.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 115.0,
+        "math": 31.0,
+        "physics": 51.0,
+        "chemistry": 48.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 110.0,
+        "math": 30.0,
+        "physics": 49.0,
+        "chemistry": 47.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 105.0,
+        "math": 27.0,
+        "physics": 47.0,
+        "chemistry": 44.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 99.0,
+        "math": 26.0,
+        "physics": 44.0,
+        "chemistry": 42.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 94.0,
+        "math": 24.0,
+        "physics": 42.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 90.0,
+        "math": 23.0,
+        "physics": 40.0,
+        "chemistry": 39.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 85.0,
+        "math": 22.0,
+        "physics": 37.0,
+        "chemistry": 37.0
+      }
+    ],
+    "21S2": [
+      {
+        "percentile": 99.9,
+        "overall": 234.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 220.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 209.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 200.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 193.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 187.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 182.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 178.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 174.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 171.0,
+        "math": 47.0,
+        "physics": 74.0,
+        "chemistry": 66.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 157.0,
+        "math": 42.0,
+        "physics": 70.0,
+        "chemistry": 61.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 147.0,
+        "math": 36.0,
+        "physics": 67.0,
+        "chemistry": 60.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 139.0,
+        "math": 33.0,
+        "physics": 64.0,
+        "chemistry": 56.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 132.0,
+        "math": 32.0,
+        "physics": 63.0,
+        "chemistry": 54.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 127.0,
+        "math": 29.0,
+        "physics": 59.0,
+        "chemistry": 52.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 122.0,
+        "math": 28.0,
+        "physics": 58.0,
+        "chemistry": 51.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 117.0,
+        "math": 27.0,
+        "physics": 55.0,
+        "chemistry": 47.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 113.0,
+        "math": 24.0,
+        "physics": 54.0,
+        "chemistry": 46.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 106.0,
+        "math": 23.0,
+        "physics": 49.0,
+        "chemistry": 44.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 100.0,
+        "math": 21.0,
+        "physics": 47.0,
+        "chemistry": 41.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 93.0,
+        "math": 20.0,
+        "physics": 44.0,
+        "chemistry": 39.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 89.0,
+        "math": 19.0,
+        "physics": 42.0,
+        "chemistry": 37.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 84.0,
+        "math": 18.0,
+        "physics": 39.0,
+        "chemistry": 36.0
+      }
+    ],
+    "22S1": [
+      {
+        "percentile": 99.9,
+        "overall": 224.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 207.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 196.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 187.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 180.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 174.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 169.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 165.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 161.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 158.0,
+        "math": 50.0,
+        "physics": 70.0,
+        "chemistry": 56.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 144.0,
+        "math": 43.0,
+        "physics": 67.0,
+        "chemistry": 51.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 134.0,
+        "math": 38.0,
+        "physics": 64.0,
+        "chemistry": 50.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 126.0,
+        "math": 34.0,
+        "physics": 61.0,
+        "chemistry": 46.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 120.0,
+        "math": 32.0,
+        "physics": 60.0,
+        "chemistry": 43.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 115.0,
+        "math": 29.0,
+        "physics": 59.0,
+        "chemistry": 41.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 110.0,
+        "math": 28.0,
+        "physics": 58.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 106.0,
+        "math": 26.0,
+        "physics": 54.0,
+        "chemistry": 38.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 101.0,
+        "math": 25.0,
+        "physics": 51.0,
+        "chemistry": 37.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 93.0,
+        "math": 23.0,
+        "physics": 49.0,
+        "chemistry": 34.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 88.0,
+        "math": 21.0,
+        "physics": 45.0,
+        "chemistry": 32.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 84.0,
+        "math": 20.0,
+        "physics": 44.0,
+        "chemistry": 30.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 79.0,
+        "math": 19.0,
+        "physics": 40.0,
+        "chemistry": 28.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 74.0,
+        "math": 18.0,
+        "physics": 37.0,
+        "chemistry": 27.0
+      }
+    ],
+    "22S2": [
+      {
+        "percentile": 99.9,
+        "overall": 223.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 203.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 191.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 182.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 176.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 170.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 166.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 162.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 158.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 155.0,
+        "math": 38.0,
+        "physics": 72.0,
+        "chemistry": 58.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 143.0,
+        "math": 34.0,
+        "physics": 71.0,
+        "chemistry": 53.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 131.0,
+        "math": 32.0,
+        "physics": 70.0,
+        "chemistry": 50.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 126.0,
+        "math": 30.0,
+        "physics": 63.0,
+        "chemistry": 46.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 120.0,
+        "math": 29.0,
+        "physics": 61.0,
+        "chemistry": 45.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 115.0,
+        "math": 28.0,
+        "physics": 60.0,
+        "chemistry": 43.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 111.0,
+        "math": 27.0,
+        "physics": 58.0,
+        "chemistry": 41.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 107.0,
+        "math": 25.0,
+        "physics": 57.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 104.0,
+        "math": 24.0,
+        "physics": 56.0,
+        "chemistry": 38.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 97.0,
+        "math": 22.0,
+        "physics": 52.0,
+        "chemistry": 37.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 92.0,
+        "math": 21.0,
+        "physics": 50.0,
+        "chemistry": 34.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 88.0,
+        "math": 20.0,
+        "physics": 49.0,
+        "chemistry": 32.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 84.0,
+        "math": 19.0,
+        "physics": 48.0,
+        "chemistry": 31.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 81.0,
+        "math": 18.0,
+        "physics": 43.0,
+        "chemistry": 29.0
+      }
+    ],
+    "23S1": [
+      {
+        "percentile": 99.9,
+        "overall": 221.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 204.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 194.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 186.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 180.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 174.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 169.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 165.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 161.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 158.0,
+        "math": 44.0,
+        "physics": 71.0,
+        "chemistry": 60.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 145.0,
+        "math": 39.0,
+        "physics": 68.0,
+        "chemistry": 55.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 135.0,
+        "math": 35.0,
+        "physics": 66.0,
+        "chemistry": 53.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 127.0,
+        "math": 33.0,
+        "physics": 65.0,
+        "chemistry": 48.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 121.0,
+        "math": 32.0,
+        "physics": 60.0,
+        "chemistry": 46.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 116.0,
+        "math": 29.0,
+        "physics": 59.0,
+        "chemistry": 43.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 111.0,
+        "math": 27.0,
+        "physics": 58.0,
+        "chemistry": 41.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 107.0,
+        "math": 26.0,
+        "physics": 56.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 103.0,
+        "math": 25.0,
+        "physics": 55.0,
+        "chemistry": 39.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 96.0,
+        "math": 24.0,
+        "physics": 49.0,
+        "chemistry": 35.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 89.0,
+        "math": 23.0,
+        "physics": 47.0,
+        "chemistry": 33.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 86.0,
+        "math": 21.0,
+        "physics": 44.0,
+        "chemistry": 32.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 81.0,
+        "math": 20.0,
+        "physics": 41.0,
+        "chemistry": 30.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 77.0,
+        "math": 19.0,
+        "physics": 40.0,
+        "chemistry": 27.0
+      }
+    ],
+    "23S2": [
+      {
+        "percentile": 99.9,
+        "overall": 228.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 209.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 199.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 191.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 184.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 179.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 175.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 171.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 167.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 163.0,
+        "math": 43.0,
+        "physics": 68.0,
+        "chemistry": 69.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 150.0,
+        "math": 38.0,
+        "physics": 64.0,
+        "chemistry": 63.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 139.0,
+        "math": 33.0,
+        "physics": 63.0,
+        "chemistry": 60.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 132.0,
+        "math": 32.0,
+        "physics": 59.0,
+        "chemistry": 56.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 126.0,
+        "math": 31.0,
+        "physics": 55.0,
+        "chemistry": 55.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 120.0,
+        "math": 29.0,
+        "physics": 53.0,
+        "chemistry": 51.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 115.0,
+        "math": 28.0,
+        "physics": 51.0,
+        "chemistry": 48.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 111.0,
+        "math": 27.0,
+        "physics": 49.0,
+        "chemistry": 47.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 106.0,
+        "math": 26.0,
+        "physics": 48.0,
+        "chemistry": 45.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 100.0,
+        "math": 24.0,
+        "physics": 44.0,
+        "chemistry": 42.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 94.0,
+        "math": 22.0,
+        "physics": 42.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 88.0,
+        "math": 21.0,
+        "physics": 40.0,
+        "chemistry": 38.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 83.0,
+        "math": 20.0,
+        "physics": 38.0,
+        "chemistry": 36.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 79.0,
+        "math": 19.0,
+        "physics": 37.0,
+        "chemistry": 34.0
+      }
+    ],
+    "24S1": [
+      {
+        "percentile": 99.9,
+        "overall": 219.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 204.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 194.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 187.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 180.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 175.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 171.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 168.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 165.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 162.0,
+        "math": 36.0,
+        "physics": 69.0,
+        "chemistry": 69.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 150.0,
+        "math": 34.0,
+        "physics": 65.0,
+        "chemistry": 66.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 141.0,
+        "math": 31.0,
+        "physics": 62.0,
+        "chemistry": 64.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 134.0,
+        "math": 28.0,
+        "physics": 60.0,
+        "chemistry": 60.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 127.0,
+        "math": 26.0,
+        "physics": 59.0,
+        "chemistry": 59.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 123.0,
+        "math": 25.0,
+        "physics": 54.0,
+        "chemistry": 56.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 118.0,
+        "math": 24.0,
+        "physics": 52.0,
+        "chemistry": 55.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 113.0,
+        "math": 23.0,
+        "physics": 50.0,
+        "chemistry": 53.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 109.0,
+        "math": 22.0,
+        "physics": 48.0,
+        "chemistry": 50.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 102.0,
+        "math": 20.0,
+        "physics": 45.0,
+        "chemistry": 49.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 96.0,
+        "math": 19.0,
+        "physics": 42.0,
+        "chemistry": 47.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 92.0,
+        "math": 18.0,
+        "physics": 41.0,
+        "chemistry": 45.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 86.0,
+        "math": 17.0,
+        "physics": 37.0,
+        "chemistry": 43.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 80.0,
+        "math": 16.0,
+        "physics": 36.0,
+        "chemistry": 41.0
+      }
+    ],
+    "24S2": [
+      {
+        "percentile": 99.9,
+        "overall": 231.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 213.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 200.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 190.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 183.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 177.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 172.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 168.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 164.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 160.0,
+        "math": 47.0,
+        "physics": 72.0,
+        "chemistry": 59.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 146.0,
+        "math": 41.0,
+        "physics": 67.0,
+        "chemistry": 54.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 137.0,
+        "math": 38.0,
+        "physics": 61.0,
+        "chemistry": 52.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 128.0,
+        "math": 34.0,
+        "physics": 60.0,
+        "chemistry": 47.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 121.0,
+        "math": 31.0,
+        "physics": 57.0,
+        "chemistry": 45.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 115.0,
+        "math": 30.0,
+        "physics": 55.0,
+        "chemistry": 43.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 110.0,
+        "math": 28.0,
+        "physics": 53.0,
+        "chemistry": 41.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 104.0,
+        "math": 27.0,
+        "physics": 52.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 101.0,
+        "math": 26.0,
+        "physics": 51.0,
+        "chemistry": 38.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 93.0,
+        "math": 24.0,
+        "physics": 46.0,
+        "chemistry": 37.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 88.0,
+        "math": 23.0,
+        "physics": 42.0,
+        "chemistry": 36.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 81.0,
+        "math": 22.0,
+        "physics": 41.0,
+        "chemistry": 32.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 77.0,
+        "math": 20.0,
+        "physics": 40.0,
+        "chemistry": 31.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 73.0,
+        "math": 19.0,
+        "physics": 39.0,
+        "chemistry": 30.0
+      }
+    ],
+    "28S1": [
+      {
+        "percentile": 99.9,
+        "overall": 228.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 209.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 198.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 188.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 181.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 177.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 172.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 168.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 165.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 161.0,
+        "math": 40.0,
+        "physics": 73.0,
+        "chemistry": 65.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 149.0,
+        "math": 35.0,
+        "physics": 69.0,
+        "chemistry": 59.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 138.0,
+        "math": 31.0,
+        "physics": 66.0,
+        "chemistry": 55.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 132.0,
+        "math": 30.0,
+        "physics": 63.0,
+        "chemistry": 53.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 126.0,
+        "math": 28.0,
+        "physics": 60.0,
+        "chemistry": 51.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 121.0,
+        "math": 27.0,
+        "physics": 58.0,
+        "chemistry": 49.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 114.0,
+        "math": 26.0,
+        "physics": 56.0,
+        "chemistry": 48.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 112.0,
+        "math": 25.0,
+        "physics": 54.0,
+        "chemistry": 46.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 109.0,
+        "math": 24.0,
+        "physics": 52.0,
+        "chemistry": 45.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 102.0,
+        "math": 23.0,
+        "physics": 49.0,
+        "chemistry": 42.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 96.0,
+        "math": 22.0,
+        "physics": 45.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 91.0,
+        "math": 21.0,
+        "physics": 44.0,
+        "chemistry": 39.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 86.0,
+        "math": 20.0,
+        "physics": 41.0,
+        "chemistry": 38.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 82.0,
+        "math": 19.0,
+        "physics": 39.0,
+        "chemistry": 37.0
+      }
+    ],
+    "28S2": [
+      {
+        "percentile": 99.9,
+        "overall": 226.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.8,
+        "overall": 209.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.7,
+        "overall": 196.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.6,
+        "overall": 189.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.5,
+        "overall": 182.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.4,
+        "overall": 177.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.3,
+        "overall": 173.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.2,
+        "overall": 169.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.1,
+        "overall": 165.0,
+        "math": null,
+        "physics": null,
+        "chemistry": null
+      },
+      {
+        "percentile": 99.0,
+        "overall": 162.0,
+        "math": 43.0,
+        "physics": 68.0,
+        "chemistry": 67.0
+      },
+      {
+        "percentile": 98.5,
+        "overall": 150.0,
+        "math": 38.0,
+        "physics": 64.0,
+        "chemistry": 63.0
+      },
+      {
+        "percentile": 98.0,
+        "overall": 140.0,
+        "math": 37.0,
+        "physics": 60.0,
+        "chemistry": 60.0
+      },
+      {
+        "percentile": 97.5,
+        "overall": 133.0,
+        "math": 31.0,
+        "physics": 58.0,
+        "chemistry": 58.0
+      },
+      {
+        "percentile": 97.0,
+        "overall": 126.0,
+        "math": 29.0,
+        "physics": 55.0,
+        "chemistry": 57.0
+      },
+      {
+        "percentile": 96.5,
+        "overall": 123.0,
+        "math": 28.0,
+        "physics": 53.0,
+        "chemistry": 54.0
+      },
+      {
+        "percentile": 96.0,
+        "overall": 116.0,
+        "math": 27.0,
+        "physics": 51.0,
+        "chemistry": 53.0
+      },
+      {
+        "percentile": 95.5,
+        "overall": 112.0,
+        "math": 26.0,
+        "physics": 49.0,
+        "chemistry": 50.0
+      },
+      {
+        "percentile": 95.0,
+        "overall": 108.0,
+        "math": 25.0,
+        "physics": 48.0,
+        "chemistry": 49.0
+      },
+      {
+        "percentile": 94.0,
+        "overall": 103.0,
+        "math": 23.0,
+        "physics": 45.0,
+        "chemistry": 47.0
+      },
+      {
+        "percentile": 93.0,
+        "overall": 95.0,
+        "math": 22.0,
+        "physics": 43.0,
+        "chemistry": 43.0
+      },
+      {
+        "percentile": 92.0,
+        "overall": 91.0,
+        "math": 21.0,
+        "physics": 41.0,
+        "chemistry": 40.0
+      },
+      {
+        "percentile": 91.0,
+        "overall": 86.0,
+        "math": 19.0,
+        "physics": 39.0,
+        "chemistry": 39.0
+      },
+      {
+        "percentile": 90.0,
+        "overall": 85.0,
+        "math": 18.0,
+        "physics": 37.0,
+        "chemistry": null
+      }
+    ]
+  }
+}

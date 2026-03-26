@@ -47,6 +47,7 @@ import InAppBrowserOverlay from './components/InAppBrowserOverlay';
 import ExamTypeModal from './components/ExamTypeModal';
 import GuestExamTypeModal from './components/GuestExamTypeModal';
 import AuthCallback from './components/AuthCallback';
+import JEEPredictor from './components/JEEPredictor';
 import { isInAppBrowser, getIsIOS } from './utils/inAppBrowserRedirect';
 import { supabase } from './utils/supabaseClient';
 
@@ -159,7 +160,7 @@ export const AppContent: React.FC = () => {
   const isReviewRoute = /^\/review\/[^/]+$/.test(location.pathname);
   const isWaitlistRoute = location.pathname.startsWith('/waitlist');
   const isRegisterSuccessRoute = location.pathname.startsWith('/register-success');
-  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
+  const isPublicRouteWithSidebar = ['/super30', '/pyq-2026', '/pyq', '/question-set', '/pricing', '/response-upload', '/response-result', '/question', '/questions', '/jee-predictor'].some(path => location.pathname.startsWith(path)) && !isCondensedPracticeRoute && !isWaitlistRoute && !isRegisterSuccessRoute;
   const showSidebar = !loading && (isAuthenticated || isPublicRouteWithSidebar) && !isTestRoute && !isTestSubmittedRoute && !isWaitlistRoute && !isRegisterSuccessRoute && !isReviewRoute && !ntaModeActive;
 
   return (
@@ -317,6 +318,7 @@ export const AppContent: React.FC = () => {
               <SingleQuestion />
             } />
 
+            <Route path="/jee-predictor" element={<JEEPredictor />} />
             <Route path="/aipt" element={<AIPTPage />} />
             <Route path="/tests" element={
               isLiteUser ? (
