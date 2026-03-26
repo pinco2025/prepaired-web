@@ -245,6 +245,7 @@ export default async function handler(req, res) {
                 solutions,
                 totalCount: allQs.length,
                 isPaid: true,
+                sourceUrl: qUrl,
             });
         }
 
@@ -313,9 +314,10 @@ export default async function handler(req, res) {
         const allQuestions = questionsData.questions || [];
         const totalCount = allQuestions.length;
 
-        // Shuffle and enforce limit for free users
-        const shuffled = shuffleArray(allQuestions);
-        const selectedQuestions = isPaid ? shuffled : shuffled.slice(0, FREE_QUESTION_LIMIT);
+        // Paid users get shuffled questions; free users get the first N in original order
+        const selectedQuestions = isPaid
+            ? shuffleArray(allQuestions)
+            : allQuestions.slice(0, FREE_QUESTION_LIMIT);
 
         // Build a set of allowed IDs so we only send matching solutions
         const allowedIds = new Set(selectedQuestions.map(q => q.id));
@@ -330,6 +332,7 @@ export default async function handler(req, res) {
             solutions,
             totalCount,
             isPaid,
+            sourceUrl: questionUrl,
         });
 
     } catch (err) {
