@@ -227,6 +227,8 @@ const JEEPredictor: React.FC = () => {
   const [maxStep, setMaxStep] = useState(1);
   const [showUpgradePopup, setShowUpgradePopup] = useState(false);
   const [showLoginGate, setShowLoginGate] = useState(false);
+  const [showRoadmapPopup, setShowRoadmapPopup] = useState(false);
+  const roadmapPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -251,6 +253,17 @@ const JEEPredictor: React.FC = () => {
   const [visibleCards, setVisibleCards] = useState(0);
   const [computed, setComputed] = useState<Computed | null>(null);
   const procTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Roadmap popup timer (fires 11s after landing on step 4) ─────────────────
+  useEffect(() => {
+    if (roadmapPopupTimer.current) clearTimeout(roadmapPopupTimer.current);
+    if (step === 4 && computed) {
+      roadmapPopupTimer.current = setTimeout(() => setShowRoadmapPopup(true), 11000);
+    }
+    return () => {
+      if (roadmapPopupTimer.current) clearTimeout(roadmapPopupTimer.current);
+    };
+  }, [step, computed]);
 
   useEffect(() => {
     fetch('/jee_jan_data.json')
@@ -1093,6 +1106,82 @@ const JEEPredictor: React.FC = () => {
       {step === 3 && renderStep3()}
       {step === 4 && renderStep4()}
       {step === 5 && renderStep5()}
+
+      {/* Roadmap Urgency Popup */}
+      {showRoadmapPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          onClick={() => setShowRoadmapPopup(false)}
+        >
+          <div
+            className="w-full max-w-sm bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-3xl overflow-hidden shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Top band */}
+            <div className="relative bg-gradient-to-br from-error-light to-orange-500 dark:from-error-dark dark:to-orange-600 px-6 py-6 text-center overflow-hidden">
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+              <span
+                className="material-symbols-outlined text-white text-4xl mb-2 block"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                crisis_alert
+              </span>
+              <h2 className="text-white text-lg font-bold font-grotesk leading-tight">
+                We've analysed your attempt.
+              </h2>
+              <p className="text-white/80 text-xs mt-1 leading-relaxed">
+                Here's exactly what's costing you rank — and how to fix it before April.
+              </p>
+            </div>
+
+            {/* Body */}
+            <div className="px-5 pt-5 pb-2 space-y-3">
+              {[
+                { icon: 'timer', text: 'Students who act on this in the next 48 hours see the biggest rank jump.' },
+                { icon: 'trending_up', text: 'The gap between your Jan and April score is still closable — but only if you start today.' },
+                { icon: 'lock_clock', text: 'Every day you wait is a rank you hand to someone else.' },
+              ].map(({ icon, text }) => (
+                <div key={icon} className="flex items-start gap-3">
+                  <span
+                    className="material-symbols-outlined text-error-light dark:text-error-dark text-lg shrink-0 mt-0.5"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {icon}
+                  </span>
+                  <p className="text-sm text-text-light dark:text-text-dark leading-snug">{text}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTAs */}
+            <div className="px-5 py-5 space-y-2.5">
+              <button
+                onClick={() => {
+                  setShowRoadmapPopup(false);
+                  setMaxStep(m => Math.max(m, 5));
+                  setStep(5);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="w-full bg-error-light dark:bg-error-dark hover:opacity-90 text-white font-bold py-3.5 rounded-2xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span
+                  className="material-symbols-outlined text-base"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  bolt
+                </span>
+                Show me what I need to do
+              </button>
+              <button
+                onClick={() => setShowRoadmapPopup(false)}
+                className="w-full text-xs text-text-secondary-light dark:text-text-secondary-dark py-2 hover:text-text-light dark:hover:text-text-dark transition-colors"
+              >
+                I'll risk it — remind me later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Login Gate Modal */}
       {showLoginGate && (
